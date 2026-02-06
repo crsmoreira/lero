@@ -126,6 +126,12 @@ export async function GET(
     ["{{PRODUCT_IMAGE_1_ENCODED}}", encodeURIComponent(mainImage)],
     ["{{PRODUCT_DISCOUNT_PERCENT}}", discountPercent],
     ["{{PRODUCT_PRICE_APRAZO}}", `R$ ${formatPrice(Number(priceAPrazo))}`],
+    ["{{PRODUCT_INSTALLMENT_INFO}}", (() => {
+      const val = Number(priceAPrazo);
+      if (val <= 0) return "";
+      const parcela = val / 6;
+      return `em até 6x de R$ ${formatPrice(parcela)} sem juros`;
+    })()],
     ["{{PRODUCT_BREADCRUMB_BACK_LABEL}}", breadcrumbBackLabel],
     ["{{PRODUCT_BREADCRUMB_BACK_URL}}", breadcrumbBackUrl],
     ["{{CHECKOUT_URL}}", product.checkoutUrl ?? "#"],
