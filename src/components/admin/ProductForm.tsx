@@ -67,7 +67,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
     register,
     handleSubmit,
     setValue,
-    watch,
     control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
@@ -135,8 +134,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         images: r.images ?? [],
       })) ?? []
   );
-
-  const description = watch("description");
 
   async function onSubmit(data: FormData) {
     const payload = {
@@ -224,9 +221,15 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
           <div>
             <Label htmlFor="description">Descrição longa</Label>
-            <RichTextEditor
-              value={description ?? ""}
-              onChange={(v) => setValue("description", v)}
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <RichTextEditor
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                />
+              )}
             />
           </div>
         </div>
@@ -271,18 +274,24 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
             </div>
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={watch("status")}
-                onValueChange={(v) => setValue("status", v as "draft" | "active")}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Rascunho</SelectItem>
-                  <SelectItem value="active">Ativo</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Rascunho</SelectItem>
+                      <SelectItem value="active">Ativo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
             <div>
               <Label htmlFor="template">Template da página do produto</Label>
@@ -295,7 +304,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="leroy">Leroy Merlin</SelectItem>
