@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import {
   Dialog,
@@ -15,11 +15,27 @@ type Props = {
   productName: string;
 };
 
+const SWIPE_THRESHOLD = 50;
+
 export function ProductGallery({ images, productName }: Props) {
   const [selected, setSelected] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const mainImage = images[selected] ?? images[0];
+
+  function goNext() {
+    setSelected((s) => (s + 1) % images.length);
+  }
+  function goPrev() {
+    setSelected((s) => (s - 1 + images.length) % images.length);
+  }
+
+  function handleSwipeEnd(deltaX: number) {
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD || images.length <= 1) return;
+    if (deltaX < 0) goNext();
+    else goPrev();
+  }
 
   if (images.length === 0) {
     return (
@@ -32,8 +48,27 @@ export function ProductGallery({ images, productName }: Props) {
   return (
     <div className="space-y-4">
       <div
-        className="relative aspect-square bg-white border rounded-lg overflow-hidden cursor-zoom-in group"
+        className="relative aspect-square bg-white border rounded-lg overflow-hidden cursor-zoom-in group touch-pan-y select-none"
         onClick={() => setFullscreen(true)}
+        onTouchStart={(e) => {
+          touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }}
+        onTouchEnd={(e) => {
+          if (!touchStart.current) return;
+          const deltaX = e.changedTouches[0].clientX - touchStart.current.x;
+          handleSwipeEnd(deltaX);
+          touchStart.current = null;
+        }}
+        onMouseDown={(e) => {
+          if (e.button !== 0) return;
+          touchStart.current = { x: e.clientX, y: e.clientY };
+        }}
+        onMouseUp={(e) => {
+          if (e.button !== 0 || !touchStart.current) return;
+          const deltaX = e.clientX - touchStart.current.x;
+          handleSwipeEnd(deltaX);
+          touchStart.current = null;
+        }}
       >
         <Image
           src={mainImage.url}

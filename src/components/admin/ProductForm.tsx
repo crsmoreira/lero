@@ -29,6 +29,7 @@ const productSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive(),
   promotionalPrice: z.number().positive().nullable().optional(),
+  installmentPrice: z.number().positive().nullable().optional(),
   sku: z.string().optional(),
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
@@ -75,6 +76,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           description: product.description ?? "",
           price: Number(product.price),
           promotionalPrice: product.promotionalPrice ? Number(product.promotionalPrice) : null,
+          installmentPrice: product.installmentPrice ? Number(product.installmentPrice) : null,
           sku: product.sku ?? "",
           gtin: product.gtin ?? "",
           stock: product.stock,
@@ -235,6 +237,16 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                 step="0.01"
                 {...register("promotionalPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
               />
+            </div>
+            <div>
+              <Label htmlFor="installmentPrice">Valor a prazo (R$)</Label>
+              <Input
+                id="installmentPrice"
+                type="number"
+                step="0.01"
+                {...register("installmentPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
+              />
+              <p className="text-xs text-gray-500 mt-1">Quando definido, exibe este valor em vez do preço</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">

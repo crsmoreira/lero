@@ -51,20 +51,22 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
             </p>
           )}
           <div className="mt-2">
-            {product.promotionalPrice ? (
-              <>
-                <span className="text-green-600 font-bold">
-                  R$ {Number(product.promotionalPrice).toFixed(2)}
-                </span>
-                <span className="text-gray-400 text-sm line-through ml-1">
-                  R$ {Number(product.price).toFixed(2)}
-                </span>
-              </>
-            ) : (
-              <span className="font-bold">
-                R$ {Number(product.price).toFixed(2)}
-              </span>
-            )}
+            {(() => {
+              const dp = product.installmentPrice ?? product.promotionalPrice ?? product.price;
+              const orig = Number(dp) < Number(product.price) ? product.price : null;
+              return (
+                <>
+                  <span className="text-green-600 font-bold">
+                    R$ {Number(dp).toFixed(2)}
+                  </span>
+                  {orig && (
+                    <span className="text-gray-400 text-sm line-through ml-1">
+                      R$ {Number(orig).toFixed(2)}
+                    </span>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>

@@ -30,11 +30,9 @@ export function StoreHeader() {
       {/* Main header */}
       <div className="relative mx-auto max-w-7xl px-4 py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <Link href="/produtos" className="flex items-center">
-            <span className="font-bold text-xl text-green-700 lg:text-blue-900">
-              Loja
-            </span>
-          </Link>
+          <span className="flex items-center cursor-default font-bold text-xl text-green-700 lg:text-blue-900">
+            Loja
+          </span>
 
           <div className="flex-1 max-w-xl hidden md:block">
             <form action="/produtos" method="get" className="relative">

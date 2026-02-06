@@ -49,8 +49,8 @@ export async function GET(
 
   const images = product.images.map((img) => img.url);
   const mainImage = images[0] ?? "";
-  const displayPrice = product.promotionalPrice ?? product.price;
-  const originalPrice = product.promotionalPrice ? product.price : null;
+  const displayPrice = product.installmentPrice ?? product.promotionalPrice ?? product.price;
+  const originalPrice = Number(displayPrice) < Number(product.price) ? product.price : null;
   const brandName = product.brandName ?? product.brand?.name ?? "";
   const shortDescription = (product.shortDescription ?? "")
     .replace(/&/g, "&amp;")

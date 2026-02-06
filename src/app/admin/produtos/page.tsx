@@ -75,12 +75,19 @@ export default async function AdminProductsPage() {
                 </TableCell>
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>
-                  R$ {Number(product.price).toFixed(2)}
-                  {product.promotionalPrice && (
-                    <span className="text-green-600 ml-1">
-                      (R$ {Number(product.promotionalPrice).toFixed(2)})
-                    </span>
-                  )}
+                  {(() => {
+                    const dp = product.installmentPrice ?? product.promotionalPrice ?? product.price;
+                    return (
+                      <>
+                        R$ {Number(dp).toFixed(2)}
+                        {Number(dp) < Number(product.price) && (
+                          <span className="text-gray-500 line-through ml-1 text-sm">
+                            R$ {Number(product.price).toFixed(2)}
+                          </span>
+                        )}
+                      </>
+                    );
+                  })()}
                 </TableCell>
                 <TableCell>
                   {product.checkoutUrl ? (

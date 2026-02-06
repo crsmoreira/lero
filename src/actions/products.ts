@@ -12,6 +12,7 @@ const productSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive(),
   promotionalPrice: z.number().positive().optional().nullable(),
+  installmentPrice: z.number().positive().optional().nullable(),
   sku: z.string().optional(),
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
@@ -64,6 +65,7 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
       brandName: rest.brandName ?? null,
       price: rest.price as unknown as Decimal,
       promotionalPrice: rest.promotionalPrice as unknown as Decimal | null,
+      installmentPrice: rest.installmentPrice as unknown as Decimal | null,
       images: {
         create: images.map((img) => ({
           url: img.url,
@@ -117,6 +119,7 @@ export async function updateProduct(
       brandName: rest.brandName ?? null,
       price: rest.price as unknown as Decimal,
       promotionalPrice: rest.promotionalPrice as unknown as Decimal | null,
+      installmentPrice: rest.installmentPrice as unknown as Decimal | null,
       images: {
         deleteMany: {},
         create: images.map((img) => ({
