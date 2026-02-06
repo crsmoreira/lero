@@ -134,7 +134,8 @@ export async function GET(
       const val = Number(priceAPrazo);
       if (val <= 0) return "";
       const parcela = val / 6;
-      return `em até 6x de R$ ${formatPrice(parcela)} sem juros`;
+      const priceStr = product.template === "drogasil" ? `R$\u00A0${formatPrice(parcela)}` : `R$ ${formatPrice(parcela)}`;
+      return `em até 6x de ${priceStr} sem juros`;
     })()],
     ["{{PRODUCT_BREADCRUMB_BACK_LABEL}}", breadcrumbBackLabel],
     ["{{PRODUCT_BREADCRUMB_BACK_URL}}", breadcrumbBackUrl],
