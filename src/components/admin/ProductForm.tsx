@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(productSchema),
@@ -285,18 +286,24 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
             </div>
             <div>
               <Label htmlFor="template">Template da página do produto</Label>
-              <Select
-                value={watch("template") ?? "leroy"}
-                onValueChange={(v) => setValue("template", v as "leroy" | "drogasil")}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="leroy">Leroy Merlin</SelectItem>
-                  <SelectItem value="drogasil">Drogasil</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="template"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value ?? "leroy"}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="leroy">Leroy Merlin</SelectItem>
+                      <SelectItem value="drogasil">Drogasil</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
           <div>

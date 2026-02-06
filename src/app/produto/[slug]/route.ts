@@ -87,6 +87,12 @@ export async function GET(
           .join("")
       : "";
 
+  const baseUrl =
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
+  const productUrl = `${baseUrl}/produto/${slug}`;
+
   const reviews = "reviews" in product ? product.reviews : [];
   const reviewsHtml = buildReviewsHtml(
     reviews.map((r) => ({
@@ -115,11 +121,16 @@ export async function GET(
     ["{{PRODUCT_BRAND}}", brandName],
     ["{{PRODUCT_PRICE}}", `R$ ${formatPrice(Number(priceAvista))}`],
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : ""],
+    ["{{PRODUCT_PRICE_META}}", Number(priceAvista).toFixed(2)],
+    ["{{PRODUCT_SKU}}", product.sku ?? ""],
+    ["{{PRODUCT_IMAGE_1_ENCODED}}", encodeURIComponent(mainImage)],
     ["{{PRODUCT_DISCOUNT_PERCENT}}", discountPercent],
     ["{{PRODUCT_PRICE_APRAZO}}", `R$ ${formatPrice(Number(priceAPrazo))}`],
     ["{{PRODUCT_BREADCRUMB_BACK_LABEL}}", breadcrumbBackLabel],
     ["{{PRODUCT_BREADCRUMB_BACK_URL}}", breadcrumbBackUrl],
     ["{{CHECKOUT_URL}}", product.checkoutUrl ?? "#"],
+    ["{{PRODUCT_URL}}", productUrl],
+    ["{{SITE_URL}}", baseUrl],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],
     ["{{PRODUCT_DESCRIPTION}}", productDescription],
@@ -127,6 +138,8 @@ export async function GET(
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
     ["{{META_TITLE}}", product.metaTitle ?? `${product.name} | Loja`],
     ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? product.name],
+    ["{{PRODUCT_PRICE_VALID_UNTIL}}", new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)],
+    ["{{PRODUCT_AVAILABILITY}}", "https://schema.org/InStock"],
   ];
 
   for (const [key, value] of replacements) {
