@@ -67,6 +67,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
     register,
     handleSubmit,
     setValue,
+    setError,
     control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
@@ -136,43 +137,55 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
   );
 
   async function onSubmit(data: FormData) {
-    const payload = {
-      ...data,
-      tags: data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
-      checkoutUrl: data.checkoutUrl || null,
-      template: data.template || "leroy",
-      breadcrumbBackLabel: data.breadcrumbBackLabel?.trim() || null,
-      breadcrumbBackUrl: data.breadcrumbBackUrl?.trim() || null,
-      brandName: data.brandName || null,
-      categoryId: data.categoryId || null,
-      brandId: data.brandId || null,
-      promotionalPrice: data.promotionalPrice ?? null,
-      installmentPrice: data.installmentPrice ?? null,
-      images,
-      specifications: specs.map((s, i) => ({ ...s, order: i })),
-      reviews: reviews
-        .filter((r) => r.userName.trim())
-        .map((r) => ({
-          userName: r.userName.trim(),
-          rating: r.rating,
-          title: r.title?.trim() || null,
-          comment: r.comment?.trim() || null,
-          images: r.images ?? [],
-        })),
-    };
+    try {
+      const slug = (data.slug?.trim() || slugify(String(data.name ?? "")) || "produto").slice(0, 200);
+      const payload = {
+        ...data,
+        slug: slug || "produto",
+        tags: data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+        checkoutUrl: data.checkoutUrl || null,
+        template: data.template || "leroy",
+        breadcrumbBackLabel: data.breadcrumbBackLabel?.trim() || null,
+        breadcrumbBackUrl: data.breadcrumbBackUrl?.trim() || null,
+        brandName: data.brandName || null,
+        categoryId: data.categoryId || null,
+        brandId: data.brandId || null,
+        promotionalPrice: data.promotionalPrice ?? null,
+        installmentPrice: data.installmentPrice ?? null,
+        images,
+        specifications: specs.map((s, i) => ({ ...s, order: i })),
+        reviews: reviews
+          .filter((r) => r.userName.trim())
+          .map((r) => ({
+            userName: r.userName.trim(),
+            rating: r.rating,
+            title: r.title?.trim() || null,
+            comment: r.comment?.trim() || null,
+            images: r.images ?? [],
+          })),
+      };
 
-    const result = isEditing
-      ? await updateProduct(product.id, payload)
-      : await createProduct(payload);
+      const result = isEditing
+        ? await updateProduct(product.id, payload)
+        : await createProduct(payload);
 
-    if (result.error) {
-      toast.error("Erro ao salvar produto");
-      return;
-    }
+      if (result.error) {
+        const err = result.error as Record<string, string[] | undefined>;
+        const msg = Object.values(err).flat().filter(Boolean).join(", ") || "Verifique os campos do formulário.";
+        toast.error(`Erro ao salvar: ${msg}`);
+        Object.entries(err).forEach(([field, msgs]) => {
+          if (msgs?.[0] && field in data) setError(field as keyof FormData, { message: msgs[0] });
+        });
+        return;
+      }
 
-    toast.success(isEditing ? "Produto atualizado" : "Produto criado");
-    if (!isEditing && result.data) {
-      window.location.href = `/admin/produtos/${result.data.id}/editar`;
+      toast.success(isEditing ? "Produto atualizado" : "Produto criado");
+      if (!isEditing && result.data) {
+        window.location.href = `/admin/produtos/${result.data.id}/editar`;
+      }
+    } catch (e) {
+      console.error("Erro ao salvar produto:", e);
+      toast.error("Erro inesperado ao salvar. Verifique o console.");
     }
   }
 
