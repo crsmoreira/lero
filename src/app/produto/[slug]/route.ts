@@ -10,6 +10,10 @@ function formatPrice(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
 
+function formatPriceDrogasil(value: number): string {
+  return `R$\u00A0${formatPrice(value)}`;
+}
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -119,8 +123,8 @@ export async function GET(
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
     ["{{PRODUCT_TITLE}}", product.name],
     ["{{PRODUCT_BRAND}}", brandName],
-    ["{{PRODUCT_PRICE}}", `R$ ${formatPrice(Number(priceAvista))}`],
-    ["{{PRODUCT_OLD_PRICE}}", originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : ""],
+    ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : `R$ ${formatPrice(Number(priceAvista))}`],
+    ["{{PRODUCT_OLD_PRICE}}", originalPrice ? (product.template === "drogasil" ? formatPriceDrogasil(Number(originalPrice)) : `R$ ${formatPrice(Number(originalPrice))}`) : ""],
     ["{{PRODUCT_PRICE_META}}", Number(priceAvista).toFixed(2)],
     ["{{PRODUCT_SKU}}", product.sku ?? ""],
     ["{{PRODUCT_IMAGE_1_ENCODED}}", encodeURIComponent(mainImage)],
@@ -135,6 +139,8 @@ export async function GET(
     ["{{PRODUCT_BREADCRUMB_BACK_LABEL}}", breadcrumbBackLabel],
     ["{{PRODUCT_BREADCRUMB_BACK_URL}}", breadcrumbBackUrl],
     ["{{CHECKOUT_URL}}", product.checkoutUrl ?? "#"],
+    ["{{PARTNER_STORE_URL}}", product.partnerStoreUrl ?? "/loja-parceira/epocacosmeticos"],
+    ["{{PARTNER_STORE_NAME}}", product.partnerStoreName ?? brandName ?? "Época Cosméticos"],
     ["{{PRODUCT_URL}}", productUrl],
     ["{{SITE_URL}}", baseUrl],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
