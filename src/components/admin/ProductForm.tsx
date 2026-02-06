@@ -34,6 +34,7 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
+  template: z.enum(["leroy", "drogasil"]).optional(),
   tags: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -83,6 +84,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           gtin: product.gtin ?? "",
           stock: product.stock,
           status: product.status as "draft" | "active",
+          template: (product as { template?: string }).template === "drogasil" ? "drogasil" : "leroy",
           tags: product.tags.join(", "),
           metaTitle: product.metaTitle ?? "",
           metaDescription: product.metaDescription ?? "",
@@ -96,6 +98,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       : {
           status: "draft",
           stock: 0,
+          template: "leroy",
           breadcrumbBackLabel: "",
           breadcrumbBackUrl: "",
         },
@@ -139,6 +142,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       ...data,
       tags: data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
       checkoutUrl: data.checkoutUrl || null,
+      template: data.template || "leroy",
       breadcrumbBackLabel: data.breadcrumbBackLabel?.trim() || null,
       breadcrumbBackUrl: data.breadcrumbBackUrl?.trim() || null,
       brandName: data.brandName || null,
@@ -276,6 +280,21 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                 <SelectContent>
                   <SelectItem value="draft">Rascunho</SelectItem>
                   <SelectItem value="active">Ativo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="template">Template da página do produto</Label>
+              <Select
+                value={watch("template") ?? "leroy"}
+                onValueChange={(v) => setValue("template", v as "leroy" | "drogasil")}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="leroy">Leroy Merlin</SelectItem>
+                  <SelectItem value="drogasil">Drogasil</SelectItem>
                 </SelectContent>
               </Select>
             </div>

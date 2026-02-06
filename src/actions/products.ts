@@ -17,6 +17,7 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
+  template: z.enum(["leroy", "drogasil"]).optional().default("leroy"),
   tags: z.array(z.string()).default([]),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -65,6 +66,7 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
     data: {
       ...rest,
       brandName: rest.brandName ?? null,
+      template: rest.template ?? "leroy",
       breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
       breadcrumbBackUrl: rest.breadcrumbBackUrl ?? null,
       price: rest.price as unknown as Decimal,
@@ -121,6 +123,7 @@ export async function updateProduct(
     data: {
       ...rest,
       brandName: rest.brandName ?? null,
+      template: rest.template ?? "leroy",
       breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
       breadcrumbBackUrl: rest.breadcrumbBackUrl ?? null,
       price: rest.price as unknown as Decimal,

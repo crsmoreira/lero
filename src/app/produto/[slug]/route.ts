@@ -39,7 +39,8 @@ export async function GET(
     return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
   }
 
-  const templatePath = join(process.cwd(), "public", "produto-template.html");
+  const templateFile = product.template === "drogasil" ? "produto-template-drogasil.html" : "produto-template.html";
+  const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
 
   function escapeHtml(text: string): string {

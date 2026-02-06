@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{META_TITLE}}</title>
+  <meta name="description" content="{{META_DESCRIPTION}}"/>
+  <meta property="og:title" content="{{META_TITLE}}"/>
+  <meta property="og:description" content="{{META_DESCRIPTION}}"/>
+  <meta property="og:image" content="{{PRODUCT_IMAGE_1}}"/>
+  <meta property="og:type" content="product"/>
+  <link rel="preload" as="image" href="{{PRODUCT_IMAGE_1}}" fetchpriority="high"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#303030;line-height:1.5;}
+    .header{background:#fff;border-bottom:1px solid #e6e6e6;padding:12px 16px;}
+    .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+    .logo{font-weight:700;font-size:24px;color:#EB3C4D;text-decoration:none;}
+    .container{max-width:1200px;margin:0 auto;padding:24px 16px;}
+    .product-grid{display:grid;grid-template-columns:1fr;gap:24px;background:#fff;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+    @media(min-width:900px){.product-grid{grid-template-columns:400px 1fr;}}
+    .gallery{position:relative;}
+    .main-img-wrap{border-radius:16px;overflow:hidden;background:#f2f2f2;aspect-ratio:1;display:flex;align-items:center;justify-content:center;}
+    .main-img-wrap img{max-width:100%;max-height:400px;object-fit:contain;}
+    .thumbs{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;}
+    .thumb-btn{width:56px;height:56px;border-radius:8px;overflow:hidden;border:2px solid #e6e6e6;padding:0;cursor:pointer;background:#fff;opacity:.7;transition:all .2s;}
+    .thumb-btn:hover,.thumb-btn.active{border-color:#EB3C4D;opacity:1;}
+    .thumb-btn img{width:100%;height:100%;object-fit:cover;}
+    .info h1{font-size:24px;font-weight:700;margin-bottom:8px;line-height:1.3;}
+    .brand{color:#575757;font-size:14px;margin-bottom:12px;}
+    .price-wrap{margin-bottom:16px;}
+    .price-old{text-decoration:line-through;color:#9e9e9e;font-size:14px;}
+    .price-current{font-size:28px;font-weight:700;color:#303030;}
+    .price-current small{font-size:14px;font-weight:400;color:#575757;}
+    .discount-badge{display:inline-block;background:#C2FFEB;color:#006644;padding:4px 8px;border-radius:24px;font-size:12px;font-weight:600;margin-left:8px;}
+    .description{margin:20px 0;font-size:14px;color:#6b6b6b;line-height:1.6;}
+    .description p{margin-bottom:12px;}
+    .btn-checkout{display:inline-block;background:#B6202F;color:#fff!important;font-weight:600;font-size:16px;padding:14px 32px;border-radius:999px;text-decoration:none;border:none;cursor:pointer;transition:background .2s;}
+    .btn-checkout:hover{background:#940619;}
+    .specs{margin-top:24px;border-top:1px solid #e6e6e6;padding-top:24px;}
+    .specs h2{font-size:16px;font-weight:700;margin-bottom:16px;}
+    .specs table{width:100%;border-collapse:collapse;}
+    .specs th,.specs td{padding:10px 12px;text-align:left;border-bottom:1px solid #f2f2f2;}
+    .specs th{font-weight:600;color:#303030;width:40%;}
+    .specs td{color:#6b6b6b;}
+    .specs tr:nth-child(odd){background:#fafafa;}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <span class="logo">Drogasil</span>
+    </div>
+  </header>
+  <main class="container">
+    <div class="product-grid">
+      <div class="gallery">
+        <div class="main-img-wrap">
+          <img data-gallery-main src="{{PRODUCT_IMAGE_1}}" alt="{{PRODUCT_TITLE}}"/>
+        </div>
+        <div class="thumbs">
+          <button type="button" data-gallery-thumb class="thumb-btn active"><img src="{{PRODUCT_IMAGE_1}}" alt=""/></button>
+          <button type="button" data-gallery-thumb class="thumb-btn"><img src="{{PRODUCT_IMAGE_2}}" alt=""/></button>
+          <button type="button" data-gallery-thumb class="thumb-btn"><img src="{{PRODUCT_IMAGE_3}}" alt=""/></button>
+          <button type="button" data-gallery-thumb class="thumb-btn"><img src="{{PRODUCT_IMAGE_4}}" alt=""/></button>
+          <button type="button" data-gallery-thumb class="thumb-btn"><img src="{{PRODUCT_IMAGE_5}}" alt=""/></button>
+        </div>
+      </div>
+      <div class="info">
+        <span class="brand">{{PRODUCT_BRAND}}</span>
+        <h1>{{PRODUCT_TITLE}}</h1>
+        <div class="price-wrap">
+          <span class="price-old" id="old-price">{{PRODUCT_OLD_PRICE}}</span>
+          <div>
+            <span class="price-current">{{PRODUCT_PRICE}}<small> à vista no PIX</small></span>
+            <span class="discount-badge" id="discount">{{PRODUCT_DISCOUNT_PERCENT}}</span>
+          </div>
+          <p class="price-aprazo" style="font-size:14px;color:#575757;margin-top:4px;">ou {{PRODUCT_PRICE_APRAZO}} a prazo</p>
+        </div>
+        <a href="{{CHECKOUT_URL}}" class="btn-checkout" target="_blank" rel="noopener">Comprar</a>
+        <div class="description">{{PRODUCT_DESCRIPTION}}</div>
+        <div class="specs">
+          <h2>Características</h2>
+          <table>{{PRODUCT_SPECIFICATIONS}}</table>
+        </div>
+      </div>
+    </div>
+  </main>
+  <style>[data-gallery-thumb]{-webkit-tap-highlight-color:transparent}[data-gallery-thumb]:focus{outline:none!important}</style>
+  <script>
+    document.addEventListener('DOMContentLoaded',function(){
+      var thumbs=document.querySelectorAll('[data-gallery-thumb]');
+      var main=document.querySelector('[data-gallery-main]');
+      if(thumbs.length&&main){
+        thumbs.forEach(function(thumb){
+          thumb.addEventListener('click',function(){
+            var img=thumb.querySelector('img');
+            if(img&&img.src){main.src=img.src;main.alt=img.alt||'';}
+            thumbs.forEach(function(t){t.classList.remove('active');});
+            thumb.classList.add('active');
+            this.blur();
+          });
+        });
+      }
+      var oldEl=document.getElementById('old-price');
+      if(oldEl&&!oldEl.textContent.trim())oldEl.style.display='none';
+      var discEl=document.getElementById('discount');
+      if(discEl&&!discEl.textContent.trim())discEl.style.display='none';
+    });
+  </script>
+</body>
+</html>
