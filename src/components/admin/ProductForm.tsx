@@ -136,6 +136,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       brandName: data.brandName || null,
       categoryId: data.categoryId || null,
       brandId: data.brandId || null,
+      promotionalPrice: data.promotionalPrice ?? null,
+      installmentPrice: data.installmentPrice ?? null,
       images,
       specifications: specs.map((s, i) => ({ ...s, order: i })),
       reviews: reviews

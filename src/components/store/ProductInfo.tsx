@@ -53,7 +53,8 @@ export function ProductInfo({
   const [cep, setCep] = useState("");
   const checkoutUrl = product.checkoutUrl || "#";
 
-  const displayPrice = product.installmentPrice ?? product.promotionalPrice ?? product.price;
+  const hasInstallment = product.installmentPrice != null && Number(product.installmentPrice) > 0;
+  const displayPrice = hasInstallment ? product.installmentPrice : (product.promotionalPrice ?? product.price);
   const originalPrice = Number(displayPrice) < Number(product.price) ? product.price : null;
   const savings =
     originalPrice &&

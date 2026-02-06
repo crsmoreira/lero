@@ -76,7 +76,8 @@ export default async function AdminProductsPage() {
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>
                   {(() => {
-                    const dp = product.installmentPrice ?? product.promotionalPrice ?? product.price;
+                    const hasInstallment = product.installmentPrice != null && Number(product.installmentPrice) > 0;
+                    const dp = hasInstallment ? product.installmentPrice : (product.promotionalPrice ?? product.price);
                     return (
                       <>
                         R$ {Number(dp).toFixed(2)}

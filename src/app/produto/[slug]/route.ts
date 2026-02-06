@@ -4,6 +4,8 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 function formatPrice(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
@@ -49,7 +51,8 @@ export async function GET(
 
   const images = product.images.map((img) => img.url);
   const mainImage = images[0] ?? "";
-  const displayPrice = product.installmentPrice ?? product.promotionalPrice ?? product.price;
+  const hasInstallment = product.installmentPrice != null && Number(product.installmentPrice) > 0;
+  const displayPrice = hasInstallment ? product.installmentPrice : (product.promotionalPrice ?? product.price);
   const originalPrice = Number(displayPrice) < Number(product.price) ? product.price : null;
   const brandName = product.brandName ?? product.brand?.name ?? "";
   const shortDescription = (product.shortDescription ?? "")
