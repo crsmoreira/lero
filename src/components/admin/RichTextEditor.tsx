@@ -17,7 +17,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      StarterKit.configure({ link: false }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: { target: "_blank", rel: "noopener" },

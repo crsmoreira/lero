@@ -62,9 +62,11 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
 
   const { images, specifications, reviews, ...rest } = parsed.data;
 
+  try {
   const product = await prisma.product.create({
     data: {
       ...rest,
+      sku: rest.sku?.trim() || null,
       brandName: rest.brandName ?? null,
       template: rest.template ?? "leroy",
       breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
@@ -104,7 +106,12 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
   revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
   revalidatePath(`/produto/${product.slug}`);
-  return { data: product };
+  return { data: { id: product.id, slug: product.slug } };
+  } catch (e) {
+    console.error("createProduct error:", e);
+    const msg = e instanceof Error ? e.message : "Erro ao criar produto";
+    return { error: { _form: [msg] } };
+  }
 }
 
 export async function updateProduct(
@@ -118,10 +125,12 @@ export async function updateProduct(
 
   const { images, specifications, reviews, ...rest } = parsed.data;
 
+  try {
   await prisma.product.update({
     where: { id },
     data: {
       ...rest,
+      sku: rest.sku?.trim() || null,
       brandName: rest.brandName ?? null,
       template: rest.template ?? "leroy",
       breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
@@ -165,7 +174,12 @@ export async function updateProduct(
   revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
   revalidatePath(`/produto/${product?.slug ?? ""}`);
-  return { data: product };
+  return { data: product ? { id: product.id, slug: product.slug } : null };
+  } catch (e) {
+    console.error("updateProduct error:", e);
+    const msg = e instanceof Error ? e.message : "Erro ao atualizar produto";
+    return { error: { _form: [msg] } };
+  }
 }
 
 export async function deleteProduct(id: string) {

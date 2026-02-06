@@ -174,7 +174,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         const msg = Object.values(err).flat().filter(Boolean).join(", ") || "Verifique os campos do formulário.";
         toast.error(`Erro ao salvar: ${msg}`);
         Object.entries(err).forEach(([field, msgs]) => {
-          if (msgs?.[0] && field in data) setError(field as keyof FormData, { message: msgs[0] });
+          if (msgs?.[0] && field !== "_form" && field in data) setError(field as keyof FormData, { message: msgs[0] });
         });
         return;
       }
