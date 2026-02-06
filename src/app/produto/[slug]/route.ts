@@ -140,7 +140,7 @@ export async function GET(
     ["{{PRODUCT_BREADCRUMB_BACK_LABEL}}", breadcrumbBackLabel],
     ["{{PRODUCT_BREADCRUMB_BACK_URL}}", breadcrumbBackUrl],
     ["{{CHECKOUT_URL}}", product.checkoutUrl ?? "#"],
-    ["{{PARTNER_STORE_URL}}", product.checkoutUrl ?? "/loja-parceira/epocacosmeticos"],
+    ["{{PARTNER_STORE_URL}}", "/loja-parceira/epocacosmeticos"],
     ["{{PARTNER_STORE_NAME}}", brandName ?? "Época Cosméticos"],
     ["{{PRODUCT_URL}}", productUrl],
     ["{{SITE_URL}}", baseUrl],
