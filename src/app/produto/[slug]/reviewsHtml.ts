@@ -13,12 +13,8 @@ function formatRelativeDate(date: Date): string {
 const STAR_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 13 13" aria-hidden="true" class="w-4" style="color:#EA7315"><path d="M3.813 12.135a1.29 1.29 0 0 1-.7-.22 1.22 1.22 0 0 1-.45-1.38l1-2.94-2.36-1.33a1.16 1.16 0 0 1-.56-1.35 1.19 1.19 0 0 1 1.17-.86h2.74l.87-3a1.27 1.27 0 0 1 1.21-.92 1.22 1.22 0 0 1 1.23.91l.89 2.93h2.65a1.19 1.19 0 0 1 1.115 1.617 1.19 1.19 0 0 1-.485.583l-2.17 1.35 1 2.81a1.3 1.3 0 0 1-.48 1.48 1.29 1.29 0 0 1-1.55 0l-2.19-1.66-2.13 1.68a1.19 1.19 0 0 1-.8.3Z"></path></svg>';
 
-function starSvg(_id: string): string {
-  return STAR_SVG;
-}
-
-function starsHtml(count: number, idPrefix: string): string {
-  return Array.from({ length: count }, (_, i) => starSvg(`${idPrefix}-${i}`)).join("");
+function starsHtml(count: number): string {
+  return Array(count).fill(STAR_SVG).join("");
 }
 
 const CHECK_SVG =
@@ -60,10 +56,10 @@ export function buildReviewsHtml(
 
   const distRows = distribution
     .map(
-      (d, i) =>
+      (d) =>
         `<div class="flex items-center gap-2">
           <span class="text-black font-bold text-2xl md:text-3xl block w-4 text-center">${d.star}</span>
-          ${starSvg(`dist-${i}`)}
+          ${STAR_SVG}
           ${progressBar(total ? (d.count / total) * 100 : 0)}
           <span class="text-gray-600 text-lg block w-4 text-center">${d.count}</span>
         </div>`
@@ -75,7 +71,7 @@ export function buildReviewsHtml(
       <p class="text-gray-600 text-lg block">Nota média do produto</p>
       <div class="flex items-center gap-4">
         <span class="text-black font-bold text-2xl md:text-6xl block">${avgRounded}</span>
-        <div class="flex gap-0.5" role="img" aria-label="Avaliação: ${avgRounded} de 5 estrelas">${starsHtml(5, "avg")}</div>
+        <div class="flex gap-0.5" role="img" aria-label="Avaliação: ${avgRounded} de 5 estrelas">${starsHtml(5)}</div>
       </div>
     </div>`;
 
@@ -100,7 +96,7 @@ export function buildReviewsHtml(
   const reviewCard = (r: ReviewInput, index: number, yesCount: number, noCount: number) => `
     <div class="flex flex-col gap-4" style="padding-bottom:1.5rem;margin-bottom:1.5rem">
       <div class="flex flex-col gap-1">
-        <div class="flex gap-0.5">${starsHtml(r.rating, `r${index}`)}</div>
+        <div class="flex gap-0.5">${starsHtml(r.rating)}</div>
         <div class="flex flex-wrap items-center gap-2">
           <span class="font-bold text-black text-base font-bold block">${escapeHtml(r.userName)}</span>
           <span class="text-gray-600 text-lg block">${formatRelativeDate(new Date(r.createdAt))}</span>
