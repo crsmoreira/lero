@@ -66,9 +66,8 @@ export async function GET(
   const brandName = product.brandName ?? product.brand?.name ?? "";
   // Link "Voltar" do breadcrumb: usa campos do produto ou fallback da categoria
   const breadcrumbBackLabel = product.breadcrumbBackLabel ?? product.category?.name ?? "";
-  const breadcrumbBackUrl = product.breadcrumbBackUrl
-    ?? (product.category ? `/produtos?categoria=${product.category.slug}` : "")
-    || "javascript:void(0)";
+  const fallbackUrl = product.category ? `/produtos?categoria=${product.category.slug}` : "javascript:void(0)";
+  const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
   const shortDescription = (product.shortDescription ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
