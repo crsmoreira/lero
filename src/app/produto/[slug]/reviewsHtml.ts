@@ -32,6 +32,101 @@ export type ReviewInput = {
   images?: string[];
 };
 
+function formatDateDrogasil(date: Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+// Estrelas amarelas estilo Drogasil (5 estrelas)
+const STAR_DROGASIL_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25.71 27.305" fill="#ffc107" width="14" height="14"><path fill-rule="evenodd" d="m14.034 17.793 7.207 4.579-2.142-8.361 6.607-5.479-8.532-.513L14.034 0l-3.156 8.019-8.657.513 6.6 5.479L6.675 22.4Z"/></svg>';
+
+function starsHtmlDrogasil(count: number): string {
+  return Array(count).fill(STAR_DROGASIL_SVG).join("");
+}
+
+/** Gera HTML de avaliações no estilo Drogasil (cards "Avaliação em produto relacionado") */
+export function buildReviewsHtmlDrogasil(
+  reviews: ReviewInput[],
+  productName: string,
+  productImage: string,
+  escapeHtml: (s: string) => string
+): string {
+  const emptyStateHtml = `
+<div class="avaliacoes-empty">
+  <div class="avaliacoes-empty-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 91.056 51.344" width="40" height="31"><path fill="#999" d="M8.225 23.898l4.224 2.678-1.253-4.893 3.87-3.215-5-.3-1.845-4.7-1.845 4.7-5.078.3 3.868 3.213-1.258 4.913z"/><path fill="#999" d="M24.223 23.898l4.224 2.678-1.253-4.893 3.87-3.215-5-.3-1.845-4.7-1.845 4.7-5.078.3 3.868 3.213-1.258 4.913z"/></svg>
+  </div>
+  <span class="avaliacoes-empty-text">Não temos avaliações para este produto ainda, mas buscamos algumas em produtos relacionados que podem ser úteis.</span>
+  <div class="avaliacoes-empty-cta">
+    <button type="button" class="avaliacoes-btn-secondary" aria-label="Quero avaliar">Quero avaliar</button>
+  </div>
+</div>`;
+
+  if (reviews.length === 0) {
+    return emptyStateHtml;
+  }
+
+  const cardHtml = (r: ReviewInput) => {
+    const pills = extractPills(r);
+    const pillsHtml = pills
+      .map((p) => `<span class="avaliacoes-pill">${escapeHtml(p)}</span>`)
+      .join("");
+    return `
+<div class="avaliacoes-card">
+  <div class="avaliacoes-card-label">Avaliação em um <strong>produto relacionado</strong></div>
+  <div class="avaliacoes-card-product">
+    <div class="avaliacoes-card-product-img">
+      <img src="${escapeHtml(productImage)}" alt="imagem do produto" loading="lazy"/>
+    </div>
+    <span class="avaliacoes-card-product-name">${escapeHtml(productName)}</span>
+  </div>
+  <div class="avaliacoes-card-body">
+    <div class="avaliacoes-card-meta">
+      <div class="avaliacoes-card-location">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7.2 9.611" width="10" height="10"><path d="M3.6 9.611a1 1 0 01-.8-.4C1.521 7.535 0 5.235 0 3.746A3.68 3.68 0 013.6 0a3.68 3.68 0 013.6 3.746c0 1.484-1.521 3.79-2.8 5.462a1 1 0 01-.8.403z"/></svg>
+        <span>${escapeHtml(r.userName)}</span>
+      </div>
+      <span class="avaliacoes-card-badge">Cliente da Marca</span>
+    </div>
+    <div class="avaliacoes-card-rating">
+      <div class="avaliacoes-stars">${starsHtmlDrogasil(r.rating)}</div>
+      <span class="avaliacoes-card-date">${formatDateDrogasil(new Date(r.createdAt))}</span>
+      <div class="avaliacoes-verified">
+        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 20 20"><path fill="#40aa60" d="M10 0a10 10 0 110 10A10.03 10.03 0 0010 0M8.75 14.25 4.5 10l1.75-1.75 2.5 2.5 5-5L15.5 7.5z"/></svg>
+        <span>Compra Verificada</span>
+      </div>
+    </div>
+    <div class="avaliacoes-pills">${pillsHtml}</div>
+    <div class="avaliacoes-helpful">
+      <button type="button" class="avaliacoes-helpful-btn" aria-label=" útil">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22.056 19.772" width="16" height="16"><path fill="none" d="M20.053 8.086a2.75 2.75 0 00-1.783-.667h-4.327V4.295A3.27 3.27 0 0012.8 1.479c-1.2-.881-1.461-.21-1.531-.186-.203.066-4.859 8.075-4.859 8.075s-2.8.014-4.372.016A1.04 1.04 0 001 10.424v8.346c0-.005 14.3 0 14.3 0 1.89 0 3.973-.188 4.6-1.179l1.107-6.871a2.9 2.9 0 00-.959-2.635z"/><path d="M1 10.026h6v9H1z"/></svg>
+        <span>0</span>
+      </button>
+    </div>
+  </div>
+</div>`;
+  };
+
+  const cardsHtml = reviews.slice(0, 10).map((r) => cardHtml(r)).join("");
+  return `<div class="avaliacoes-cards">${cardsHtml}</div>`;
+}
+
+function extractPills(r: ReviewInput): string[] {
+  const pills: string[] = [];
+  if (r.title && r.title.length >= 5) pills.push(r.title.trim());
+  if (r.comment) {
+    const phrase = r.comment.split(/[.!?]/)[0]?.trim();
+    if (phrase && phrase.length >= 8 && phrase !== r.title) {
+      pills.push(phrase.length > 40 ? phrase.slice(0, 37) + "..." : phrase);
+    }
+  }
+  return pills.slice(0, 3);
+}
+
 export function buildReviewsHtml(
   reviews: ReviewInput[],
   escapeHtml: (s: string) => string

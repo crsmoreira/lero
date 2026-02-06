@@ -1,0 +1,50 @@
+<section id="avaliacoes" class="sc-c96b5a0e-0 jjTuDx avaliacoes-section">
+<div class="avaliacoes-wrapper">
+<div class="avaliacoes-header">
+  <h2 class="avaliacoes-title">Reações dos Clientes</h2>
+  <div class="avaliacoes-user-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.003 18.603" width="24" height="24"><g fill="none" stroke="#212928" stroke-width="2"><path d="M17 18.604v-1.956a3.957 3.957 0 00-4-3.912H5a3.957 3.957 0 00-4 3.912v1.956"/><path stroke-linecap="round" d="M13.001 4.912a4 4 0 01-8 0 4 4 0 018 0z"/></g></svg>
+  </div>
+</div>
+<div class="avaliacoes-social">
+  <figure class="avaliacoes-product-figure">
+    <img src="{{PRODUCT_IMAGE_1}}" alt="{{PRODUCT_TITLE}}" title="{{PRODUCT_TITLE}}" loading="lazy"/>
+  </figure>
+  <div class="avaliacoes-whatsapp">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="24" height="24"><path fill="#999" d="M20 13.94a4.813 4.813 0 100-9.626 4.813 4.813 0 000 9.626"/></svg>
+    <span class="avaliacoes-social-text">Será que seus amigos já têm esse produto?</span>
+    <a href="{{PRODUCT_URL_WHATSAPP}}" target="_blank" rel="noopener" class="avaliacoes-whatsapp-link">Envie pelo Whatsapp</a>
+  </div>
+</div>
+<div class="avaliacoes-buttons">
+  <button type="button" class="avaliacoes-btn avaliacoes-btn-quero" aria-label="Quero"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 25" width="18" height="20"><path d="m15.636 0-.005 6.6L22 6.273l-5.515 3.4 3.351 5.553-5.517-3.2-3.01 5.87v-6.6l-6.373.329 5.521-3.407-3.354-5.544 5.519 3.2z"/></svg><span>Quero</span></button>
+  <button type="button" class="avaliacoes-btn avaliacoes-btn-tenho active" aria-label="Tenho"><span>Tenho</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 18" width="18" height="14"><path fill="#a700ff" d="M25 2.546 22.4-.001 9.193 12.921l-6.591-6.45-2.6 2.547 9.177 8.981.016-.015.016.015z"/></svg></button>
+</div>
+<div class="avaliacoes-tabs">
+  <button type="button" class="avaliacoes-tab active">Avaliações</button>
+  <button type="button" class="avaliacoes-tab">Perguntas</button>
+</div>
+<div class="avaliacoes-content">
+  {{PRODUCT_REVIEWS}}
+</div>
+<div class="avaliacoes-filters">
+  <select class="avaliacoes-select" aria-label="Filtrar por">
+    <option value="default" disabled>Filtrar por</option>
+    <option value="">Todos</option>
+    <option value="positive">Elogios</option>
+    <option value="negative">Críticas</option>
+    <option value="mixed">Sugestões</option>
+  </select>
+  <select class="avaliacoes-select" aria-label="Ordenar por">
+    <option value="" disabled>Ordenar por</option>
+    <option value="relevance" disabled>Relevância</option>
+    <option value="newer">Recentes</option>
+    <option value="older">Antigas</option>
+  </select>
+  <span class="avaliacoes-filter-pill"><span class="avaliacoes-pill-dot"></span>Entrega rápida</span>
+</div>
+<div class="avaliacoes-load-more">
+  <button type="button" class="avaliacoes-btn-load" aria-label="Veja mais comentários">Veja mais comentários</button>
+</div>
+</div>
+</section>

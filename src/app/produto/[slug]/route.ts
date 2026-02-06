@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { buildReviewsHtml } from "./reviewsHtml";
+import { buildReviewsHtml, buildReviewsHtmlDrogasil } from "./reviewsHtml";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { NextRequest, NextResponse } from "next/server";
@@ -98,17 +98,23 @@ export async function GET(
   const productUrl = `${baseUrl}/produto/${slug}`;
 
   const reviews = "reviews" in product ? product.reviews : [];
-  const reviewsHtml = buildReviewsHtml(
-    reviews.map((r) => ({
-      userName: r.userName,
-      rating: r.rating,
-      title: r.title,
-      comment: r.comment,
-      createdAt: r.createdAt,
-      images: r.images ?? [],
-    })),
-    escapeHtml
-  );
+  const reviewInputs = reviews.map((r) => ({
+    userName: r.userName,
+    rating: r.rating,
+    title: r.title,
+    comment: r.comment,
+    createdAt: r.createdAt,
+    images: r.images ?? [],
+  }));
+  const reviewsHtml =
+    product.template === "drogasil"
+      ? buildReviewsHtmlDrogasil(
+          reviewInputs,
+          product.name,
+          mainImage,
+          escapeHtml
+        )
+      : buildReviewsHtml(reviewInputs, escapeHtml);
 
   const replacements: [string | RegExp, string][] = [
     ["{{PRODUCT_IMAGE_1}}", mainImage],
@@ -143,6 +149,7 @@ export async function GET(
     ["{{PARTNER_STORE_URL}}", "/loja-parceira/epocacosmeticos"],
     ["{{PARTNER_STORE_NAME}}", brandName ?? "Época Cosméticos"],
     ["{{PRODUCT_URL}}", productUrl],
+    ["{{PRODUCT_URL_WHATSAPP}}", `https://wa.me/?text=${encodeURIComponent(productUrl + " - " + product.name)}`],
     ["{{SITE_URL}}", baseUrl],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],
