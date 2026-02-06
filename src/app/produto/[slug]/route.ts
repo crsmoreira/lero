@@ -58,6 +58,10 @@ export async function GET(
   // A prazo = valor a prazo quando definido, senão o mesmo do à vista
   const hasInstallment = product.installmentPrice != null && Number(product.installmentPrice) > 0;
   const priceAPrazo = hasInstallment ? product.installmentPrice : priceAvista;
+  // Cálculo automático da % de desconto: (original - promocional) / original * 100
+  const discountPercent = originalPrice && Number(originalPrice) > 0
+    ? `-${Math.round(((Number(originalPrice) - Number(priceAvista)) / Number(originalPrice)) * 100)}%`
+    : "";
   const brandName = product.brandName ?? product.brand?.name ?? "";
   const shortDescription = (product.shortDescription ?? "")
     .replace(/&/g, "&amp;")
@@ -105,6 +109,7 @@ export async function GET(
     ["{{PRODUCT_BRAND}}", brandName],
     ["{{PRODUCT_PRICE}}", `R$ ${formatPrice(Number(priceAvista))}`],
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : ""],
+    ["{{PRODUCT_DISCOUNT_PERCENT}}", discountPercent],
     ["{{PRODUCT_PRICE_APRAZO}}", `R$ ${formatPrice(Number(priceAPrazo))}`],
     ["{{CHECKOUT_URL}}", product.checkoutUrl ?? "#"],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
