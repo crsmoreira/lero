@@ -51,9 +51,13 @@ export async function GET(
 
   const images = product.images.map((img) => img.url);
   const mainImage = images[0] ?? "";
+  // À vista (cash) = sempre valor promocional ou preço
+  const priceAvista = product.promotionalPrice ?? product.price;
+  // Preço riscado = preço original quando há promoção
+  const originalPrice = product.promotionalPrice && Number(product.promotionalPrice) < Number(product.price) ? product.price : null;
+  // A prazo = valor a prazo quando definido, senão o mesmo do à vista
   const hasInstallment = product.installmentPrice != null && Number(product.installmentPrice) > 0;
-  const displayPrice = hasInstallment ? product.installmentPrice : (product.promotionalPrice ?? product.price);
-  const originalPrice = Number(displayPrice) < Number(product.price) ? product.price : null;
+  const priceAPrazo = hasInstallment ? product.installmentPrice : priceAvista;
   const brandName = product.brandName ?? product.brand?.name ?? "";
   const shortDescription = (product.shortDescription ?? "")
     .replace(/&/g, "&amp;")
@@ -99,8 +103,9 @@ export async function GET(
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
     ["{{PRODUCT_TITLE}}", product.name],
     ["{{PRODUCT_BRAND}}", brandName],
-    ["{{PRODUCT_PRICE}}", `R$ ${formatPrice(Number(displayPrice))}`],
+    ["{{PRODUCT_PRICE}}", `R$ ${formatPrice(Number(priceAvista))}`],
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : ""],
+    ["{{PRODUCT_PRICE_APRAZO}}", `R$ ${formatPrice(Number(priceAPrazo))}`],
     ["{{CHECKOUT_URL}}", product.checkoutUrl ?? "#"],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],

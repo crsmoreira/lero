@@ -52,8 +52,7 @@ export function ProductCard({ product }: { product: ProductWithRelations }) {
           )}
           <div className="mt-2">
             {(() => {
-              const hasInstallment = product.installmentPrice != null && Number(product.installmentPrice) > 0;
-              const dp = hasInstallment ? product.installmentPrice : (product.promotionalPrice ?? product.price);
+              const dp = product.promotionalPrice ?? product.price;
               const orig = Number(dp) < Number(product.price) ? product.price : null;
               return (
                 <>
