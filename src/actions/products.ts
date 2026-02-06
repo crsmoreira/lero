@@ -21,6 +21,8 @@ const productSchema = z.object({
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   checkoutUrl: z.union([z.string().url(), z.literal("")]).optional().nullable(),
+  breadcrumbBackLabel: z.string().optional().nullable(),
+  breadcrumbBackUrl: z.string().optional().nullable(),
   brandName: z.string().optional().nullable(),
   categoryId: z.string().optional().nullable(),
   brandId: z.string().optional().nullable(),
@@ -63,6 +65,8 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
     data: {
       ...rest,
       brandName: rest.brandName ?? null,
+      breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
+      breadcrumbBackUrl: rest.breadcrumbBackUrl ?? null,
       price: rest.price as unknown as Decimal,
       promotionalPrice: rest.promotionalPrice as unknown as Decimal | null,
       installmentPrice: rest.installmentPrice as unknown as Decimal | null,
@@ -117,6 +121,8 @@ export async function updateProduct(
     data: {
       ...rest,
       brandName: rest.brandName ?? null,
+      breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
+      breadcrumbBackUrl: rest.breadcrumbBackUrl ?? null,
       price: rest.price as unknown as Decimal,
       promotionalPrice: rest.promotionalPrice as unknown as Decimal | null,
       installmentPrice: rest.installmentPrice as unknown as Decimal | null,

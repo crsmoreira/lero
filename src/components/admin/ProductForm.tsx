@@ -38,6 +38,8 @@ const productSchema = z.object({
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   checkoutUrl: z.union([z.string().url(), z.literal("")]).optional().nullable(),
+  breadcrumbBackLabel: z.string().optional().nullable(),
+  breadcrumbBackUrl: z.string().optional().nullable(),
   brandName: z.string().optional(),
   categoryId: z.string().optional().nullable(),
   brandId: z.string().optional().nullable(),
@@ -85,6 +87,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           metaTitle: product.metaTitle ?? "",
           metaDescription: product.metaDescription ?? "",
           checkoutUrl: product.checkoutUrl ?? "",
+          breadcrumbBackLabel: (product as { breadcrumbBackLabel?: string | null }).breadcrumbBackLabel ?? "",
+          breadcrumbBackUrl: (product as { breadcrumbBackUrl?: string | null }).breadcrumbBackUrl ?? "",
           brandName: product.brandName ?? product.brand?.name ?? "",
           categoryId: product.categoryId ?? "",
           brandId: product.brandId ?? "",
@@ -92,6 +96,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       : {
           status: "draft",
           stock: 0,
+          breadcrumbBackLabel: "",
+          breadcrumbBackUrl: "",
         },
   });
 
@@ -133,6 +139,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       ...data,
       tags: data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
       checkoutUrl: data.checkoutUrl || null,
+      breadcrumbBackLabel: data.breadcrumbBackLabel?.trim() || null,
+      breadcrumbBackUrl: data.breadcrumbBackUrl?.trim() || null,
       brandName: data.brandName || null,
       categoryId: data.categoryId || null,
       brandId: data.brandId || null,
@@ -301,6 +309,27 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
               placeholder="Ex: Smart Norte"
               {...register("brandName")}
             />
+          </div>
+          <div>
+            <Label htmlFor="breadcrumbBackLabel">Link &quot;Voltar&quot; do breadcrumb</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+              <div>
+                <Input
+                  id="breadcrumbBackLabel"
+                  placeholder="Ex: Todos os Modelos de Espelho para Banheiro"
+                  {...register("breadcrumbBackLabel")}
+                />
+                <p className="text-xs text-gray-500 mt-1">Texto exibido no link</p>
+              </div>
+              <div>
+                <Input
+                  id="breadcrumbBackUrl"
+                  placeholder="Ex: /produtos?categoria=espelhos ou https://..."
+                  {...register("breadcrumbBackUrl")}
+                />
+                <p className="text-xs text-gray-500 mt-1">URL de destino ao clicar</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

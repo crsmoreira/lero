@@ -30,6 +30,7 @@ export async function GET(
       images: { orderBy: { order: "asc" } },
       specifications: { orderBy: { order: "asc" } },
       brand: true,
+      category: true,
       reviews: { where: { approved: true }, orderBy: { createdAt: "desc" } },
     },
   });
@@ -63,6 +64,11 @@ export async function GET(
     ? `-${Math.round(((Number(originalPrice) - Number(priceAvista)) / Number(originalPrice)) * 100)}%`
     : "";
   const brandName = product.brandName ?? product.brand?.name ?? "";
+  // Link "Voltar" do breadcrumb: usa campos do produto ou fallback da categoria
+  const breadcrumbBackLabel = product.breadcrumbBackLabel ?? product.category?.name ?? "";
+  const breadcrumbBackUrl = product.breadcrumbBackUrl
+    ?? (product.category ? `/produtos?categoria=${product.category.slug}` : "")
+    || "javascript:void(0)";
   const shortDescription = (product.shortDescription ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -111,6 +117,8 @@ export async function GET(
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : ""],
     ["{{PRODUCT_DISCOUNT_PERCENT}}", discountPercent],
     ["{{PRODUCT_PRICE_APRAZO}}", `R$ ${formatPrice(Number(priceAPrazo))}`],
+    ["{{PRODUCT_BREADCRUMB_BACK_LABEL}}", breadcrumbBackLabel],
+    ["{{PRODUCT_BREADCRUMB_BACK_URL}}", breadcrumbBackUrl],
     ["{{CHECKOUT_URL}}", product.checkoutUrl ?? "#"],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],

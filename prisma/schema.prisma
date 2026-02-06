@@ -109,6 +109,8 @@ model Product {
   metaDescription String?   @db.Text
   ogImage         String?
   checkoutUrl     String?   // Link for "Comprar" / "Adicionar ao carrinho"
+  breadcrumbBackLabel String?  // Ex: "Todos os Modelos de Espelho para Banheiro"
+  breadcrumbBackUrl   String?  // URL do link de voltar (breadcrumb)
   brandName       String?   // Nome da marca (para exibição sem Brand)
   categoryId      String?
   brandId         String?
