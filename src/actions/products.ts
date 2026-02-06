@@ -62,10 +62,18 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
 
   const { images, specifications, reviews, ...rest } = parsed.data;
 
+  const baseSlug = rest.slug.trim() || "produto";
+  let slug = baseSlug;
+  let attempt = 0;
+  const maxAttempts = 20;
+
   try {
+  while (attempt < maxAttempts) {
+    try {
   const product = await prisma.product.create({
     data: {
       ...rest,
+      slug,
       sku: rest.sku?.trim() || null,
       brandName: rest.brandName ?? null,
       template: rest.template ?? "leroy",
@@ -107,9 +115,31 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
   revalidatePath("/produtos");
   revalidatePath(`/produto/${product.slug}`);
   return { data: { id: product.id, slug: product.slug } };
-  } catch (e) {
+    } catch (inner: unknown) {
+      const isSlugConflict = inner && typeof inner === "object" && "code" in inner && (inner as { code: string }).code === "P2002"
+        && (inner as { meta?: { target?: string[] } }).meta?.target?.includes("slug");
+      if (isSlugConflict && attempt < maxAttempts - 1) {
+        attempt++;
+        slug = `${baseSlug}-${attempt}`;
+        continue;
+      }
+      throw inner;
+    }
+  }
+  return { error: { _form: ["Não foi possível gerar um slug único. Tente outro nome."] } };
+  } catch (e: unknown) {
     console.error("createProduct error:", e);
-    const msg = e instanceof Error ? e.message : "Erro ao criar produto";
+    let msg = "Erro ao criar produto";
+    if (e && typeof e === "object" && "code" in e && (e as { code: string }).code === "P2002") {
+      const meta = (e as { meta?: { target?: string[] } }).meta;
+      if (meta?.target?.includes("slug")) {
+        msg = "O slug já está em uso. Escolha outro ou edite o slug.";
+      } else if (meta?.target?.includes("sku")) {
+        msg = "O SKU já está em uso. Escolha outro.";
+      }
+    } else if (e instanceof Error) {
+      msg = e.message;
+    }
     return { error: { _form: [msg] } };
   }
 }
