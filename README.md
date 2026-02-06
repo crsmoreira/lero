@@ -38,15 +38,15 @@ Copie o `.env.example` para `.env` e preencha:
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ecommerce_store?schema=public"
 
 # NextAuth
-NEXTAUTH_SECRET="gere-uma-chave-segura-com-openssl-rand-base64-32"
-NEXTAUTH_URL="http://localhost:3000"
+AUTH_SECRET="gere-uma-chave-segura-com-openssl-rand-base64-32"
+AUTH_URL="http://localhost:3000"
 
 # UploadThing - pegue em https://uploadthing.com/dashboard
 UPLOADTHING_TOKEN="seu-token"
 UPLOADTHING_APP_ID="seu-app-id"
 ```
 
-Gerar NEXTAUTH_SECRET:
+Gerar AUTH_SECRET:
 ```bash
 openssl rand -base64 32
 ```
@@ -137,6 +137,29 @@ src/
 ## Link de Checkout
 
 No Admin, ao criar/editar um produto, o campo **"Link de Checkout"** define a URL para onde os botões "Adicionar ao carrinho" e "Comprar agora" redirecionam. Pode ser qualquer URL (ex: link de pagamento, carrinho externo, WhatsApp, etc.).
+
+## Deploy no Vercel
+
+Configure estas variáveis de ambiente no painel da Vercel:
+
+| Variável | Obrigatório | Descrição |
+|----------|-------------|-----------|
+| `DATABASE_URL` | Sim | Connection string PostgreSQL. Use URL de **connection pooler** (Neon, Supabase, Railway) para evitar erro de limite de conexões |
+| `AUTH_SECRET` | Sim | Chave secreta (gere com `openssl rand -base64 32`) |
+| `AUTH_URL` | Sim | URL do app em produção (ex: `https://seu-app.vercel.app`) |
+
+O `AUTH_URL` deve ser a URL base do seu deploy. O NextAuth usa isso para callbacks e cookies.
+
+**Importante:** No Vercel (serverless), use sempre uma URL de connection pooler para PostgreSQL. Exemplo:
+- **Neon:** use o endpoint "Pooled connection" no dashboard
+- **Supabase:** use `?pgbouncer=true` na connection string
+- **Railway:** oferece pooler nativo
+
+Após o deploy, rode as migrations no banco de produção:
+```bash
+DATABASE_URL="sua-url-producao" npx prisma migrate deploy
+npm run db:seed  # para criar o admin inicial
+```
 
 ## Comandos úteis
 

@@ -1,4 +1,8 @@
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth.config";
+
+// Usa config mínimo (sem Prisma) para rodar no Edge Runtime
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const isAdmin = req.nextUrl.pathname.startsWith("/admin");
