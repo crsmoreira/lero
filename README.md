@@ -57,6 +57,10 @@ openssl rand -base64 32
 # Criar migrations
 npm run db:migrate
 
+# Se migrate falhar (ex: Prisma 7), use db push ou o SQL manual:
+npm run db:push
+# Ou: psql $DATABASE_URL -f prisma/add_product_analytics_manual.sql
+
 # Ou, se preferir apenas sincronizar o schema (desenvolvimento):
 npx prisma db push
 
