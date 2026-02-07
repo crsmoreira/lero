@@ -43,7 +43,12 @@ export async function GET(
     return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
   }
 
-  const templateFile = product.template === "drogasil" ? "produto-template-drogasil.html" : "produto-template.html";
+  const templateFile =
+    product.template === "drogasil"
+      ? "produto-template-drogasil.html"
+      : product.template === "decolar"
+        ? "produto-template-decolar.html"
+        : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
 
@@ -73,6 +78,22 @@ export async function GET(
   const breadcrumbBackLabel = product.breadcrumbBackLabel ?? product.category?.name ?? "";
   const fallbackUrl = product.category ? `/produtos?categoria=${product.category.slug}` : "javascript:void(0)";
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
+
+  const packageDaysNights =
+    product.template === "decolar" && product.specifications.length > 0
+      ? (() => {
+          const map = Object.fromEntries(
+            product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
+          );
+          const dias = map["dias"] ?? map["dia"];
+          const noites = map["noites"] ?? map["noite"];
+          if (dias && noites)
+            return `<span class="days-badge">${String(dias).trim()} DIAS / ${String(noites).trim()} NOITES</span>`;
+          if (dias) return `<span class="days-badge">${String(dias).trim()} DIAS</span>`;
+          if (noites) return `<span class="days-badge">${String(noites).trim()} NOITES</span>`;
+          return "";
+        })()
+      : "";
   const shortDescription = (product.shortDescription ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -81,14 +102,16 @@ export async function GET(
   const longDescription = product.description ?? "";
   const productDescription = product.description ?? product.shortDescription ?? ""; // para schema/SEO
 
+  const specsRows = product.specifications.map((s) =>
+    product.template === "decolar"
+      ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
+      : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
+  );
   const specsHtml =
-    product.specifications.length > 0
-      ? product.specifications
-          .map(
-            (s) =>
-              `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
-          )
-          .join("")
+    specsRows.length > 0
+      ? product.template === "decolar"
+        ? `<table><tbody>${specsRows.join("")}</tbody></table>`
+        : specsRows.join("")
       : "";
 
   const baseUrl =
@@ -167,6 +190,7 @@ export async function GET(
       return `${day}/${month}/${year}`;
     })()],
     ["{{PRODUCT_AVAILABILITY}}", "https://schema.org/InStock"],
+    ["{{PACKAGE_DAYS_NIGHTS}}", packageDaysNights],
   ];
 
   for (const [key, value] of replacements) {

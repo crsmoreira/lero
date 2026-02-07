@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <title>{{META_TITLE}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="{{META_DESCRIPTION}}"/>
+  <meta name="robots" content="INDEX, FOLLOW"/>
+  <link rel="canonical" href="{{PRODUCT_URL}}"/>
+  <meta property="og:locale" content="pt_BR"/>
+  <meta property="og:url" content="{{PRODUCT_URL}}"/>
+  <meta property="og:title" content="{{META_TITLE}}"/>
+  <meta property="og:site_name" content="Pacotes de Viagens"/>
+  <meta property="og:description" content="{{META_DESCRIPTION}}"/>
+  <meta property="og:type" content="product"/>
+  <meta property="og:image" content="{{PRODUCT_IMAGE_1}}"/>
+  <meta property="og:image:alt" content="{{PRODUCT_TITLE}}"/>
+  <meta property="product:price:amount" content="{{PRODUCT_PRICE_META}}"/>
+  <meta property="product:price:currency" content="BRL"/>
+  <link rel="icon" href="https://www.decolar.com/favicon.ico" type="image/x-icon"/>
+  <link rel="preload" as="image" href="{{PRODUCT_IMAGE_1}}"/>
+  <style>
+    :root { --decolar-purple: #550FED; --decolar-gray-0: #343A3D; --decolar-gray-1: #767E89; --decolar-gray-2: #A4ACB5; --decolar-gray-4: #E9ECEF; --decolar-white: #fff; --decolar-green: #00A699; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; color: var(--decolar-gray-0); line-height: 1.5; background: var(--decolar-gray-4); }
+    .detail-container { max-width: 1280px; margin: 0 auto; padding: 0 16px 24px; }
+    .decolar-gallery { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+    .decolar-gallery .main-img { grid-row: span 2; min-height: 380px; }
+    .decolar-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .decolar-gallery .sub-img { min-height: 186px; }
+    @media (max-width: 768px) {
+      .decolar-gallery { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .decolar-gallery .main-img { grid-row: span 1; min-height: 250px; }
+      .decolar-gallery .sub-img { min-height: 120px; display: none; }
+      .decolar-gallery .sub-img:first-of-type { display: block; min-height: 120px; }
+    }
+    .days-badge { display: inline-block; background: var(--decolar-purple); color: white; font-size: 12px; font-weight: 600; letter-spacing: .5px; padding: 6px 12px; border-radius: 4px; margin-bottom: 12px; }
+    .decolar-title { font-size: 28px; font-weight: 700; color: var(--decolar-gray-0); margin-bottom: 8px; }
+    .decolar-tags { font-size: 14px; color: var(--decolar-gray-1); margin-bottom: 20px; }
+    .decolar-tags span { color: var(--decolar-purple); }
+    .decolar-content { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+    @media (max-width: 1024px) { .decolar-content { grid-template-columns: 1fr; } }
+    .decolar-main { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .decolar-sidebar { position: relative; }
+    .decolar-pricebox { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); position: sticky; top: 24px; }
+    .decolar-price-label { font-size: 14px; color: var(--decolar-gray-1); margin-bottom: 4px; }
+    .decolar-price-value { font-size: 32px; font-weight: 700; color: var(--decolar-gray-0); }
+    .decolar-price-value .currency { font-size: 20px; margin-right: 2px; }
+    .decolar-price-per { font-size: 12px; color: var(--decolar-gray-1); margin-top: 4px; }
+    .decolar-cta { display: block; width: 100%; background: var(--decolar-purple); color: white; font-size: 16px; font-weight: 600; padding: 16px 24px; border: none; border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; margin-top: 16px; }
+    .decolar-cta:hover { background: #4509c9; }
+    .decolar-section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--decolar-gray-0); }
+    .decolar-description { font-size: 14px; color: var(--decolar-gray-1); line-height: 1.6; }
+    .decolar-description p { margin-bottom: 12px; }
+    .decolar-inclusions { margin-top: 24px; }
+    .decolar-inclusion-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--decolar-gray-4); border-radius: 8px; margin-bottom: 12px; }
+    .decolar-inclusion-item .icon { width: 40px; height: 40px; background: var(--decolar-purple); border-radius: 8px; flex-shrink: 0; }
+    .decolar-specs { margin-top: 24px; }
+    .decolar-specs table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .decolar-specs th { text-align: left; padding: 10px 12px; background: var(--decolar-gray-4); font-weight: 600; }
+    .decolar-specs td { padding: 10px 12px; border-bottom: 1px solid var(--decolar-gray-4); }
+    .decolar-price-per:empty { display: none; }
+    .decolar-days-row:empty { display: none; }
+  </style>
+</head>
+<body>
+  <main class="detail-container">
+    <div class="decolar-gallery">
+      <div class="main-img"><img src="{{PRODUCT_IMAGE_1}}" alt="{{PRODUCT_TITLE}}"/></div>
+      <div class="sub-img"><img src="{{PRODUCT_IMAGE_2}}" alt=""/></div>
+      <div class="sub-img"><img src="{{PRODUCT_IMAGE_3}}" alt=""/></div>
+    </div>
+
+    <div class="decolar-days-row">{{PACKAGE_DAYS_NIGHTS}}</div>
+    <h1 class="decolar-title">{{PRODUCT_TITLE}}</h1>
+    <div class="decolar-tags">{{PRODUCT_SHORT_DESCRIPTION}}</div>
+
+    <div class="decolar-content">
+      <div class="decolar-main">
+        <div class="decolar-description">{{PRODUCT_LONG_DESCRIPTION}}</div>
+        <div class="decolar-specs">{{PRODUCT_SPECIFICATIONS}}</div>
+        {{PRODUCT_REVIEWS}}
+      </div>
+      <aside class="decolar-sidebar">
+        <div class="decolar-pricebox">
+          <div class="decolar-price-label">Preço por pessoa</div>
+          <div class="decolar-price-value"><span class="currency">R$</span>{{PRODUCT_PRICE}}</div>
+          <p class="decolar-price-per">{{PRODUCT_INSTALLMENT_INFO}}</p>
+          <a href="{{CHECKOUT_URL}}" class="decolar-cta">Próximo</a>
+        </div>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>
