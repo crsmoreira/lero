@@ -115,7 +115,6 @@ model Product {
   brandName       String?   // Nome da marca (para exibição sem Brand)
   categoryId      String?
   brandId         String?
-  viewCount       Int       @default(0)  // Total de acessos ao produto
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -126,18 +125,6 @@ model Product {
   variantGroups ProductVariantGroup[]
   reviews      Review[]
   questions    Question[]
-  views        ProductView[]
-}
-
-model ProductView {
-  id        String   @id @default(cuid())
-  productId String
-  viewedAt  DateTime @default(now())
-
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([productId])
-  @@index([viewedAt])
 }
 
 model ProductImage {

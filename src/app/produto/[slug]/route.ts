@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { recordProductView } from "@/lib/analytics";
 import { buildReviewsHtml, buildReviewsHtmlDrogasil } from "./reviewsHtml";
 import { readFile } from "fs/promises";
 import { join } from "path";
@@ -43,9 +42,6 @@ export async function GET(
   if (!product) {
     return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
   }
-
-  // Registra o acesso (fire-and-forget para não atrasar a resposta)
-  recordProductView(product.id).catch(() => {});
 
   const templateFile = product.template === "drogasil" ? "produto-template-drogasil.html" : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
