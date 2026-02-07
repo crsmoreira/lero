@@ -159,6 +159,13 @@ export async function GET(
     ["{{META_TITLE}}", product.metaTitle ?? `${product.name} | Loja`],
     ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? product.name],
     ["{{PRODUCT_PRICE_VALID_UNTIL}}", new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)],
+    ["{{PRODUCT_PRICE_VALID_DATE}}", (() => {
+      const d = new Date();
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    })()],
     ["{{PRODUCT_AVAILABILITY}}", "https://schema.org/InStock"],
   ];
 
