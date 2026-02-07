@@ -365,6 +365,10 @@ export async function GET(
     );
   }
 
+  if (templateFile === "produto-template.html") {
+    html = html.replace(/href="\/login"/g, 'href="javascript:void(0)"');
+  }
+
   return new NextResponse(html, {
     headers: { "Content-Type": "text/html; charset=utf-8" },
   });

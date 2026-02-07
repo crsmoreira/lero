@@ -76,7 +76,7 @@ function LoginForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@loja.com"
+                placeholder=""
                 {...register("email")}
                 className={errors.email ? "border-red-500" : ""}
               />
