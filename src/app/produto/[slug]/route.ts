@@ -82,7 +82,7 @@ export async function GET(
     : "";
   const brandName = product.brandName ?? product.brand?.name ?? "";
   // Link "Voltar" do breadcrumb: usa campos do produto ou fallback da categoria
-  const breadcrumbBackLabel = product.breadcrumbBackLabel ?? product.category?.name ?? "";
+  const breadcrumbBackLabel = product.breadcrumbBackLabel ?? product.category?.name ?? "Home";
   const fallbackUrl = product.category ? `/produtos?categoria=${product.category.slug}` : "javascript:void(0)";
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
