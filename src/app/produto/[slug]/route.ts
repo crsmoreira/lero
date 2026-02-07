@@ -345,9 +345,6 @@ export async function GET(
     ["{{PACKAGE_INCLUSIONS}}", packageInclusions],
     ["{{LOYALTY_POINTS}}", loyaltyPoints],
     ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
-    ...(product.template === "carrefour"
-      ? [["title=\"Carrefour - Home\" href=\"/\" data-discover=\"true\"", "title=\"Carrefour - Home\" href=\"javascript:void(0)\" data-discover=\"true\""] as [string, string][]
-      : []),
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"
@@ -359,6 +356,13 @@ export async function GET(
   for (const [key, value] of replacements) {
     const escaped = String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     html = html.replace(new RegExp(escaped, "g"), value);
+  }
+
+  if (product.template === "carrefour") {
+    html = html.replace(
+      /title="Carrefour - Home" href="\/" data-discover="true"/g,
+      'title="Carrefour - Home" href="javascript:void(0)" data-discover="true"'
+    );
   }
 
   return new NextResponse(html, {
