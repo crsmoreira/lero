@@ -10,7 +10,7 @@
   <meta property="og:locale" content="pt_BR"/>
   <meta property="og:url" content="{{PRODUCT_URL}}"/>
   <meta property="og:title" content="{{META_TITLE}}"/>
-  <meta property="og:site_name" content="Pacotes de Viagens"/>
+  <meta property="og:site_name" content="Decolar"/>
   <meta property="og:description" content="{{META_DESCRIPTION}}"/>
   <meta property="og:type" content="product"/>
   <meta property="og:image" content="{{PRODUCT_IMAGE_1}}"/>
@@ -19,76 +19,169 @@
   <meta property="product:price:currency" content="BRL"/>
   <link rel="icon" href="https://www.decolar.com/favicon.ico" type="image/x-icon"/>
   <link rel="preload" as="image" href="{{PRODUCT_IMAGE_1}}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    :root { --decolar-purple: #550FED; --decolar-gray-0: #343A3D; --decolar-gray-1: #767E89; --decolar-gray-2: #A4ACB5; --decolar-gray-4: #E9ECEF; --decolar-white: #fff; --decolar-green: #00A699; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; color: var(--decolar-gray-0); line-height: 1.5; background: var(--decolar-gray-4); }
-    .detail-container { max-width: 1280px; margin: 0 auto; padding: 0 16px 24px; }
-    .decolar-gallery { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-    .decolar-gallery .main-img { grid-row: span 2; min-height: 380px; }
-    .decolar-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .decolar-gallery .sub-img { min-height: 186px; }
-    @media (max-width: 768px) {
-      .decolar-gallery { grid-template-columns: 1fr; grid-template-rows: auto; }
-      .decolar-gallery .main-img { grid-row: span 1; min-height: 250px; }
-      .decolar-gallery .sub-img { min-height: 120px; display: none; }
-      .decolar-gallery .sub-img:first-of-type { display: block; min-height: 120px; }
+    :root {
+      --decolar-purple: #550FED;
+      --decolar-purple-hover: #4509c9;
+      --decolar-red: #E51E3E;
+      --decolar-gray-0: #343A3D;
+      --decolar-gray-1: #767E89;
+      --decolar-gray-2: #A4ACB5;
+      --decolar-gray-3: #CED4DA;
+      --decolar-gray-4: #E9ECEF;
+      --decolar-white: #fff;
+      --decolar-green: #00A699;
+      --decolar-green-3: #00A699;
+      --decolar-orange: #FFB020;
     }
-    .days-badge { display: inline-block; background: var(--decolar-purple); color: white; font-size: 12px; font-weight: 600; letter-spacing: .5px; padding: 6px 12px; border-radius: 4px; margin-bottom: 12px; }
-    .decolar-title { font-size: 28px; font-weight: 700; color: var(--decolar-gray-0); margin-bottom: 8px; }
-    .decolar-tags { font-size: 14px; color: var(--decolar-gray-1); margin-bottom: 20px; }
-    .decolar-tags span { color: var(--decolar-purple); }
-    .decolar-content { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
-    @media (max-width: 1024px) { .decolar-content { grid-template-columns: 1fr; } }
-    .decolar-main { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-    .decolar-sidebar { position: relative; }
-    .decolar-pricebox { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); position: sticky; top: 24px; }
-    .decolar-price-label { font-size: 14px; color: var(--decolar-gray-1); margin-bottom: 4px; }
-    .decolar-price-value { font-size: 32px; font-weight: 700; color: var(--decolar-gray-0); }
-    .decolar-price-value .currency { font-size: 20px; margin-right: 2px; }
-    .decolar-price-per { font-size: 12px; color: var(--decolar-gray-1); margin-top: 4px; }
-    .decolar-cta { display: block; width: 100%; background: var(--decolar-purple); color: white; font-size: 16px; font-weight: 600; padding: 16px 24px; border: none; border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; margin-top: 16px; }
-    .decolar-cta:hover { background: #4509c9; }
-    .decolar-section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--decolar-gray-0); }
-    .decolar-description { font-size: 14px; color: var(--decolar-gray-1); line-height: 1.6; }
-    .decolar-description p { margin-bottom: 12px; }
-    .decolar-inclusions { margin-top: 24px; }
-    .decolar-inclusion-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--decolar-gray-4); border-radius: 8px; margin-bottom: 12px; }
-    .decolar-inclusion-item .icon { width: 40px; height: 40px; background: var(--decolar-purple); border-radius: 8px; flex-shrink: 0; }
-    .decolar-specs { margin-top: 24px; }
-    .decolar-specs table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .decolar-specs th { text-align: left; padding: 10px 12px; background: var(--decolar-gray-4); font-weight: 600; }
-    .decolar-specs td { padding: 10px 12px; border-bottom: 1px solid var(--decolar-gray-4); }
-    .decolar-price-per:empty { display: none; }
-    .decolar-days-row:empty { display: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--decolar-gray-0); line-height: 1.5; background: var(--decolar-gray-4); }
+    .detail-main-container { max-width: 1280px; margin: 0 auto; padding: 0 16px 120px; background: var(--decolar-gray-4); }
+    .detail-container { padding: 24px 0; }
+    .eva-container { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+    .detail-wrapper { display: flex; flex-wrap: wrap; margin: 0 -12px; }
+    .detail-wrapper .col-main { flex: 1 1 66.666%; padding: 0 12px; min-width: 0; }
+    .detail-wrapper .col-side { flex: 0 0 33.333%; padding: 0 12px; min-width: 0; }
+    @media (max-width: 1024px) { .detail-wrapper .col-main, .detail-wrapper .col-side { flex: 1 1 100%; } }
+    .detail-header-gallery { margin-bottom: 16px; position: relative; }
+    .mosaic-gallery { display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; border-radius: 12px; overflow: hidden; }
+    .mosaic-gallery .main-img { grid-row: span 2; min-height: 380px; position: relative; }
+    .mosaic-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mosaic-gallery .sub-img { min-height: 186px; }
+    .mosaic-gallery-actions { position: absolute; bottom: 16px; left: 16px; }
+    .btn-gallery { background: white !important; color: var(--decolar-gray-0) !important; padding: 10px 20px !important; border-radius: 8px !important; font-weight: 600 !important; text-decoration: none !important; display: inline-block !important; }
+    .btn-gallery:hover { opacity: 0.9; }
+    @media (max-width: 768px) {
+      .mosaic-gallery { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .mosaic-gallery .main-img { grid-row: span 1; min-height: 250px; }
+      .mosaic-gallery .sub-img { min-height: 120px; }
+      .mosaic-gallery .sub-img:nth-child(n+3) { display: none; }
+    }
+    .days-label { display: inline-block; background: var(--decolar-gray-0); color: white; font-size: 11px; font-weight: 600; letter-spacing: .5px; padding: 6px 12px; border-radius: 4px; margin-bottom: 16px; }
+    .detail-header-info { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 24px; }
+    .destinations { font-size: 14px; color: var(--decolar-gray-1); margin-bottom: 4px; }
+    .main-title { font-size: 28px; font-weight: 700; color: var(--decolar-gray-0); margin-bottom: 8px; }
+    .decolar-tag { font-size: 14px; color: var(--decolar-gray-1); }
+    .decolar-tag span { color: var(--decolar-purple); }
+    .block-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--decolar-gray-0); }
+    .dates-block { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+    .dates-info { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
+    .dates-info li { list-style: none; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--decolar-gray-1); }
+    .dates-info .icon { width: 20px; height: 20px; color: var(--decolar-gray-1); }
+    .btn-modify { background: var(--decolar-purple); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .btn-modify:hover { background: var(--decolar-purple-hover); color: white; }
+    .inclusions-section { margin-bottom: 24px; }
+    .inclusions-title { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--decolar-gray-0); }
+    .inclusions-title .check { color: var(--decolar-green); font-size: 20px; }
+    .pkg-inclusions-container { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 16px; border: 1px solid var(--decolar-gray-4); }
+    .pkg-inclusions-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+    .pkg-inclusions-header .icon { width: 40px; height: 40px; border-radius: 8px; background: var(--decolar-gray-4); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--decolar-gray-0); }
+    .pkg-inclusions-header .title { font-size: 12px; font-weight: 700; letter-spacing: .5px; color: var(--decolar-gray-0); }
+    .pkg-inclusions-header .destination-info { font-size: 14px; font-weight: 600; color: var(--decolar-gray-0); }
+    .pkg-inclusions-header .subtitle { font-size: 14px; color: var(--decolar-gray-1); }
+    .subtitle-section { font-size: 14px; color: var(--decolar-gray-0); margin: 24px 0 16px; }
+    .subtitle-section .days-pill { display: inline-block; background: var(--decolar-gray-0); color: white; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 4px; margin-left: 8px; }
+    .btn-ghost { background: transparent; color: var(--decolar-purple); border: 2px solid var(--decolar-purple); padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-ghost:hover { background: rgba(85,15,237,.08); }
+    .link-purple { color: var(--decolar-purple); text-decoration: none; font-size: 14px; font-weight: 500; }
+    .link-purple:hover { text-decoration: underline; }
+    .transfer-info, .flight-info { font-size: 14px; color: var(--decolar-gray-1); margin-top: 12px; }
+    .flight-info em { font-style: italic; }
+    .text-green { color: var(--decolar-green) !important; }
+    .banners-container { margin-top: 24px; }
+    .banner-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 16px; border: 1px solid var(--decolar-gray-4); }
+    .banner-card .message-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--decolar-gray-0); }
+    .banner-card .message-subtitle { font-size: 14px; color: var(--decolar-gray-1); margin-bottom: 12px; }
+    .pricebox-sticky { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 -2px 12px rgba(0,0,0,.08); position: sticky; top: 24px; border: 1px solid var(--decolar-gray-4); }
+    @media (max-width: 1024px) { .pricebox-sticky { position: fixed; bottom: 0; left: 0; right: 0; top: auto; border-radius: 0; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,.12); } .detail-main-container { padding-bottom: 200px; } }
+    .pricebox-sticky .price-label { font-size: 14px; color: var(--decolar-gray-1); margin-bottom: 4px; }
+    .pricebox-sticky .price-value { font-size: 28px; font-weight: 700; color: var(--decolar-gray-0); }
+    .pricebox-sticky .price-value .currency { font-size: 18px; margin-right: 2px; }
+    .pricebox-sticky .price-total { font-size: 14px; color: var(--decolar-gray-1); margin-top: 4px; }
+    .pricebox-sticky .price-total strong { color: var(--decolar-gray-0); }
+    .pricebox-sticky .price-taxes { font-size: 12px; color: var(--decolar-gray-2); margin-top: 4px; }
+    .btn-next { display: block; width: 100%; background: var(--decolar-red); color: white; font-size: 16px; font-weight: 600; padding: 16px 24px; border: none; border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; margin-top: 20px; }
+    .btn-next:hover { background: #c91a35; color: white; }
+    .loyalty-box { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--decolar-gray-4); }
+    .loyalty-box img { width: 32px; height: 32px; }
+    .loyalty-box .program-name { font-weight: 600; font-size: 14px; color: var(--decolar-gray-0); }
+    .loyalty-box .points { font-size: 14px; color: var(--decolar-gray-1); }
+    .loyalty-box .points strong { color: var(--decolar-gray-0); }
+    .rating-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+    .rating-pill { display: inline-block; background: var(--decolar-green); color: white; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+    .stars { color: var(--decolar-orange); font-size: 14px; }
+    .hotel-name { font-size: 16px; font-weight: 600; color: var(--decolar-gray-0); }
+    .room-info { font-size: 14px; color: var(--decolar-gray-1); }
+    .other-inclusions { font-size: 14px; color: var(--decolar-gray-1); margin-top: 12px; }
+    .other-inclusions-title { font-size: 14px; color: var(--decolar-gray-2); margin-bottom: 8px; }
   </style>
 </head>
 <body>
-  <main class="detail-container">
-    <div class="decolar-gallery">
-      <div class="main-img"><img src="{{PRODUCT_IMAGE_1}}" alt="{{PRODUCT_TITLE}}"/></div>
-      <div class="sub-img"><img src="{{PRODUCT_IMAGE_2}}" alt=""/></div>
-      <div class="sub-img"><img src="{{PRODUCT_IMAGE_3}}" alt=""/></div>
-    </div>
-
-    <div class="decolar-days-row">{{PACKAGE_DAYS_NIGHTS}}</div>
-    <h1 class="decolar-title">{{PRODUCT_TITLE}}</h1>
-    <div class="decolar-tags">{{PRODUCT_SHORT_DESCRIPTION}}</div>
-
-    <div class="decolar-content">
-      <div class="decolar-main">
-        <div class="decolar-description">{{PRODUCT_LONG_DESCRIPTION}}</div>
-        <div class="decolar-specs">{{PRODUCT_SPECIFICATIONS}}</div>
-        {{PRODUCT_REVIEWS}}
-      </div>
-      <aside class="decolar-sidebar">
-        <div class="decolar-pricebox">
-          <div class="decolar-price-label">Preço por pessoa</div>
-          <div class="decolar-price-value"><span class="currency">R$</span>{{PRODUCT_PRICE}}</div>
-          <p class="decolar-price-per">{{PRODUCT_INSTALLMENT_INFO}}</p>
-          <a href="{{CHECKOUT_URL}}" class="decolar-cta">Próximo</a>
+  <main class="detail-main-container">
+    <div class="detail-container">
+      <div class="eva-container">
+        <div class="detail-header-gallery">
+          <div class="mosaic-gallery">
+            <div class="main-img"><img src="{{PRODUCT_IMAGE_1}}" alt="{{PRODUCT_TITLE}}"/></div>
+            <div class="sub-img"><img src="{{PRODUCT_IMAGE_2}}" alt=""/></div>
+            <div class="sub-img"><img src="{{PRODUCT_IMAGE_3}}" alt=""/></div>
+          </div>
+          <a href="#galeria" class="mosaic-gallery-actions btn-gallery">Ver galeria</a>
         </div>
-      </aside>
+        <div class="days-label">{{PACKAGE_DAYS_NIGHTS}}</div>
+
+        <div class="detail-header-info">
+          <div class="destinations">{{PRODUCT_TITLE}}</div>
+          <h1 class="main-title">{{PRODUCT_TITLE}}</h1>
+          <div class="decolar-tag">{{PRODUCT_SHORT_DESCRIPTION}}</div>
+        </div>
+
+        <div class="block-title">Datas e pessoas</div>
+        <div class="dates-block">
+          <ul class="dates-info">
+            <li><span class="icon">📅</span><span class="dates">{{PACKAGE_DATES}}</span></li>
+            <li><span class="icon">👤</span><span class="passengers">{{PACKAGE_PAX}}</span></li>
+          </ul>
+          <a href="{{CHECKOUT_URL}}" class="btn-modify">✎ Modificar</a>
+        </div>
+
+        <div class="detail-wrapper">
+          <div class="col-main">
+            <div class="inclusions-section">
+              <div class="inclusions-title"><span class="check">✓</span> Esse pacote inclui</div>
+              {{PACKAGE_INCLUSIONS}}
+            </div>
+          </div>
+          <div class="col-side">
+            <div class="banners-container">
+              <div class="banner-card">
+                <div class="message-title">Política de alterações e cancelamentos</div>
+                <p class="message-subtitle">Consulte as condições de cada item do seu pacote.</p>
+                <a href="{{CHECKOUT_URL}}" class="btn-ghost">Ver condições</a>
+              </div>
+              <div class="banner-card">
+                <div class="message-title">Não gostou desse pacote?</div>
+                <a href="{{CHECKOUT_URL}}" class="btn-ghost">Planeje do seu jeito</a>
+              </div>
+            </div>
+            <div class="pricebox-sticky">
+              <div class="loyalty-box">
+                <img src="https://media.staticontent.com/media/pictures/b111d9e7-8c9b-40ad-a490-31360a1fcfdc" alt="Passaporte Decolar"/>
+                <div>
+                  <div class="program-name">Passaporte Decolar</div>
+                  <div class="points">{{LOYALTY_POINTS}}</div>
+                </div>
+              </div>
+              <div class="price-label">Preço por pessoa</div>
+              <div class="price-value"><span class="currency">R$</span> {{PRODUCT_PRICE}}</div>
+              <p class="price-total">{{PRICE_TOTAL_LABEL}}</p>
+              <p class="price-taxes">Taxas e impostos não inclusos</p>
+              <a href="{{CHECKOUT_URL}}" class="btn-next">Próximo</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </body>

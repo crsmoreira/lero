@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{META_TITLE}}</title>
+  <meta name="description" content="{{META_DESCRIPTION}}"/>
+  <meta name="robots" content="INDEX, FOLLOW"/>
+  <link rel="canonical" href="{{PRODUCT_URL}}"/>
+  <link rel="icon" href="https://www.carrefour.com.br/favicon.ico" type="image/x-icon"/>
+  <meta property="og:locale" content="pt_BR"/>
+  <meta property="og:url" content="{{PRODUCT_URL}}"/>
+  <meta property="og:title" content="{{META_TITLE}}"/>
+  <meta property="og:site_name" content="Carrefour"/>
+  <meta property="og:description" content="{{META_DESCRIPTION}}"/>
+  <meta property="og:type" content="product"/>
+  <meta property="og:image" content="{{PRODUCT_IMAGE_1}}"/>
+  <meta property="product:price:amount" content="{{PRODUCT_PRICE_META}}"/>
+  <meta property="product:price:currency" content="BRL"/>
+  <script type="application/ld+json">{"@context":"https://schema.org/","@type":"Product","@id":"{{PRODUCT_URL}}","name":"{{PRODUCT_TITLE}}","image":"{{PRODUCT_IMAGE_1}}","description":"{{META_DESCRIPTION}}","brand":{"@type":"Brand","name":"{{PRODUCT_BRAND}}"},"offers":{"@type":"Offer","url":"{{PRODUCT_URL}}","priceCurrency":"BRL","price":"{{PRODUCT_PRICE_META}}","availability":"https://schema.org/InStock"}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --carrefour-blue: #1E5BC6;
+      --carrefour-blue-royal: #1E5BC6;
+      --carrefour-red: #ED1C24;
+      --carrefour-black: #1a1a1a;
+      --carrefour-gray: #525252;
+      --carrefour-gray-light: #a3a3a3;
+      --carrefour-gray-bg: #f5f5f5;
+      --carrefour-white: #fff;
+      --carrefour-green: #2C815E;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--carrefour-black); background: var(--carrefour-white); line-height: 1.5; }
+    .carrefour-header { background: var(--carrefour-white); border-bottom: 1px solid #e5e5e5; padding: 12px 0; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+    .header-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; }
+    .logo a { text-decoration: none; display: flex; align-items: center; }
+    .logo svg { height: 36px; }
+    .cep-box { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px; }
+    .cep-box input { padding: 10px 14px; border: 1px solid #d4d4d4; border-radius: 6px; font-size: 14px; width: 140px; }
+    .cep-box button { background: var(--carrefour-blue); color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .cep-box button:hover { background: #1649a8; }
+    .cep-link { font-size: 12px; font-weight: 600; color: var(--carrefour-blue); text-decoration: none; }
+    .cep-link:hover { text-decoration: underline; }
+    .search-bar { flex: 2; max-width: 500px; display: flex; }
+    .search-bar input { flex: 1; padding: 12px 16px; border: 1px solid #d4d4d4; border-radius: 8px 0 0 8px; font-size: 14px; }
+    .search-bar button { background: var(--carrefour-blue); color: white; border: none; padding: 12px 20px; border-radius: 0 8px 8px 0; cursor: pointer; }
+    .header-actions { display: flex; align-items: center; gap: 20px; }
+    .header-actions a { color: var(--carrefour-black); text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+    .header-actions a:hover { color: var(--carrefour-blue); }
+    .cart-badge { background: var(--carrefour-red); color: white; font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .breadcrumb { padding: 16px 0; font-size: 14px; color: var(--carrefour-gray); }
+    .breadcrumb a { color: var(--carrefour-gray); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--carrefour-blue); text-decoration: underline; }
+    .breadcrumb span { margin: 0 6px; color: #d4d4d4; }
+    .product-main { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 24px 0 48px; }
+    @media (max-width: 900px) { .product-main { grid-template-columns: 1fr; } }
+    .product-gallery { position: sticky; top: 24px; }
+    .product-gallery img { width: 100%; max-width: 500px; height: auto; border-radius: 12px; background: var(--carrefour-gray-bg); }
+    .product-gallery-thumbs { display: flex; gap: 8px; margin-top: 12px; }
+    .product-gallery-thumbs img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 2px solid transparent; cursor: pointer; }
+    .product-gallery-thumbs img:hover { border-color: var(--carrefour-blue); }
+    .product-info h1 { font-size: 24px; font-weight: 700; color: var(--carrefour-black); margin-bottom: 8px; line-height: 1.3; }
+    .product-code { font-size: 14px; color: var(--carrefour-gray); margin-bottom: 20px; }
+    .price-block { background: var(--carrefour-gray-bg); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .price-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .price-original { font-size: 18px; color: var(--carrefour-gray); text-decoration: line-through; }
+    .discount-badge { background: var(--carrefour-red); color: white; font-size: 14px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+    .price-current { font-size: 28px; font-weight: 700; color: var(--carrefour-black); }
+    .price-pix { font-size: 14px; color: var(--carrefour-green); font-weight: 600; margin-top: 8px; }
+    .price-installment { font-size: 14px; color: var(--carrefour-gray); margin-top: 4px; }
+    .delivery-block { border: 1px solid #e5e5e5; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+    .delivery-block h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+    .delivery-cep { display: flex; gap: 8px; margin-bottom: 8px; }
+    .delivery-cep input { flex: 1; padding: 12px 14px; border: 1px solid #d4d4d4; border-radius: 8px; font-size: 14px; }
+    .delivery-cep button { background: var(--carrefour-blue); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .delivery-cep button:hover { background: #1649a8; }
+    .delivery-link { font-size: 12px; font-weight: 600; color: var(--carrefour-blue); text-decoration: none; }
+    .delivery-link:hover { text-decoration: underline; }
+    .seller-info { font-size: 14px; color: var(--carrefour-gray); margin-top: 12px; }
+    .btn-comprar { display: block; width: 100%; background: var(--carrefour-blue); color: white; font-size: 18px; font-weight: 700; padding: 16px 24px; border: none; border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; transition: background .2s; }
+    .btn-comprar:hover { background: #1649a8; color: white; }
+    .guarantee { font-size: 14px; color: var(--carrefour-gray); margin-top: 16px; display: flex; align-items: center; gap: 8px; }
+    .guarantee svg { flex-shrink: 0; }
+    .product-description { margin-top: 48px; padding-top: 32px; border-top: 1px solid #e5e5e5; }
+    .product-description h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+    .product-description .content { font-size: 14px; color: var(--carrefour-gray); line-height: 1.6; }
+    .product-description .content p { margin-bottom: 12px; }
+    .product-specs { margin-top: 32px; }
+    .product-specs h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .product-specs table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .product-specs th, .product-specs td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e5e5; }
+    .product-specs th { font-weight: 600; color: var(--carrefour-black); width: 40%; }
+    .product-specs td { color: var(--carrefour-gray); }
+    .product-specs tr:nth-child(odd) { background: var(--carrefour-gray-bg); }
+  </style>
+</head>
+<body>
+  <header class="carrefour-header">
+    <div class="container">
+      <div class="header-top">
+        <div class="logo">
+          <a href="{{SITE_URL}}" aria-label="Carrefour">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 34" fill="none"><path fill="#1E5BC6" fill-rule="evenodd" d="M25.63 0C20.27 0 18.18 7.69 18.18 16.85c0 9.16 2.09 16.75 7.45 16.75 2.22 0 4.96-1.91 5-3.48.02-.34-.1-.66-.38-.92-1.52-1.49-2.11-2.98-2.11-4.29 0-3.6 2.15-5.43 4.14-5.43 2.77 0 3.95 2.17 3.95 5.47 0 2.81 1.12 5.03 2.34 6.81.04.06.07.11.07.16 0 .13-.12.23-.27.23-.12 0-.22-.07-.26-.17-1.9-3.62-2.54-5.95-2.54-7.62 0-4.09 2.58-6.42 6.27-6.42 3.29 0 5.49 2.17 5.49 5.53 0 2.13-.8 4.26-2.2 5.95-.05.06-.08.13-.08.2 0 .14.11.25.25.25.11 0 .2-.06.25-.15.9-1.9 1.35-3.8 1.35-5.48 0-5.2-3.48-8.7-8.56-8.7-4.5 0-7.5 2.9-7.5 7.2 0 2.7 1.2 4.9 2.9 6.4.05.05.08.12.08.19 0 .14-.11.25-.25.25-.1 0-.19-.05-.24-.13-1.7-1.9-2.8-4.4-2.8-6.75 0-5.5 3.6-9.1 9-9.1 5.1 0 8.3 3.3 8.3 8.2 0 2.7-1 5-2.7 6.7-.06.06-.1.14-.1.22 0 .15.12.26.27.26.1 0 .18-.05.23-.12 1.8-2.1 2.8-4.8 2.8-7.3 0-6.1-4-10.1-9.9-10.1Z"/><path fill="#ED1C24" fill-rule="evenodd" d="M14.42.96c.09-.09.17-.12.24-.12.13 0 .24.11.24.24 0 .08-.03.16-.08.24C11.63 5.33 9.35 9.98 9.35 16.43c0 6.45 2.28 11.01 5.47 15.08.08.09.12.19.12.28 0 .13-.11.24-.24.24-.1 0-.18-.04-.24-.11L1.09 18.61C.42 18.03 0 17.35 0 16.38c0-.97.42-1.65 1.09-2.23L14.42.96Z"/></svg>
+          </a>
+        </div>
+        <div class="cep-box">
+          <input type="text" placeholder="Insira seu CEP" maxlength="9" aria-label="CEP"/>
+          <button type="button" aria-label="Buscar entrega">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.28 18.22L15.44 14.38c1.29-2.53 2.06-4.49 2.06-6.63 0-4.83-3.92-8.75-8.75-8.75S0 3.92 0 8.75s3.92 8.75 8.75 8.75c1.9 0 3.86-.77 5.39-2.05l3.83 3.84c.29.29.77.29 1.06 0 .29-.29.29-.77 0-1.06l-3.84-3.84zM1.5 8.75c0-4 3.25-7.25 7.25-7.25s7.25 3.25 7.25 7.25-3.25 7.25-7.25 7.25-7.25-3.25-7.25-7.25z" fill="currentColor"/></svg>
+          </button>
+          <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" class="cep-link" target="_blank" rel="noreferrer">Não sei meu CEP</a>
+        </div>
+        <div class="search-bar">
+          <input type="search" placeholder="Busque por produtos ou marcas no Carrefour" aria-label="Buscar"/>
+          <button type="submit" aria-label="Buscar">🔍</button>
+        </div>
+        <div class="header-actions">
+          <a href="{{SITE_URL}}">Entrar</a>
+          <a href="{{CHECKOUT_URL}}">🛒 Carrinho <span class="cart-badge">0</span></a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="breadcrumb">
+      <a href="{{SITE_URL}}">Home</a>
+      <span>/</span>
+      <a href="{{PRODUCT_BREADCRUMB_BACK_URL}}">{{PRODUCT_BREADCRUMB_BACK_LABEL}}</a>
+      <span>/</span>
+      <span>{{PRODUCT_TITLE}}</span>
+    </nav>
+
+    <div class="product-main">
+      <div class="product-gallery">
+        <img src="{{PRODUCT_IMAGE_1}}" alt="{{PRODUCT_TITLE}}"/>
+        <div class="product-gallery-thumbs">
+          <img src="{{PRODUCT_IMAGE_1}}" alt=""/>
+          <img src="{{PRODUCT_IMAGE_2}}" alt=""/>
+          <img src="{{PRODUCT_IMAGE_3}}" alt=""/>
+        </div>
+      </div>
+
+      <div class="product-info">
+        <h1>{{PRODUCT_TITLE}}</h1>
+        <p class="product-code">Código: {{PRODUCT_SKU}}</p>
+
+        <div class="price-block">
+          <div class="price-row">
+            {{PRICE_DISCOUNT_BLOCK}}
+            <span class="price-current">{{PRODUCT_PRICE}}</span>
+          </div>
+          <p class="price-pix">à vista no pix</p>
+          <p class="price-installment">ou {{PRODUCT_PRICE_APRAZO}} em até 6x sem juros</p>
+        </div>
+
+        <div class="delivery-block">
+          <h3>Valor e prazo de entrega</h3>
+          <div class="delivery-cep">
+            <input type="text" placeholder="Insira seu CEP" maxlength="9"/>
+            <button type="button">Calcular</button>
+          </div>
+          <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" class="delivery-link" target="_blank" rel="noreferrer">Não sei meu CEP</a>
+          <p class="seller-info">Vendido e entregue por {{PRODUCT_BRAND}}</p>
+        </div>
+
+        <a href="{{CHECKOUT_URL}}" class="btn-comprar">Comprar</a>
+
+        <p class="guarantee">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          O Carrefour garante a sua compra.
+        </p>
+      </div>
+    </div>
+
+    <section class="product-description">
+      <h2>Descrição do Produto</h2>
+      <div class="content">{{PRODUCT_DESCRIPTION}}</div>
+    </section>
+
+    <section class="product-specs">
+      <h3>Especificações Técnicas</h3>
+      <table><tbody>{{PRODUCT_SPECIFICATIONS}}</tbody></table>
+    </section>
+  </main>
+</body>
+</html>

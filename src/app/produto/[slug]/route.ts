@@ -10,6 +10,11 @@ function formatPrice(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
 
+function formatPriceDecolar(value: number): string {
+  const n = Math.round(value);
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 function formatPriceDrogasil(value: number): string {
   return `R$\u00A0${formatPrice(value)}`;
 }
@@ -48,7 +53,9 @@ export async function GET(
       ? "produto-template-drogasil.html"
       : product.template === "decolar"
         ? "produto-template-decolar.html"
-        : "produto-template.html";
+        : product.template === "carrefour"
+          ? "produto-template-carrefour.html"
+          : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
 
@@ -79,20 +86,145 @@ export async function GET(
   const fallbackUrl = product.category ? `/produtos?categoria=${product.category.slug}` : "javascript:void(0)";
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
-  const packageDaysNights =
+  const specMap =
     product.template === "decolar" && product.specifications.length > 0
+      ? Object.fromEntries(
+          product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
+        )
+      : {};
+  const packageDaysNights =
+    product.template === "decolar"
       ? (() => {
-          const map = Object.fromEntries(
-            product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
-          );
-          const dias = map["dias"] ?? map["dia"];
-          const noites = map["noites"] ?? map["noite"];
+          const dias = specMap["dias"] ?? specMap["dia"];
+          const noites = specMap["noites"] ?? specMap["noite"];
           if (dias && noites)
-            return `<span class="days-badge">${String(dias).trim()} DIAS / ${String(noites).trim()} NOITES</span>`;
-          if (dias) return `<span class="days-badge">${String(dias).trim()} DIAS</span>`;
-          if (noites) return `<span class="days-badge">${String(noites).trim()} NOITES</span>`;
+            return `${String(dias).trim()} DIAS / ${String(noites).trim()} NOITES`;
+          if (dias) return `${String(dias).trim()} DIAS`;
+          if (noites) return `${String(noites).trim()} NOITES`;
           return "";
         })()
+      : "";
+  const packageDates = product.template === "decolar" ? (specMap["datas"] ?? specMap["datas_viagem"] ?? "Sáb 02 Mai - Qui 07 Mai") : "";
+  const packagePax = product.template === "decolar" ? (specMap["passageiros"] ?? specMap["pax"] ?? "2 adultos") : "";
+  const packageInclusions =
+    product.template === "decolar"
+      ? product.description
+        ? product.description
+        : (() => {
+            const dest1 = specMap["destino1"] ?? "Recife";
+            const dest2 = specMap["destino2"] ?? "Porto de Galinhas";
+            const dest1Dias = specMap["destino1_dias"] ?? "2 DIAS / 1 NOITE";
+            const dest2Dias = specMap["destino2_dias"] ?? "5 DIAS / 4 NOITES";
+            const voo = specMap["voo_info"] ?? `Recife: ida e volta • Operado por ${specMap["voo_operador"] ?? "LATAM Airlines Group"}`;
+            const vooIda = specMap["voo_ida"] ?? "sáb 02 mai às 08.15 do CGH | Direto";
+            const vooVolta = specMap["voo_volta"] ?? "qui 07 mai às 05.20 do REC | Direto";
+            const hotel1 = specMap["hotel1"] ?? "Marante Plaza Hotel";
+            const hotel2 = specMap["hotel2"] ?? "Tabaobi Smart Hotel";
+            const quarto1 = specMap["quarto1"] ?? "Quarto Twin Standard";
+            const quarto2 = specMap["quarto2"] ?? "Quarto Standard com Varanda";
+            const regime = specMap["regime"] ?? "Buffet de café da manhã";
+            const amen1 = specMap["amenidades1"] ?? "Wi-Fi grátis nas áreas comuns · Piscina · Academia · Ar-condicionado nas áreas comuns";
+            const amen2 = specMap["amenidades2"] ?? "Wi-Fi grátis nas áreas comuns · Piscina ao ar livre - o ano todo · Estacionamento grátis · Ar-condicionado nas áreas comuns";
+            const rating1 = specMap["rating1"] ?? "8.4";
+            const rating2 = specMap["rating2"] ?? "9.0";
+            const stars1 = specMap["stars1"] ?? "4";
+            const stars2 = specMap["stars2"] ?? "3";
+            const starHtml = (n: string) => "★".repeat(parseInt(n, 10) || 4);
+            return `
+<div class="pkg-inclusions-container">
+  <div class="pkg-inclusions-header">
+    <div class="icon">✈</div>
+    <div>
+      <div class="title">VOO</div>
+      <div class="destination-info">${escapeHtml(voo)}</div>
+    </div>
+  </div>
+  <div class="flight-info"><span class="from-to"><em>IDA</em> ${escapeHtml(vooIda)}</span></div>
+  <div class="flight-info"><span class="from-to"><em>VOLTA</em> ${escapeHtml(vooVolta)}</span></div>
+  <a href="{{CHECKOUT_URL}}" class="btn-ghost">Ver voo</a>
+  <a href="{{CHECKOUT_URL}}" class="link-purple" style="display:block;margin-top:8px;">Alterar o voo</a>
+</div>
+<div class="subtitle-section">Em ${escapeHtml(dest1)} <span class="days-pill">${escapeHtml(dest1Dias)}</span></div>
+<div class="pkg-inclusions-container">
+  <div class="pkg-inclusions-header">
+    <div class="icon">🚗</div>
+    <div>
+      <div class="title">TRANSFER PRIVADO</div>
+      <div class="destination-info">De Aeroporto para ${escapeHtml(hotel1)}</div>
+    </div>
+  </div>
+  <div class="transfer-info">Ida e volta do aeroporto ao hotel</div>
+  <div class="transfer-info">2 pessoas · 2 bagagens de mão · 2 malas</div>
+  <a href="{{CHECKOUT_URL}}" class="btn-ghost">Ver transfer</a>
+</div>
+<div class="pkg-inclusions-container">
+  <div class="pkg-inclusions-header">
+    <div class="icon">🏨</div>
+    <div>
+      <div class="title">HOSPEDAGEM</div>
+      <div class="destination-info">${escapeHtml(dest1)} · 1 noite</div>
+    </div>
+  </div>
+  <a href="{{CHECKOUT_URL}}" class="btn-ghost">Ver hospedagem</a>
+  <div class="hotel-name">${escapeHtml(hotel1)}</div>
+  <div class="rating-row"><span class="rating-pill">${escapeHtml(rating1)}</span><span class="stars">${starHtml(stars1)}</span></div>
+  <div class="room-info">${escapeHtml(quarto1)}</div>
+  <div class="room-info text-green">${escapeHtml(regime)}</div>
+  <a href="{{CHECKOUT_URL}}" class="link-purple" style="display:block;margin-top:8px;">Alterar hospedagem</a>
+  <div class="other-inclusions"><div class="other-inclusions-title">O hotel também inclui</div>${escapeHtml(amen1)}</div>
+</div>
+<div class="subtitle-section">Transfer para ${escapeHtml(dest2)}</div>
+<div class="pkg-inclusions-container">
+  <div class="pkg-inclusions-header">
+    <div class="icon">🚗</div>
+    <div>
+      <div class="title">TRANSFER PRIVADO</div>
+      <div class="destination-info">De ${escapeHtml(hotel1)} para ${escapeHtml(hotel2)}</div>
+    </div>
+  </div>
+  <div class="transfer-info">Ida e volta do aeroporto ao hotel</div>
+  <a href="{{CHECKOUT_URL}}" class="btn-ghost">Ver transfer</a>
+</div>
+<div class="subtitle-section">Em ${escapeHtml(dest2)} <span class="days-pill">${escapeHtml(dest2Dias)}</span></div>
+<div class="pkg-inclusions-container">
+  <div class="pkg-inclusions-header">
+    <div class="icon">🏨</div>
+    <div>
+      <div class="title">HOSPEDAGEM</div>
+      <div class="destination-info">${escapeHtml(dest2)} · 4 noites</div>
+    </div>
+  </div>
+  <a href="{{CHECKOUT_URL}}" class="btn-ghost">Ver hospedagem</a>
+  <div class="hotel-name">${escapeHtml(hotel2)}</div>
+  <div class="rating-row"><span class="rating-pill">${escapeHtml(rating2)}</span><span class="stars">${starHtml(stars2)}</span></div>
+  <div class="room-info">${escapeHtml(quarto2)}</div>
+  <div class="room-info text-green">${escapeHtml(regime)}</div>
+  <a href="{{CHECKOUT_URL}}" class="link-purple" style="display:block;margin-top:8px;">Alterar hospedagem</a>
+  <div class="other-inclusions"><div class="other-inclusions-title">O hotel também inclui</div>${escapeHtml(amen2)}</div>
+</div>
+<div class="subtitle-section">Volta para ${escapeHtml(dest1)}</div>
+<div class="pkg-inclusions-container">
+  <div class="pkg-inclusions-header">
+    <div class="icon">🚗</div>
+    <div>
+      <div class="title">TRANSFER COMPARTILHADO</div>
+      <div class="destination-info">De ${escapeHtml(hotel2)} para Aeroporto</div>
+    </div>
+  </div>
+  <div class="transfer-info">Ida e volta do aeroporto ao hotel</div>
+  <a href="{{CHECKOUT_URL}}" class="btn-ghost">Ver transfer</a>
+</div>`;
+          })()
+      : "";
+  const loyaltyPoints =
+    product.template === "decolar"
+      ? (specMap["pontos"] ? `Você acumularia <strong>${specMap["pontos"]} pontos</strong>` : "Você acumularia <strong>801 pontos</strong>")
+      : "";
+  const paxCount = parseInt(String(packagePax).replace(/\D/g, "") || "2", 10) || 2;
+  const totalPrice = Number(priceAvista) * paxCount;
+  const priceTotalLabel =
+    product.template === "decolar"
+      ? `Total ${paxCount} pessoa${paxCount > 1 ? "s" : ""} R$${formatPriceDecolar(totalPrice)}`
       : "";
   const shortDescription = (product.shortDescription ?? "")
     .replace(/&/g, "&amp;")
@@ -103,7 +235,7 @@ export async function GET(
   const productDescription = product.description ?? product.shortDescription ?? ""; // para schema/SEO
 
   const specsRows = product.specifications.map((s) =>
-    product.template === "decolar"
+    product.template === "decolar" || product.template === "carrefour"
       ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
       : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
   );
@@ -112,6 +244,10 @@ export async function GET(
       ? product.template === "decolar"
         ? `<table><tbody>${specsRows.join("")}</tbody></table>`
         : specsRows.join("")
+      : "";
+  const priceDiscountBlockCarrefour =
+    product.template === "carrefour" && originalPrice && discountPercent
+      ? `<span class="price-original">R$ ${formatPrice(Number(originalPrice))}</span><span class="discount-badge">${discountPercent}</span>`
       : "";
 
   const baseUrl =
@@ -152,7 +288,8 @@ export async function GET(
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
     ["{{PRODUCT_TITLE}}", product.name],
     ["{{PRODUCT_BRAND}}", brandName],
-    ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : `R$ ${formatPrice(Number(priceAvista))}`],
+    ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : `R$ ${formatPrice(Number(priceAvista))}`],
+    ["{{PRICE_DISCOUNT_BLOCK}}", priceDiscountBlockCarrefour],
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? (product.template === "drogasil" ? formatPriceDrogasil(Number(originalPrice)) : `R$ ${formatPrice(Number(originalPrice))}`) : ""],
     ["{{PRODUCT_PRICE_META}}", Number(priceAvista).toFixed(2)],
     ["{{PRODUCT_SKU}}", product.sku ?? ""],
@@ -191,6 +328,11 @@ export async function GET(
     })()],
     ["{{PRODUCT_AVAILABILITY}}", "https://schema.org/InStock"],
     ["{{PACKAGE_DAYS_NIGHTS}}", packageDaysNights],
+    ["{{PACKAGE_DATES}}", packageDates],
+    ["{{PACKAGE_PAX}}", packagePax],
+    ["{{PACKAGE_INCLUSIONS}}", packageInclusions],
+    ["{{LOYALTY_POINTS}}", loyaltyPoints],
+    ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
   ];
 
   for (const [key, value] of replacements) {
