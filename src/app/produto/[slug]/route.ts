@@ -309,6 +309,8 @@ export async function GET(
     ["{{PARTNER_STORE_URL}}", "/loja-parceira/epocacosmeticos"],
     ["{{PARTNER_STORE_NAME}}", brandName ?? "Época Cosméticos"],
     ["{{PRODUCT_URL}}", productUrl],
+    ["{{PRODUCT_SLUG}}", slug],
+    ["{{PRODUCT_PATH}}", `/produto/${slug}`],
     ["{{PRODUCT_URL_WHATSAPP}}", `https://wa.me/?text=${encodeURIComponent(productUrl + " - " + product.name)}`],
     ["{{SITE_URL}}", baseUrl],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
