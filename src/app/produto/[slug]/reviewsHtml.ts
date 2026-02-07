@@ -253,3 +253,62 @@ export function buildReviewsHtml(
   </div>
 </div>`;
 }
+
+// Estrelas amarelas estilo Mercado Livre (#FFE600)
+const STAR_ML_SVG =
+  '<svg width="16" height="16" viewBox="0 0 16 16" fill="#FFE600" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 12.5L3.5 15l1-5.5L1 6l5.5-.5L8 0l1.5 5.5L15 6l-3.5 3.5 1 5.5L8 12.5z"/></svg>';
+
+function starsHtmlML(count: number): string {
+  return Array(count).fill(STAR_ML_SVG).join("");
+}
+
+/** Gera HTML de avaliações no estilo Mercado Livre (classes ui-review-*) */
+export function buildReviewsHtmlMercadoLivre(
+  reviews: ReviewInput[],
+  escapeHtml: (s: string) => string
+): string {
+  const emptyStateHtml = `
+<div class="ui-review-capability-comments">
+  <h3 class="ui-review-capability-comments__title andes-typography--type-title andes-typography--size-16px andes-typography--color-primary andes-typography--weight-regular">Opiniões em destaque</h3>
+  <span class="total-opinion">0 comentários</span>
+  <p class="ui-review-capability-comments__empty andes-typography--type-body andes-typography--color-secondary">Nenhuma avaliação ainda. Seja o primeiro a avaliar!</p>
+</div>`;
+
+  if (reviews.length === 0) {
+    return emptyStateHtml;
+  }
+
+  const avg = reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+  const avgRounded = Math.round(avg * 10) / 10;
+
+  const reviewCard = (r: ReviewInput) => `
+<div class="ui-review-capability-comments__comment">
+  <div class="ui-review-capability-comments__comment__header">
+    <div class="ui-review-capability-comments__comment__rating">${starsHtmlML(r.rating)}</div>
+    <span class="ui-review-capability-comments__comment__date">${formatRelativeDate(new Date(r.createdAt))}</span>
+  </div>
+  <p class="ui-review-capability-comments__comment__title andes-typography--type-title andes-typography--size-14px">${escapeHtml(r.title ?? "Avaliação")}</p>
+  <p class="ui-review-capability-comments__comment__content andes-typography--type-body">${escapeHtml(r.comment ?? "")}</p>
+  ${(r.images ?? []).length > 0 ? `<div class="ui-review-capability-comments__comment__images">${(r.images ?? []).slice(0, 4).map((url) => `<img src="${escapeHtml(url)}" alt="Foto" loading="lazy" class="ui-review-capability-comments__comment__image"/>`).join("")}</div>` : ""}
+  <div class="ui-review-capability-comments__comment__footer">
+    <div class="ui-review-capability-valorizations">
+      <button type="button" class="andes-button ui-review-capability-valorizations__button ui-review-capability-valorizations__button-like andes-button--large andes-button--transparent" aria-label="É útil"><span class="andes-button__content"><span class="ui-review-capability-valorizations__button-like__text">É útil</span></span></button>
+    </div>
+  </div>
+</div>`;
+
+  const cardsHtml = reviews.slice(0, 10).map((r) => reviewCard(r)).join("");
+
+  return `
+<div class="ui-review-capability-comments">
+  <h3 class="ui-review-capability-comments__title andes-typography--type-title andes-typography--size-16px andes-typography--color-primary andes-typography--weight-regular">Opiniões em destaque</h3>
+  <span class="total-opinion">${reviews.length} comentário${reviews.length !== 1 ? "s" : ""}</span>
+  <div class="ui-review-capability__summary" data-testid="summary-component">
+    <div class="ui-review-capability__summary__rating">
+      <span class="ui-review-capability__summary__rating__average">${avgRounded}</span>
+      <div class="ui-review-capability__summary__rating__stars">${starsHtmlML(5)}</div>
+    </div>
+  </div>
+  <div class="ui-review-capability-comments__list">${cardsHtml}</div>
+</div>`;
+}

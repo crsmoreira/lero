@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { buildReviewsHtml, buildReviewsHtmlDrogasil } from "./reviewsHtml";
+import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMercadoLivre } from "./reviewsHtml";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { NextRequest, NextResponse } from "next/server";
@@ -55,7 +55,9 @@ export async function GET(
         ? "produto-template-decolar.html"
         : product.template === "carrefour"
           ? "produto-template-carrefour.html"
-          : "produto-template.html";
+          : product.template === "mercadolivre"
+            ? "produto-template-mercadolivre.html"
+            : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
 
@@ -82,7 +84,7 @@ export async function GET(
     : "";
   const brandName = product.brandName ?? product.brand?.name ?? "";
   // Link "Voltar" do breadcrumb: usa campos do produto ou fallback da categoria
-  const breadcrumbBackLabel = product.breadcrumbBackLabel ?? product.category?.name ?? "Home";
+  const breadcrumbBackLabel = product.breadcrumbBackLabel ?? product.name ?? "Home";
   const fallbackUrl = product.category ? `/produtos?categoria=${product.category.slug}` : "javascript:void(0)";
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
@@ -283,7 +285,9 @@ export async function GET(
           mainImage,
           escapeHtml
         )
-      : buildReviewsHtml(reviewInputs, escapeHtml);
+      : product.template === "mercadolivre"
+        ? buildReviewsHtmlMercadoLivre(reviewInputs, escapeHtml)
+        : buildReviewsHtml(reviewInputs, escapeHtml);
 
   const replacements: [string | RegExp, string][] = [
     ["{{PRODUCT_IMAGE_1}}", mainImage],

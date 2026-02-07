@@ -34,7 +34,7 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
-  template: z.enum(["leroy", "drogasil", "decolar", "carrefour"]).optional(),
+  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre"]).optional(),
   tags: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -85,7 +85,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           gtin: product.gtin ?? "",
           stock: product.stock,
           status: product.status as "draft" | "active",
-          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour",
+          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "mercadolivre" ? "mercadolivre" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre",
           tags: product.tags.join(", "),
           metaTitle: product.metaTitle ?? "",
           metaDescription: product.metaDescription ?? "",
@@ -324,6 +324,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       <SelectItem value="drogasil">Drogasil</SelectItem>
                       <SelectItem value="decolar">Decolar (Pacotes)</SelectItem>
                       <SelectItem value="carrefour">Carrefour</SelectItem>
+                      <SelectItem value="mercadolivre">Mercado Livre</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
