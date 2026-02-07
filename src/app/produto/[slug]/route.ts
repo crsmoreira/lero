@@ -234,10 +234,12 @@ export async function GET(
   const longDescription = product.description ?? "";
   const productDescription = product.description ?? product.shortDescription ?? ""; // para schema/SEO
 
-  const specsRows = product.specifications.map((s) =>
-    product.template === "decolar" || product.template === "carrefour"
+  const specsRows = product.specifications.map((s, i) =>
+    product.template === "decolar"
       ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
-      : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
+      : product.template === "carrefour"
+        ? `<tr class="text-zinc-medium text-sm ${i % 2 === 0 ? "bg-background-gray" : ""}"><td class="p-2 w-1/3">${escapeHtml(s.key)}</td><td class="p-2 w-2/3">${escapeHtml(s.value)}</td></tr>`
+        : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
   );
   const specsHtml =
     specsRows.length > 0
