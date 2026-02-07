@@ -234,7 +234,15 @@ export async function GET(
   const longDescription = product.description ?? "";
   const productDescription = product.description ?? product.shortDescription ?? ""; // para schema/SEO
 
-  const specsRows = product.specifications.map((s, i) =>
+  const carrefourExcludeKeys = ["dimensões", "peso"];
+  const specsFiltered =
+    product.template === "carrefour"
+      ? product.specifications.filter((s) => {
+          const k = s.key.toLowerCase().trim();
+          return !carrefourExcludeKeys.some((ex) => k.includes(ex));
+        })
+      : product.specifications;
+  const specsRows = specsFiltered.map((s, i) =>
     product.template === "decolar"
       ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
       : product.template === "carrefour"
@@ -337,6 +345,12 @@ export async function GET(
     ["{{PACKAGE_INCLUSIONS}}", packageInclusions],
     ["{{LOYALTY_POINTS}}", loyaltyPoints],
     ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
+    [
+      "{{CARREFOUR_CUSTOM_STYLES}}",
+      product.template === "carrefour"
+        ? `a:not([data-carrefour-buy="1"]),button:not([data-carrefour-buy="1"]){pointer-events:none!important;cursor:default!important}div:has([class*="shimmer"]){display:none!important}[class*="shimmer"]{display:none!important}`
+        : "",
+    ],
   ];
 
   for (const [key, value] of replacements) {
