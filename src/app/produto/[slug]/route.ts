@@ -348,7 +348,7 @@ export async function GET(
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"
-        ? `div:has([class*="shimmer"]){display:none!important}[class*="shimmer"]{display:none!important}a,button{pointer-events:none!important;cursor:default!important}a[data-testid="pdp-buy-button"]{pointer-events:auto!important;cursor:pointer!important}`
+        ? `div:has([class*="shimmer"]){display:none!important}[class*="shimmer"]{display:none!important}div[class*="order-3"]:has([class*="animate-pulse"]){display:none!important}[id*="securiti"],[id*="privaci"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}a,button{pointer-events:none!important;cursor:default!important}header form[action*="busca"] input,header form[action*="busca"] button,header [data-testid="search-bar"]{pointer-events:auto!important;cursor:pointer!important}a[data-testid="pdp-buy-button"]{pointer-events:auto!important;cursor:pointer!important}`
         : "",
     ],
   ];
