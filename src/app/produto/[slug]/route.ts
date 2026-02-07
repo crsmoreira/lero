@@ -345,10 +345,13 @@ export async function GET(
     ["{{PACKAGE_INCLUSIONS}}", packageInclusions],
     ["{{LOYALTY_POINTS}}", loyaltyPoints],
     ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
+    ...(product.template === "carrefour"
+      ? [["title=\"Carrefour - Home\" href=\"/\" data-discover=\"true\"", "title=\"Carrefour - Home\" href=\"javascript:void(0)\" data-discover=\"true\""] as [string, string][]
+      : []),
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"
-        ? `[class*="shimmer"]{display:none!important}header~*div[class*="order-3"]:has([class*="animate-pulse"]){display:none!important}[id*="securiti"],[id*="privaci"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}a,button{pointer-events:none!important;cursor:default!important}header a,header button,header input{pointer-events:auto!important;cursor:pointer!important}a[data-testid="pdp-buy-button"]{pointer-events:auto!important;cursor:pointer!important}`
+        ? `[class*="shimmer"]{display:none!important}header~*div[class*="order-3"]:has([class*="animate-pulse"]){display:none!important}[id*="securiti"],[id*="privaci"],[id*="onetrust"],[id*="cookie"],[class*="cookie-consent"],[class*="cookie-banner"],[class*="cookie"],[class*="gdpr"],[class*="consent-banner"]{display:none!important}a,button{pointer-events:none!important;cursor:default!important}header a,header button,header input{pointer-events:auto!important;cursor:pointer!important}a[data-testid="pdp-buy-button"],a[href*="avaliac"],a[href*="#avali"],button[aria-label*="Avalie"],[aria-label*="avalie"],[data-testid*="avalie"]{pointer-events:auto!important;cursor:pointer!important}`
         : "",
     ],
   ];
