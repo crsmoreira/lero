@@ -157,7 +157,7 @@ model Product {
   gtin            String?
   stock           Int       @default(0)
   status          String    @default("draft") // draft, active
-  template        String    @default("leroy") // leroy | drogasil | decolar | carrefour | mercadolivre | vakinha
+  template        String    @default("leroy") // leroy | drogasil | decolar | carrefour | mercadolivre | vakinha | havan | havan
   tags            String[]  @default([])
   metaTitle       String?
   metaDescription String?   @db.Text

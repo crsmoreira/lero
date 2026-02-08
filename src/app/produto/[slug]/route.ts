@@ -88,7 +88,9 @@ export async function GET(
           ? "produto-template-carrefour.html"
           : product.template === "mercadolivre"
             ? "produto-template-mercadolivre.html"
-            : "produto-template.html";
+            : product.template === "havan"
+              ? "produto-template-havan.html"
+              : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
   const images = (product.images ?? []).map((img) => img.url);
@@ -334,9 +336,11 @@ export async function GET(
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
     ["{{PRODUCT_TITLE}}", product.name],
     ["{{PRODUCT_BRAND}}", brandName],
-    ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : `R$ ${formatPrice(Number(priceAvista))}`],
+    ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : product.template === "havan" ? `R$ ${formatPrice(Number(priceAvista))}` : `R$ ${formatPrice(Number(priceAvista))}`],
     ["{{PRICE_DISCOUNT_BLOCK}}", priceDiscountBlockCarrefour],
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? (product.template === "drogasil" ? formatPriceDrogasil(Number(originalPrice)) : `R$ ${formatPrice(Number(originalPrice))}`) : ""],
+    ["{{PRICE_DISCOUNT_HAVAN}}", product.template === "havan" && discountPercent ? `<div class="tag-discont green-tag"><div class="discont"><div class="label-discount"><span class="sale-product-icon">${discountPercent}</span></div></div></div>` : ""],
+    ["{{PRODUCT_OLD_PRICE_HAVAN}}", product.template === "havan" && originalPrice ? `<span class="old-price"><span class="price-wrapper"><span class="price">R$ ${formatPrice(Number(originalPrice))}</span></span></span>` : ""],
     ["{{PRODUCT_PRICE_META}}", Number(priceAvista).toFixed(2)],
     ["{{PRODUCT_SKU}}", product.sku ?? ""],
     ["{{PRODUCT_IMAGE_1_ENCODED}}", encodeURIComponent(mainImage)],
