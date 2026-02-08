@@ -128,16 +128,13 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
   const template = watch("template") ?? "leroy";
   const isVakinha = template === "vakinha";
 
-  const getVakinhaSpec = (key: string) =>
-    specs.find((s) => s.key.toLowerCase().trim() === key)?.value ?? "";
-  const setVakinhaSpec = (key: string, value: string) => {
-    const rest = specs.filter((s) => s.key.toLowerCase().trim() !== key);
-    if (value) {
-      setSpecs([...rest, { key, value, order: rest.length }]);
-    } else {
-      setSpecs(rest);
+  React.useEffect(() => {
+    if (isVakinha) {
+      setValue("price", 1);
+      setValue("promotionalPrice", null);
+      setValue("stock", 0);
     }
-  };
+  }, [isVakinha, setValue]);
 
   const [reviews, setReviews] = React.useState<ReviewItem[]>(
     product?.reviews
@@ -218,7 +215,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="name">Nome</Label>
+            <Label htmlFor="name">{isVakinha ? "Título" : "Nome"}</Label>
             <Input
               id="name"
               {...register("name")}
@@ -238,17 +235,19 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
               <p className="text-sm text-red-600">{errors.slug.message}</p>
             )}
           </div>
+          {!isVakinha && (
+            <div>
+              <Label htmlFor="shortDescription">Descrição curta (até 160 chars)</Label>
+              <Textarea
+                id="shortDescription"
+                {...register("shortDescription")}
+                maxLength={160}
+                rows={2}
+              />
+            </div>
+          )}
           <div>
-            <Label htmlFor="shortDescription">Descrição curta (até 160 chars)</Label>
-            <Textarea
-              id="shortDescription"
-              {...register("shortDescription")}
-              maxLength={160}
-              rows={2}
-            />
-          </div>
-          <div>
-            <Label htmlFor="description">Descrição longa</Label>
+            <Label htmlFor="description">{isVakinha ? "Descrição" : "Descrição longa"}</Label>
             <Controller
               name="description"
               control={control}
@@ -262,49 +261,50 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="price">{isVakinha ? "Meta (R$)" : "Preço (R$)"}</Label>
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                {...register("price", { valueAsNumber: true })}
-              />
-              {errors.price && (
-                <p className="text-sm text-red-600">{errors.price.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="promotionalPrice">{isVakinha ? "Valor arrecadado (R$)" : "Preço promocional (R$)"}</Label>
-              <Input
-                id="promotionalPrice"
-                type="number"
-                step="0.01"
-                {...register("promotionalPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
-              />
-              {isVakinha && (
-                <p className="text-xs text-gray-500 mt-1">Valor já arrecadado na vaquinha</p>
-              )}
-            </div>
-            {!isVakinha && (
-              <div>
-                <Label htmlFor="installmentPrice">Valor a prazo (R$)</Label>
-                <Input
-                  id="installmentPrice"
-                  type="number"
-                  step="0.01"
-                  {...register("installmentPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
-                />
-                <p className="text-xs text-gray-500 mt-1">Quando definido, exibe este valor em vez do preço</p>
+          {!isVakinha && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="price">Preço (R$)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    {...register("price", { valueAsNumber: true })}
+                  />
+                  {errors.price && (
+                    <p className="text-sm text-red-600">{errors.price.message}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="promotionalPrice">Preço promocional (R$)</Label>
+                  <Input
+                    id="promotionalPrice"
+                    type="number"
+                    step="0.01"
+                    {...register("promotionalPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="installmentPrice">Valor a prazo (R$)</Label>
+                  <Input
+                    id="installmentPrice"
+                    type="number"
+                    step="0.01"
+                    {...register("installmentPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Quando definido, exibe este valor em vez do preço</p>
+                </div>
               </div>
-            )}
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="stock">Estoque</Label>
+                  <Input id="stock" type="number" {...register("stock", { valueAsNumber: true })} />
+                </div>
+              </div>
+            </>
+          )}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="stock">Estoque</Label>
-              <Input id="stock" type="number" {...register("stock", { valueAsNumber: true })} />
-            </div>
             <div>
               <Label htmlFor="status">Status</Label>
               <Controller
@@ -352,59 +352,61 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
               />
             </div>
           </div>
-          <div>
-            <Label htmlFor="checkoutUrl">Link de Checkout</Label>
-            <Input
-              id="checkoutUrl"
-              type="url"
-              placeholder="https://..."
-              {...register("checkoutUrl")}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              URL para onde os botões &quot;Comprar&quot; e &quot;Adicionar ao carrinho&quot; redirecionam
-            </p>
-          </div>
           {!isVakinha && (
-            <div className="grid grid-cols-2 gap-4">
+            <>
               <div>
-                <Label htmlFor="sku">SKU</Label>
-                <Input id="sku" {...register("sku")} />
+                <Label htmlFor="checkoutUrl">Link de Checkout</Label>
+                <Input
+                  id="checkoutUrl"
+                  type="url"
+                  placeholder="https://..."
+                  {...register("checkoutUrl")}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  URL para onde os botões &quot;Comprar&quot; e &quot;Adicionar ao carrinho&quot; redirecionam
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="sku">SKU</Label>
+                  <Input id="sku" {...register("sku")} />
+                </div>
+                <div>
+                  <Label htmlFor="gtin">GTIN</Label>
+                  <Input id="gtin" {...register("gtin")} />
+                </div>
               </div>
               <div>
-                <Label htmlFor="gtin">GTIN</Label>
-                <Input id="gtin" {...register("gtin")} />
+                <Label htmlFor="brandName">Marca (opcional)</Label>
+                <Input
+                  id="brandName"
+                  placeholder="Ex: Smart Norte"
+                  {...register("brandName")}
+                />
               </div>
-            </div>
+              <div>
+                <Label htmlFor="breadcrumbBackLabel">Link &quot;Voltar&quot; do breadcrumb</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <Input
+                      id="breadcrumbBackLabel"
+                      placeholder="Ex: Todos os Modelos de Espelho para Banheiro"
+                      {...register("breadcrumbBackLabel")}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Texto exibido no link</p>
+                  </div>
+                  <div>
+                    <Input
+                      id="breadcrumbBackUrl"
+                      placeholder="Ex: /produtos?categoria=espelhos ou https://..."
+                      {...register("breadcrumbBackUrl")}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">URL de destino ao clicar</p>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
-          <div>
-            <Label htmlFor="brandName">Marca (opcional)</Label>
-            <Input
-              id="brandName"
-              placeholder="Ex: Smart Norte"
-              {...register("brandName")}
-            />
-          </div>
-          <div>
-            <Label htmlFor="breadcrumbBackLabel">Link &quot;Voltar&quot; do breadcrumb</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-              <div>
-                <Input
-                  id="breadcrumbBackLabel"
-                  placeholder="Ex: Todos os Modelos de Espelho para Banheiro"
-                  {...register("breadcrumbBackLabel")}
-                />
-                <p className="text-xs text-gray-500 mt-1">Texto exibido no link</p>
-              </div>
-              <div>
-                <Input
-                  id="breadcrumbBackUrl"
-                  placeholder="Ex: /produtos?categoria=espelhos ou https://..."
-                  {...register("breadcrumbBackUrl")}
-                />
-                <p className="text-xs text-gray-500 mt-1">URL de destino ao clicar</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -413,95 +415,20 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         <ImageUploader images={images} onChange={setImages} uploadEnabled={uploadEnabled} />
       </div>
 
-      {isVakinha ? (
-        <div>
-          <h3 className="font-medium mb-4">Dados da Vaquinha</h3>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <Label htmlFor="vakinha-num_doadores">Número de doadores</Label>
-              <Input
-                id="vakinha-num_doadores"
-                placeholder="Ex: 150"
-                value={getVakinhaSpec("num_doadores")}
-                onChange={(e) => setVakinhaSpec("num_doadores", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="vakinha-nome_criador">Nome do criador</Label>
-              <Input
-                id="vakinha-nome_criador"
-                placeholder="Ex: João Silva"
-                value={getVakinhaSpec("nome_criador")}
-                onChange={(e) => setVakinhaSpec("nome_criador", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="vakinha-pix_chave">Chave PIX</Label>
-              <Input
-                id="vakinha-pix_chave"
-                placeholder="Ex: email@exemplo.com ou CPF"
-                value={getVakinhaSpec("pix_chave")}
-                onChange={(e) => setVakinhaSpec("pix_chave", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="vakinha-data_criacao">Data de criação</Label>
-              <Input
-                id="vakinha-data_criacao"
-                placeholder="DD/MM/AAAA"
-                value={getVakinhaSpec("data_criacao")}
-                onChange={(e) => setVakinhaSpec("data_criacao", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="vakinha-categoria">Categoria</Label>
-              <Input
-                id="vakinha-categoria"
-                placeholder="Ex: Saúde / Tratamentos"
-                value={getVakinhaSpec("categoria")}
-                onChange={(e) => setVakinhaSpec("categoria", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="vakinha-beneficiario">Beneficiário</Label>
-              <Input
-                id="vakinha-beneficiario"
-                placeholder="Nome do beneficiário"
-                value={getVakinhaSpec("beneficiario")}
-                onChange={(e) => setVakinhaSpec("beneficiario", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="vakinha-coracoes_recebidos">Corações recebidos</Label>
-              <Input
-                id="vakinha-coracoes_recebidos"
-                placeholder="Ex: 42"
-                value={getVakinhaSpec("coracoes_recebidos")}
-                onChange={(e) => setVakinhaSpec("coracoes_recebidos", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="vakinha-id">ID da vaquinha (opcional)</Label>
-              <Input
-                id="vakinha-id"
-                placeholder="Ex: 5938075"
-                {...register("sku")}
-              />
-              <p className="text-xs text-gray-500 mt-1">Exibido como &quot;ID: 5938075&quot;</p>
-            </div>
-          </div>
-        </div>
-      ) : (
+      {!isVakinha && (
         <div>
           <h3 className="font-medium mb-4">Especificações</h3>
           <SpecificationsEditor specs={specs} onChange={setSpecs} />
         </div>
       )}
 
-      <div>
-        <ReviewsEditor reviews={reviews} onChange={setReviews} uploadEnabled={uploadEnabled} />
-      </div>
+      {!isVakinha && (
+        <div>
+          <ReviewsEditor reviews={reviews} onChange={setReviews} uploadEnabled={uploadEnabled} />
+        </div>
+      )}
 
+      {!isVakinha && (
       <div className="border-t pt-6">
         <h3 className="font-medium mb-4">SEO</h3>
         <div className="space-y-4">
@@ -515,6 +442,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
       </div>
+      )}
 
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>

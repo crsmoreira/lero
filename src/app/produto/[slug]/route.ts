@@ -10,12 +10,6 @@ function formatPrice(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
 
-function formatPriceBr(value: number): string {
-  const [intPart, decPart] = value.toFixed(2).split(".");
-  const intFormatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return `${intFormatted},${decPart}`;
-}
-
 function formatPriceDecolar(value: number): string {
   const n = Math.round(value);
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -104,7 +98,7 @@ export async function GET(
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
   const specMap =
-    (product.template === "decolar" || product.template === "vakinha") && product.specifications.length > 0
+    product.template === "decolar" && product.specifications.length > 0
       ? Object.fromEntries(
           product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
         )
@@ -285,30 +279,6 @@ export async function GET(
         ).join("")
       : "";
 
-  // Vakinha-specific
-  const vakinhaMeta = Number(product.price);
-  const vakinhaArrecadado = product.promotionalPrice != null ? Number(product.promotionalPrice) : 0;
-  const vakinhaPercent = vakinhaMeta > 0 ? Math.min(100, Math.round((vakinhaArrecadado / vakinhaMeta) * 100)) : 0;
-  const vk = product.template === "vakinha" ? specMap : {} as Record<string, string>;
-  const vakinhaCategoriaHtml = product.template === "vakinha" && vk["categoria"]
-    ? `<span class="vak-categoria">${escapeHtml(vk["categoria"])}</span>`
-    : "";
-  const vakinhaDataCriacaoHtml = product.template === "vakinha" && vk["data_criacao"]
-    ? `<span>Criada em ${escapeHtml(vk["data_criacao"])}</span>`
-    : "";
-  const vakinhaCoracoesHtml = product.template === "vakinha" && vk["coracoes_recebidos"]
-    ? `<div class="vak-stat"><strong>${escapeHtml(vk["coracoes_recebidos"])}</strong> corações recebidos</div>`
-    : "";
-  const vakinhaPixHtml = product.template === "vakinha" && vk["pix_chave"]
-    ? `<div class="vak-pix"><div class="vak-pix-title">Doar via PIX</div><div class="vak-pix-chave">${escapeHtml(vk["pix_chave"])}</div></div>`
-    : "";
-  const vakinhaBeneficiarioHtml = product.template === "vakinha" && vk["beneficiario"]
-    ? `<div class="vak-criador" style="margin-top:8px">Beneficiário: <strong>${escapeHtml(vk["beneficiario"])}</strong></div>`
-    : "";
-  const vakinhaIdHtml = product.template === "vakinha" && product.sku
-    ? `<div class="vak-id">ID: ${escapeHtml(product.sku)}</div>`
-    : "";
-
   const baseUrl =
     process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
@@ -408,22 +378,6 @@ export async function GET(
           ["{{IS_MOBILE}}", mlIsMobile],
           ["{{DEVICE_TYPE}}", mlDeviceType],
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
-        ] as [string | RegExp, string][])
-      : []),
-    ...(product.template === "vakinha"
-      ? ([
-          ["{{VAKINHA_META}}", formatPriceBr(vakinhaMeta)],
-          ["{{VAKINHA_ARRECADADO}}", formatPriceBr(vakinhaArrecadado)],
-          ["{{VAKINHA_ARRECADADO_NUM}}", vakinhaArrecadado.toFixed(2)],
-          ["{{VAKINHA_PERCENT}}", String(vakinhaPercent)],
-          ["{{VAKINHA_NUM_DOADORES}}", vk["num_doadores"] ?? "0"],
-          ["{{VAKINHA_NOME_CRIADOR}}", vk["nome_criador"] ?? "Anônimo"],
-          ["{{VAKINHA_CATEGORIA_HTML}}", vakinhaCategoriaHtml],
-          ["{{VAKINHA_DATA_CRIACAO_HTML}}", vakinhaDataCriacaoHtml],
-          ["{{VAKINHA_CORACOES_HTML}}", vakinhaCoracoesHtml],
-          ["{{VAKINHA_PIX_HTML}}", vakinhaPixHtml],
-          ["{{VAKINHA_BENEFICIARIO_HTML}}", vakinhaBeneficiarioHtml],
-          ["{{VAKINHA_ID_HTML}}", vakinhaIdHtml],
         ] as [string | RegExp, string][])
       : []),
     [
