@@ -28,11 +28,15 @@ const createDomainSchema = z.object({
 });
 
 export async function listDomains() {
-  const workspaceId = await getWorkspaceId();
-  return prisma.domain.findMany({
-    where: { workspaceId },
-    orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
-  });
+  try {
+    const workspaceId = await getWorkspaceId();
+    return prisma.domain.findMany({
+      where: { workspaceId },
+      orderBy: [{ isPrimary: "desc" }, { createdAt: "desc" }],
+    });
+  } catch {
+    return [];
+  }
 }
 
 export async function createDomain(data: z.infer<typeof createDomainSchema>) {

@@ -53,20 +53,24 @@ openssl rand -base64 32
 
 ### 3. Banco de dados
 
+**Opção A – Docker (PostgreSQL local)**
+
 ```bash
-# Criar migrations
-npm run db:migrate
-
-# Se migrate falhar (ex: Prisma 7), use db push ou o SQL manual:
+docker compose up -d
 npm run db:push
-# Ou: psql $DATABASE_URL -f prisma/add_product_analytics_manual.sql
-
-# Ou, se preferir apenas sincronizar o schema (desenvolvimento):
-npx prisma db push
-
-# Executar seed (cria admin e produto exemplo)
 npm run db:seed
+npm run db:seed-domains   # cria workspace, domínio padrão e vínculos multi-domínio
 ```
+
+**Opção B – PostgreSQL já instalado**
+
+```bash
+npm run db:push
+npm run db:seed
+npm run db:seed-domains
+```
+
+**Importante:** Após a implementação do sistema multi-domínio, é obrigatório rodar `db:push` e `db:seed-domains`. Sem isso, a página de produtos e domínios não funcionará.
 
 ### 4. Rodar o projeto
 

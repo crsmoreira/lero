@@ -14,8 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { deleteProduct } from "@/actions/products";
 
 export default async function AdminProductsPage() {
-  let products;
+  let products: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
   const domainMap: Record<string, string[]> = {};
+
   try {
     products = await prisma.product.findMany({
       include: {
@@ -23,7 +24,19 @@ export default async function AdminProductsPage() {
       },
       orderBy: { createdAt: "desc" },
     });
-    const productIds = (products ?? []).map((p) => p.id);
+  } catch (err) {
+    console.error("Erro ao carregar produtos:", err);
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-red-800">
+        <h2 className="font-semibold mb-2">Erro ao carregar produtos</h2>
+        <p className="text-sm mb-4">Verifique se o banco de dados está rodando e acessível.</p>
+        <a href="/admin/produtos" className="text-sm underline">Tentar novamente</a>
+      </div>
+    );
+  }
+
+  try {
+    const productIds = products.map((p) => p.id);
     if (productIds.length > 0) {
       const cds = await prisma.contentDomain.findMany({
         where: { contentType: "product", contentId: { in: productIds } },
@@ -34,15 +47,8 @@ export default async function AdminProductsPage() {
         domainMap[cd.contentId].push(cd.domain.hostname);
       });
     }
-  } catch (err) {
-    console.error("Erro ao carregar produtos:", err);
-    return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-red-800">
-        <h2 className="font-semibold mb-2">Erro ao carregar produtos</h2>
-        <p className="text-sm mb-4">Verifique se o banco de dados está rodando e acessível.</p>
-        <a href="/admin/produtos" className="text-sm underline">Tentar novamente</a>
-      </div>
-    );
+  } catch {
+    // Tabelas de domínio podem não existir ainda; ignora e segue sem chips
   }
 
   const productList = products ?? [];
