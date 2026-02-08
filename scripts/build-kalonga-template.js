@@ -55,6 +55,12 @@ imgMap.forEach(([suffix, num]) => {
   html = html.replace(re, `{{PRODUCT_IMAGE_${num}}}`);
 });
 
+// 4b. Primeira imagem da galeria: remover lazy-load e data-src para carregar imediatamente (evita bug)
+const firstMainImg = /(<li class="splide__slide">[\s\S]*?<img class="img-fluid )img-prod-lazy (img-grande"[^>]+)src="\{\{PRODUCT_IMAGE_1\}\}"([^>]*?)data-src="\{\{PRODUCT_IMAGE_1\}\}"([^>]*>)/;
+html = html.replace(firstMainImg, (_m, p1, p2, p3, p4) => {
+  return p1 + p2 + 'loading="eager" fetchpriority="high" src="{{PRODUCT_IMAGE_1}}" ' + p3 + p4;
+});
+
 // 5. Título do produto no body - múltiplas ocorrências
 const titleVariants = [
   "Mochila escolar com rodas, Up4you Capivara, Rosa, IC42112UP0310U, Luxcel - PT 1 UN - Escolar",
