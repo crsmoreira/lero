@@ -128,13 +128,16 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
   const template = watch("template") ?? "leroy";
   const isVakinha = template === "vakinha";
 
-  React.useEffect(() => {
-    if (isVakinha) {
-      setValue("price", 1);
-      setValue("promotionalPrice", null);
-      setValue("stock", 0);
+  const getVakinhaSpec = (key: string) =>
+    specs.find((s) => s.key.toLowerCase().trim() === key)?.value ?? "";
+  const setVakinhaSpec = (key: string, value: string) => {
+    const rest = specs.filter((s) => s.key.toLowerCase().trim() !== key);
+    if (value) {
+      setSpecs([...rest, { key, value, order: rest.length }]);
+    } else {
+      setSpecs(rest);
     }
-  }, [isVakinha, setValue]);
+  };
 
   const [reviews, setReviews] = React.useState<ReviewItem[]>(
     product?.reviews
@@ -235,17 +238,15 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
               <p className="text-sm text-red-600">{errors.slug.message}</p>
             )}
           </div>
-          {!isVakinha && (
-            <div>
-              <Label htmlFor="shortDescription">Descrição curta (até 160 chars)</Label>
-              <Textarea
-                id="shortDescription"
-                {...register("shortDescription")}
-                maxLength={160}
-                rows={2}
-              />
-            </div>
-          )}
+          <div>
+            <Label htmlFor="shortDescription">{isVakinha ? "Descrição curta / Meta description (até 160 chars)" : "Descrição curta (até 160 chars)"}</Label>
+            <Textarea
+              id="shortDescription"
+              {...register("shortDescription")}
+              maxLength={160}
+              rows={2}
+            />
+          </div>
           <div>
             <Label htmlFor="description">{isVakinha ? "Descrição" : "Descrição longa"}</Label>
             <Controller
@@ -261,7 +262,44 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
         <div className="space-y-4">
-          {!isVakinha && (
+          {(isVakinha ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="price">Meta (R$)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  {...register("price", { valueAsNumber: true })}
+                />
+                {errors.price && (
+                  <p className="text-sm text-red-600">{errors.price.message}</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">Valor total que a vaquinha pretende arrecadar</p>
+              </div>
+              <div>
+                <Label htmlFor="promotionalPrice">Valor arrecadado (R$)</Label>
+                <Input
+                  id="promotionalPrice"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  {...register("promotionalPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
+                />
+                <p className="text-xs text-gray-500 mt-1">Valor já arrecadado até o momento</p>
+              </div>
+              <div>
+                <Label htmlFor="vakinha-num_doadores">Número de doadores</Label>
+                <Input
+                  id="vakinha-num_doadores"
+                  placeholder="Ex: 150"
+                  value={getVakinhaSpec("num_doadores")}
+                  onChange={(e) => setVakinhaSpec("num_doadores", e.target.value)}
+                />
+              </div>
+            </div>
+          ) : (
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -303,7 +341,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                 </div>
               </div>
             </>
-          )}
+          ))}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="status">Status</Label>
