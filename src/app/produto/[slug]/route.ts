@@ -10,6 +10,12 @@ function formatPrice(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
 
+function formatPriceBr(value: number): string {
+  const [intPart, decPart = "00"] = value.toFixed(2).split(".");
+  const withDots = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${withDots},${decPart}`;
+}
+
 function formatPriceDecolar(value: number): string {
   const n = Math.round(value);
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -386,12 +392,12 @@ export async function GET(
             const spec = specMap["valor_arrecadado"];
             if (spec) return spec;
             const v = product.promotionalPrice != null ? Number(product.promotionalPrice) : Number(product.price);
-            return `R$ ${formatPrice(v)}`;
+            return `R$ ${formatPriceBr(v)}`;
           })()],
           ["{{VAKINHA_DE_META}}", (() => {
             const spec = specMap["meta"];
             if (spec) return spec.startsWith("de ") ? spec : `de ${spec}`;
-            return `de R$ ${formatPrice(Number(product.price))}`;
+            return `de R$ ${formatPriceBr(Number(product.price))}`;
           })()],
           ["{{VAKINHA_CORACOES}}", specMap["coracoes_recebidos"] ?? specMap["coracoes"] ?? "0"],
           ["{{VAKINHA_APOIADORES}}", specMap["num_doadores"] ?? specMap["apoiadores"] ?? "0"],
