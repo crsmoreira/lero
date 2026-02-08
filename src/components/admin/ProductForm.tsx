@@ -27,14 +27,14 @@ const productSchema = z.object({
   slug: z.string().min(1, "Slug obrigatório"),
   shortDescription: z.string().max(160).optional(),
   description: z.string().optional(),
-  price: z.number().positive(),
+  price: z.number().min(0),
   promotionalPrice: z.number().positive().nullable().optional(),
   installmentPrice: z.number().positive().nullable().optional(),
   sku: z.string().optional(),
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
-  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre"]).optional(),
+  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre", "vakinha"]).optional(),
   tags: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -44,7 +44,20 @@ const productSchema = z.object({
   brandName: z.string().optional(),
   categoryId: z.string().optional().nullable(),
   brandId: z.string().optional().nullable(),
-});
+  pixKey: z.string().optional().nullable(),
+  campaignGoal: z.number().positive().nullable().optional(),
+  campaignCollected: z.number().min(0).nullable().optional(),
+  beneficiaryName: z.string().optional().nullable(),
+  creatorName: z.string().optional().nullable(),
+  creatorAvatar: z.string().optional().nullable(),
+  campaignCategory: z.string().optional().nullable(),
+}).refine(
+  (data) => {
+    if (data.template === "vakinha") return (data.campaignGoal ?? 0) > 0;
+    return (data.price ?? 0) > 0;
+  },
+  { message: "Preço ou meta obrigatória", path: ["price"] }
+);
 
 type FormData = z.infer<typeof productSchema>;
 
@@ -63,12 +76,25 @@ type ProductFormProps = {
 export function ProductForm({ product, uploadEnabled = false }: ProductFormProps) {
   const isEditing = !!product;
 
+  const productExt = product
+    ? (product as Product & {
+        pixKey?: string | null;
+        campaignGoal?: { toString: () => string } | number | null;
+        campaignCollected?: { toString: () => string } | number | null;
+        beneficiaryName?: string | null;
+        creatorName?: string | null;
+        creatorAvatar?: string | null;
+        campaignCategory?: string | null;
+      })
+    : null;
+
   const {
     register,
     handleSubmit,
     setValue,
     setError,
     control,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(productSchema),
@@ -85,7 +111,14 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           gtin: product.gtin ?? "",
           stock: product.stock,
           status: product.status as "draft" | "active",
-          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "mercadolivre" ? "mercadolivre" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre",
+          template: (productExt?.template === "drogasil" ? "drogasil" : productExt?.template === "decolar" ? "decolar" : productExt?.template === "carrefour" ? "carrefour" : productExt?.template === "mercadolivre" ? "mercadolivre" : productExt?.template === "vakinha" ? "vakinha" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre" | "vakinha",
+          pixKey: productExt?.pixKey ?? "",
+          campaignGoal: productExt?.campaignGoal != null ? Number(productExt.campaignGoal) : null,
+          campaignCollected: productExt?.campaignCollected != null ? Number(productExt.campaignCollected) : null,
+          beneficiaryName: productExt?.beneficiaryName ?? "",
+          creatorName: productExt?.creatorName ?? "",
+          creatorAvatar: productExt?.creatorAvatar ?? "",
+          campaignCategory: productExt?.campaignCategory ?? "",
           tags: product.tags.join(", "),
           metaTitle: product.metaTitle ?? "",
           metaDescription: product.metaDescription ?? "",
@@ -139,9 +172,14 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
   async function onSubmit(data: FormData) {
     try {
       const slug = (data.slug?.trim() || slugify(String(data.name ?? "")) || "produto").slice(0, 200);
+      const isVakinha = data.template === "vakinha";
+      const price = isVakinha ? (data.campaignGoal ?? 1) : (data.price ?? 0);
+      const promotionalPrice = isVakinha ? (data.campaignCollected ?? null) : (data.promotionalPrice ?? null);
       const payload = {
         ...data,
         slug: slug || "produto",
+        price,
+        promotionalPrice,
         tags: data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
         checkoutUrl: data.checkoutUrl || null,
         template: data.template || "leroy",
@@ -150,7 +188,13 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         brandName: data.brandName || null,
         categoryId: data.categoryId || null,
         brandId: data.brandId || null,
-        promotionalPrice: data.promotionalPrice ?? null,
+        pixKey: data.pixKey?.trim() || null,
+        campaignGoal: data.campaignGoal ?? null,
+        campaignCollected: data.campaignCollected ?? null,
+        beneficiaryName: data.beneficiaryName?.trim() || null,
+        creatorName: data.creatorName?.trim() || null,
+        creatorAvatar: data.creatorAvatar?.trim() || null,
+        campaignCategory: data.campaignCategory?.trim() || null,
         installmentPrice: data.installmentPrice ?? null,
         images,
         specifications: specs.map((s, i) => ({ ...s, order: i })),
@@ -247,6 +291,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
         <div className="space-y-4">
+            {watch("template") !== "vakinha" && (
+            <>
             <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="price">Preço (R$)</Label>
@@ -286,6 +332,44 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   <Input id="stock" type="number" {...register("stock", { valueAsNumber: true })} />
                 </div>
               </div>
+            </>
+            )}
+            {watch("template") === "vakinha" && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 space-y-4">
+                <h4 className="font-medium text-amber-900">Campanha Vakinha</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="pixKey">Chave PIX</Label>
+                    <Input id="pixKey" placeholder="CPF, e-mail, telefone ou chave aleatória" {...register("pixKey")} />
+                  </div>
+                  <div>
+                    <Label htmlFor="campaignGoal">Meta da campanha (R$) *</Label>
+                    <Input id="campaignGoal" type="number" step="0.01" min="0" placeholder="Ex: 5000" {...register("campaignGoal", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })} />
+                    {errors.campaignGoal && <p className="text-sm text-red-600">{errors.campaignGoal.message}</p>}
+                  </div>
+                  <div>
+                    <Label htmlFor="campaignCollected">Valor já arrecadado (R$)</Label>
+                    <Input id="campaignCollected" type="number" step="0.01" min="0" placeholder="Ex: 1200" {...register("campaignCollected", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })} />
+                  </div>
+                  <div>
+                    <Label htmlFor="campaignCategory">Categoria da campanha</Label>
+                    <Input id="campaignCategory" placeholder="Ex: Saúde / Tratamentos" {...register("campaignCategory")} />
+                  </div>
+                  <div>
+                    <Label htmlFor="beneficiaryName">Nome do beneficiário</Label>
+                    <Input id="beneficiaryName" placeholder="Em benefício de..." {...register("beneficiaryName")} />
+                  </div>
+                  <div>
+                    <Label htmlFor="creatorName">Nome do criador</Label>
+                    <Input id="creatorName" placeholder="Quem criou a vaquinha" {...register("creatorName")} />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="creatorAvatar">URL da foto do criador</Label>
+                    <Input id="creatorAvatar" type="url" placeholder="https://..." {...register("creatorAvatar")} />
+                  </div>
+                </div>
+              </div>
+            )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="status">Status</Label>
@@ -327,6 +411,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       <SelectItem value="decolar">Decolar (Pacotes)</SelectItem>
                       <SelectItem value="carrefour">Carrefour</SelectItem>
                       <SelectItem value="mercadolivre">Mercado Livre</SelectItem>
+                      <SelectItem value="vakinha">Vakinha (Vaquinha)</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
