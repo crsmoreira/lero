@@ -15,13 +15,13 @@ export default function AdminError({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-8">
       <h2 className="text-xl font-semibold mb-2">Algo deu errado</h2>
-      <p className="text-gray-600 text-center mb-6 max-w-md">
+      <p className="text-muted-foreground text-center mb-6 max-w-md">
         Ocorreu um erro ao carregar o admin. Verifique o console do servidor.
       </p>
       <Button onClick={() => reset()}>Tentar novamente</Button>
-      <a href="/admin/login" className="mt-4 text-sm text-blue-600 hover:underline">
+      <a href="/admin/login" className="mt-4 text-sm text-primary hover:underline">
         Ir para login
       </a>
     </div>

@@ -157,9 +157,9 @@ export default function AdminDomainsPage() {
           ) : domains.length === 0 ? (
             <div className="text-sm text-muted-foreground py-4 space-y-2">
               <p>Nenhum domínio cadastrado. Adicione um domínio acima.</p>
-              <p className="text-amber-600">
+              <p className="text-amber-600 dark:text-amber-400">
                 Se o botão &quot;Adicionar&quot; não funcionar, execute no terminal:
-                <code className="block mt-2 p-2 bg-gray-100 rounded text-xs">
+                <code className="block mt-2 p-2 bg-muted rounded text-xs font-mono">
                   npm run db:push && npm run db:seed-domains
                 </code>
               </p>
