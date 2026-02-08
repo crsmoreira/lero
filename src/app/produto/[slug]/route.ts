@@ -90,7 +90,9 @@ export async function GET(
             ? "produto-template-mercadolivre.html"
             : product.template === "havan"
               ? "produto-template-havan.html"
-              : "produto-template.html";
+              : product.template === "kalonga"
+                ? "produto-template-kalonga.html"
+                : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
   const images = (product.images ?? []).map((img) => img.url);
