@@ -73,6 +73,7 @@ export async function GET(
   const checkoutUrl = (product.checkoutUrl ?? productUrl).trim();
 
   const description = product.description ?? product.shortDescription ?? "";
+  const shortDescription = (product.shortDescription ?? stripHtml(description).slice(0, 160) ?? "").trim();
   const descriptionEscaped = escapeForJson(stripHtml(description || product.name));
 
   const replacements: [string | RegExp, string][] = [
@@ -87,6 +88,8 @@ export async function GET(
     ["{{CREATOR_AVATAR}}", creatorAvatar],
     ["{{BENEFICIARY_NAME}}", beneficiaryName],
     ["{{CAMPAIGN_CATEGORY}}", campaignCategory],
+    ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
+    ["{{PRODUCT_DESCRIPTION}}", description || ""],
     ["{{PRODUCT_DESCRIPTION_ESCAPED}}", descriptionEscaped],
     ["{{PRODUCT_URL}}", productUrl],
     ["{{CHECKOUT_URL}}", checkoutUrl],
