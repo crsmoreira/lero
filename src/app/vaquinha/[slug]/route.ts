@@ -41,6 +41,7 @@ export async function GET(
     },
     include: {
       images: { orderBy: { order: "asc" } },
+      specifications: true,
     },
   });
 
@@ -65,12 +66,24 @@ export async function GET(
   const campaignCollected = Number(product.promotionalPrice ?? 0);
   const percent = campaignGoal > 0 ? Math.min(100, Math.round((campaignCollected / campaignGoal) * 100)) : 0;
 
+  const getSpec = (key: string) =>
+    product.specifications?.find((s) => s.key === key)?.value ?? "";
+
   const pixKey = (product.breadcrumbBackLabel ?? "").trim();
-  const beneficiaryName = "";
-  const creatorName = "";
-  const creatorAvatar = "";
+  const beneficiaryName = getSpec("beneficiary").trim();
+  const creatorName = getSpec("creator").trim();
+  const creatorAvatar = getSpec("creator_avatar").trim();
   const campaignCategory = (product.brandName ?? "").trim();
   const checkoutUrl = (product.checkoutUrl ?? productUrl).trim();
+
+  const createdAtSpec = getSpec("campaign_created_at").trim();
+  const campaignCreatedAt = createdAtSpec
+    ? createdAtSpec
+    : product.createdAt
+      ? new Date(product.createdAt).toLocaleDateString("pt-BR")
+      : "";
+
+  const donorsCount = getSpec("donors_count").trim() || "0";
 
   const description = product.description ?? product.shortDescription ?? "";
   const shortDescription = (product.shortDescription ?? stripHtml(description).slice(0, 160) ?? "").trim();
@@ -88,6 +101,8 @@ export async function GET(
     ["{{CREATOR_AVATAR}}", creatorAvatar],
     ["{{BENEFICIARY_NAME}}", beneficiaryName],
     ["{{CAMPAIGN_CATEGORY}}", campaignCategory],
+    ["{{CAMPAIGN_CREATED_AT}}", campaignCreatedAt],
+    ["{{CAMPAIGN_DONORS_COUNT}}", donorsCount],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
     ["{{PRODUCT_DESCRIPTION}}", description || ""],
     ["{{PRODUCT_DESCRIPTION_ESCAPED}}", descriptionEscaped],

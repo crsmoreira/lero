@@ -117,13 +117,25 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
     })) ?? [] as ImageItem[]
   );
 
+  const getSpec = (key: string) =>
+    product?.specifications?.find((s) => s.key === key)?.value ?? "";
+
   const [specs, setSpecs] = React.useState<
     { key: string; value: string; order: number }[]
   >(
     product?.specifications
+      .filter((s) => !["beneficiary", "creator", "creator_avatar", "campaign_created_at", "donors_count"].includes(s.key))
       .sort((a, b) => a.order - b.order)
       .map((s) => ({ key: s.key, value: s.value, order: s.order })) ?? []
   );
+
+  const [vaquinhaFields, setVaquinhaFields] = React.useState({
+    beneficiary: getSpec("beneficiary"),
+    creator: getSpec("creator"),
+    creatorAvatar: getSpec("creator_avatar"),
+    campaignCreatedAt: getSpec("campaign_created_at") || (product?.createdAt ? new Date(product.createdAt).toLocaleDateString("pt-BR") : ""),
+    donorsCount: getSpec("donors_count") || "0",
+  });
 
   const [reviews, setReviews] = React.useState<ReviewItem[]>(
     product?.reviews
@@ -140,6 +152,19 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
   async function onSubmit(data: FormData) {
     try {
       const slug = (data.slug?.trim() || slugify(String(data.name ?? "")) || "produto").slice(0, 200);
+      const baseSpecs = specs.map((s, i) => ({ ...s, order: i }));
+      const vaquinhaSpecs =
+        data.template === "vakinha"
+          ? [
+              { key: "beneficiary", value: vaquinhaFields.beneficiary.trim(), order: -5 },
+              { key: "creator", value: vaquinhaFields.creator.trim(), order: -4 },
+              { key: "creator_avatar", value: vaquinhaFields.creatorAvatar.trim(), order: -3 },
+              { key: "campaign_created_at", value: vaquinhaFields.campaignCreatedAt.trim(), order: -2 },
+              { key: "donors_count", value: vaquinhaFields.donorsCount.trim(), order: -1 },
+            ].filter((s) => s.value)
+          : [];
+      const allSpecs = [...vaquinhaSpecs, ...baseSpecs.map((s, i) => ({ ...s, order: i }))];
+
       const payload = {
         ...data,
         slug: slug || "produto",
@@ -154,7 +179,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         promotionalPrice: data.promotionalPrice ?? null,
         installmentPrice: data.installmentPrice ?? null,
         images,
-        specifications: specs.map((s, i) => ({ ...s, order: i })),
+        specifications: allSpecs,
         reviews: reviews
           .filter((r) => r.userName.trim())
           .map((r) => ({
@@ -201,6 +226,92 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      {watch("template") === "vakinha" && (
+        <div className="rounded-lg border bg-muted/30 p-6 space-y-4">
+          <h3 className="font-semibold text-lg">Vaquinha</h3>
+          <p className="text-sm text-muted-foreground">Campos específicos da campanha</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <Label>Valor arrecadado (R$)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="0"
+                {...register("promotionalPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
+              />
+            </div>
+            <div>
+              <Label>Meta (R$)</Label>
+              <Input type="number" step="0.01" {...register("price", { valueAsNumber: true })} />
+            </div>
+            <div>
+              <Label>Data criação</Label>
+              <Input
+                placeholder="DD/MM/AAAA"
+                value={vaquinhaFields.campaignCreatedAt}
+                onChange={(e) => setVaquinhaFields((f) => ({ ...f, campaignCreatedAt: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Beneficiário</Label>
+              <Input
+                placeholder="Nome de quem recebe a vaquinha"
+                value={vaquinhaFields.beneficiary}
+                onChange={(e) => setVaquinhaFields((f) => ({ ...f, beneficiary: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Criador</Label>
+              <Input
+                placeholder="Nome do criador da campanha"
+                value={vaquinhaFields.creator}
+                onChange={(e) => setVaquinhaFields((f) => ({ ...f, creator: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Avatar do criador (URL)</Label>
+              <Input
+                placeholder="https://..."
+                value={vaquinhaFields.creatorAvatar}
+                onChange={(e) => setVaquinhaFields((f) => ({ ...f, creatorAvatar: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Categoria</Label>
+              <Input
+                placeholder="Ex: Saúde / Tratamentos"
+                {...register("brandName")}
+              />
+            </div>
+            <div>
+              <Label>Chave PIX</Label>
+              <Input
+                placeholder="CPF, e-mail, telefone ou chave"
+                {...register("breadcrumbBackLabel")}
+              />
+            </div>
+            <div>
+              <Label>Link checkout / Doar</Label>
+              <Input
+                type="url"
+                placeholder="https://..."
+                {...register("checkoutUrl")}
+              />
+            </div>
+            <div>
+              <Label>Número de doações</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="0"
+                value={vaquinhaFields.donorsCount}
+                onChange={(e) => setVaquinhaFields((f) => ({ ...f, donorsCount: e.target.value }))}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-4">
           <div>
@@ -248,6 +359,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
         <div className="space-y-4">
+            {watch("template") !== "vakinha" && (
             <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="price">Preço (R$)</Label>
@@ -281,12 +393,15 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   <p className="text-xs text-gray-500 mt-1">Quando definido, exibe este valor em vez do preço</p>
                 </div>
               </div>
+            )}
+            {watch("template") !== "vakinha" && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="stock">Estoque</Label>
                   <Input id="stock" type="number" {...register("stock", { valueAsNumber: true })} />
                 </div>
               </div>
+            )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="status">Status</Label>
@@ -335,7 +450,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
               />
             </div>
           </div>
-          <div>
+          {watch("template") !== "vakinha" && (
+              <div>
                 <Label htmlFor="checkoutUrl">Link de Checkout / Doar</Label>
                 <Input
                   id="checkoutUrl"
@@ -343,30 +459,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   placeholder="https://..."
                   {...register("checkoutUrl")}
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  {watch("template") === "vakinha" ? "URL do botão Quero Ajudar / Doar" : "URL para onde os botões Comprar e Adicionar ao carrinho redirecionam"}
-                </p>
+                <p className="text-xs text-gray-500 mt-1">URL para onde os botões Comprar e Adicionar ao carrinho redirecionam</p>
               </div>
-              {watch("template") === "vakinha" && (
-                <>
-                  <div>
-                    <Label htmlFor="breadcrumbBackLabel">Chave PIX</Label>
-                    <Input
-                      id="breadcrumbBackLabel"
-                      placeholder="CPF, e-mail, telefone ou chave aleatória"
-                      {...register("breadcrumbBackLabel")}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Exibida na página da vaquinha para doações</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="brandName">Categoria da campanha</Label>
-                    <Input
-                      id="brandName"
-                      placeholder="Ex: Saúde / Tratamentos"
-                      {...register("brandName")}
-                    />
-                  </div>
-                </>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
