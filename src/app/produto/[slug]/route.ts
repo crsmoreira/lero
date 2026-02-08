@@ -4,8 +4,7 @@ import {
   resolveProductBySlugOnly,
 } from "@/lib/domain";
 import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMercadoLivre } from "./reviewsHtml";
-import { readFile } from "fs/promises";
-import { join } from "path";
+import { loadTemplate } from "@/lib/loadTemplate";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -45,9 +44,13 @@ export async function GET(
   try {
   const { slug } = await params;
 
+  const baseUrl =
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : (process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin);
+
   if (slug === "modelo") {
-    const modeloPath = join(process.cwd(), "public", "produto-modelo.html");
-    const html = await readFile(modeloPath, "utf-8");
+    const html = await loadTemplate("produto-modelo.html", baseUrl);
     return new NextResponse(html, {
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
@@ -86,8 +89,7 @@ export async function GET(
           : product.template === "mercadolivre"
             ? "produto-template-mercadolivre.html"
             : "produto-template.html";
-  const templatePath = join(process.cwd(), "public", templateFile);
-  let html = await readFile(templatePath, "utf-8");
+  let html = await loadTemplate(templateFile, baseUrl);
 
   const images = (product.images ?? []).map((img) => img.url);
   const mainImage = images[0] ?? "";
@@ -291,10 +293,6 @@ export async function GET(
         ).join("")
       : "";
 
-  const baseUrl =
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
   const productUrl = `${baseUrl}/produto/${slug}`;
 
   const reviews = "reviews" in product ? product.reviews : [];

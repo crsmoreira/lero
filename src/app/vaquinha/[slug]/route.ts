@@ -3,8 +3,7 @@ import {
   resolveProductByDomainAndSlug,
   resolveProductBySlugOnly,
 } from "@/lib/domain";
-import { readFile } from "fs/promises";
-import { join } from "path";
+import { loadTemplate } from "@/lib/loadTemplate";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -62,6 +61,8 @@ export async function GET(
       : (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
   const productUrl = `${baseUrl}/vaquinha/${slug}`;
 
+  const html = await loadTemplate("vakinha-template.html", baseUrl);
+
   const rawImage = (product.images ?? [])[0]?.url ?? "";
   const mainImage =
     !rawImage ? ""
@@ -118,15 +119,13 @@ export async function GET(
     ["{{PIX_SECTION_STYLE}}", pixKey ? "" : "display:none"],
   ];
 
-  const templatePath = join(process.cwd(), "public", "vakinha-template.html");
-  let html = await readFile(templatePath, "utf-8");
-
+  let htmlContent = html;
   for (const [key, value] of replacements) {
     const escaped = String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    html = html.replace(new RegExp(escaped, "g"), value);
+    htmlContent = htmlContent.replace(new RegExp(escaped, "g"), value);
   }
 
-  return new NextResponse(html, {
+  return new NextResponse(htmlContent, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
