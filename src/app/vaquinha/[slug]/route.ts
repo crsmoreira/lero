@@ -44,7 +44,7 @@ export async function GET(
     if (domainCtx) {
       product = await resolveProductByDomainAndSlug(domainCtx.domainId, slug);
     }
-  } catch (_) {
+  } catch {
     // Se resolução por domínio falhar, usa fallback por slug
   }
   if (!product) {
