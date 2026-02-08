@@ -55,6 +55,10 @@ export async function GET(
     return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
   }
 
+  if (product.template === "vakinha") {
+    return NextResponse.redirect(new URL(`/vaquinha/${slug}`, req.url), 302);
+  }
+
   const templateFile =
     product.template === "drogasil"
       ? "produto-template-drogasil.html"

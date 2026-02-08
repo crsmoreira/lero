@@ -17,7 +17,7 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
-  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre"]).optional().default("leroy"),
+  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre", "vakinha"]).optional().default("leroy"),
   tags: z.array(z.string()).default([]),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -27,6 +27,13 @@ const productSchema = z.object({
   brandName: z.string().optional().nullable(),
   categoryId: z.string().optional().nullable(),
   brandId: z.string().optional().nullable(),
+  pixKey: z.string().optional().nullable(),
+  campaignGoal: z.number().positive().nullable().optional(),
+  campaignCollected: z.number().min(0).nullable().optional(),
+  beneficiaryName: z.string().optional().nullable(),
+  creatorName: z.string().optional().nullable(),
+  creatorAvatar: z.string().optional().nullable(),
+  campaignCategory: z.string().optional().nullable(),
   images: z
     .array(
       z.object({
@@ -79,6 +86,13 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
       template: rest.template ?? "leroy",
       breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
       breadcrumbBackUrl: rest.breadcrumbBackUrl ?? null,
+      pixKey: rest.pixKey ?? null,
+      campaignGoal: rest.campaignGoal != null ? (rest.campaignGoal as unknown as Decimal) : null,
+      campaignCollected: rest.campaignCollected != null ? (rest.campaignCollected as unknown as Decimal) : null,
+      beneficiaryName: rest.beneficiaryName ?? null,
+      creatorName: rest.creatorName ?? null,
+      creatorAvatar: rest.creatorAvatar ?? null,
+      campaignCategory: rest.campaignCategory ?? null,
       price: rest.price as unknown as Decimal,
       promotionalPrice: rest.promotionalPrice as unknown as Decimal | null,
       installmentPrice: rest.installmentPrice as unknown as Decimal | null,
@@ -114,6 +128,7 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
   revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
   revalidatePath(`/produto/${product.slug}`);
+  if (rest.template === "vakinha") revalidatePath(`/vaquinha/${product.slug}`);
   return { data: { id: product.id, slug: product.slug } };
     } catch (inner: unknown) {
       const isSlugConflict = inner && typeof inner === "object" && "code" in inner && (inner as { code: string }).code === "P2002"
@@ -165,6 +180,13 @@ export async function updateProduct(
       template: rest.template ?? "leroy",
       breadcrumbBackLabel: rest.breadcrumbBackLabel ?? null,
       breadcrumbBackUrl: rest.breadcrumbBackUrl ?? null,
+      pixKey: rest.pixKey ?? null,
+      campaignGoal: rest.campaignGoal != null ? (rest.campaignGoal as unknown as Decimal) : null,
+      campaignCollected: rest.campaignCollected != null ? (rest.campaignCollected as unknown as Decimal) : null,
+      beneficiaryName: rest.beneficiaryName ?? null,
+      creatorName: rest.creatorName ?? null,
+      creatorAvatar: rest.creatorAvatar ?? null,
+      campaignCategory: rest.campaignCategory ?? null,
       price: rest.price as unknown as Decimal,
       promotionalPrice: rest.promotionalPrice as unknown as Decimal | null,
       installmentPrice: rest.installmentPrice as unknown as Decimal | null,
@@ -204,6 +226,7 @@ export async function updateProduct(
   revalidatePath("/admin/produtos");
   revalidatePath("/produtos");
   revalidatePath(`/produto/${product?.slug ?? ""}`);
+  if (rest.template === "vakinha" && product) revalidatePath(`/vaquinha/${product.slug}`);
   return { data: product ? { id: product.id, slug: product.slug } : null };
   } catch (e) {
     console.error("updateProduct error:", e);
