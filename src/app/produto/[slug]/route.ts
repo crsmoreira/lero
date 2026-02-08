@@ -95,7 +95,12 @@ export async function GET(
                 : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
-  const images = (product.images ?? []).map((img) => img.url);
+  const toAbsoluteUrl = (url: string) => {
+    if (!url || url.startsWith("http://") || url.startsWith("https://")) return url;
+    if (url.startsWith("/")) return baseUrl.replace(/\/$/, "") + url;
+    return url;
+  };
+  const images = (product.images ?? []).map((img) => toAbsoluteUrl(img.url));
   const mainImage = images[0] ?? "";
   // À vista (cash) = sempre valor promocional ou preço
   const priceAvista = product.promotionalPrice ?? product.price;

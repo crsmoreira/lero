@@ -51,15 +51,20 @@ const imgMap = [
   ["795755z.jpg", 1], ["795755z_1.jpg", 2], ["795755z_2.jpg", 3], ["795755z_3.jpg", 4], ["795755z_4.jpg", 5], ["795755z_5.jpg", 6],
 ];
 imgMap.forEach(([suffix, num]) => {
-  const re = new RegExp(`https://img\\.kalunga\\.com\\.br/fotosdeprodutos/${suffix.replace(".", "\\.")}`, "g");
+  const re = new RegExp(`https://img\\.kalunga\\.com\\.br/[fF]otosde[pP]rodutos/${suffix.replace(".", "\\.")}`, "g");
   html = html.replace(re, `{{PRODUCT_IMAGE_${num}}}`);
 });
 
-// 4b. Primeira imagem da galeria: remover lazy-load e data-src para carregar imediatamente (evita bug)
-const firstMainImg = /(<li class="splide__slide">[\s\S]*?<img class="img-fluid )img-prod-lazy (img-grande"[^>]+)src="\{\{PRODUCT_IMAGE_1\}\}"([^>]*?)data-src="\{\{PRODUCT_IMAGE_1\}\}"([^>]*>)/;
-html = html.replace(firstMainImg, (_m, p1, p2, p3, p4) => {
-  return p1 + p2 + 'loading="eager" fetchpriority="high" src="{{PRODUCT_IMAGE_1}}" ' + p3 + p4;
-});
+// 4b. Remover lazy-load de TODAS as imagens da galeria (img-prod-lazy + data-src quebram o carregamento)
+// - Remove classe img-prod-lazy
+// - Remove atributo data-src para evitar conflito com scripts de lazy
+// - Primeira imagem: loading="eager" fetchpriority="high"
+html = html.replace(/class="img-fluid img-prod-lazy img-grande"/g, 'class="img-fluid img-grande"');
+html = html.replace(/class="galeriaproduto__image img-fluid"/g, 'class="galeriaproduto__image img-fluid"');
+html = html.replace(/\s*data-src="\{\{PRODUCT_IMAGE_(\d+)\}\}"/g, "");
+// Primeira imagem do main-slider: eager + fetchpriority
+const firstMainImg = /(<li class="splide__slide">[\s\S]*?<img class="img-fluid img-grande"[^>]+)src="\{\{PRODUCT_IMAGE_1\}\}"/;
+html = html.replace(firstMainImg, '$1loading="eager" fetchpriority="high" src="{{PRODUCT_IMAGE_1}}"');
 
 // 5. Título do produto no body - múltiplas ocorrências
 const titleVariants = [
