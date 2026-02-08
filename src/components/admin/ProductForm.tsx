@@ -176,9 +176,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       const isVakinha = data.template === "vakinha";
       const price = isVakinha ? (data.campaignGoal ?? 0) : (data.price ?? 0);
       const promotionalPrice = isVakinha ? (data.campaignCollected ?? null) : (data.promotionalPrice ?? null);
-      const { price: _p, promotionalPrice: _pp, ...restData } = data;
       const payload = {
-        ...restData,
+        ...data,
         slug: slug || "produto",
         price,
         promotionalPrice,
