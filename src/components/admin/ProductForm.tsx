@@ -34,15 +34,8 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
-  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre", "vakinha"]).optional(),
+  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre"]).optional(),
   tags: z.string().optional(),
-  pixKey: z.string().optional().nullable(),
-  campaignGoal: z.number().positive().nullable().optional(),
-  campaignCollected: z.number().min(0).nullable().optional(),
-  beneficiaryName: z.string().optional().nullable(),
-  creatorName: z.string().optional().nullable(),
-  creatorAvatar: z.string().optional().nullable(),
-  campaignCategory: z.string().optional().nullable(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   checkoutUrl: z.union([z.string().url(), z.literal("")]).optional().nullable(),
@@ -51,10 +44,6 @@ const productSchema = z.object({
   brandName: z.string().optional(),
   categoryId: z.string().optional().nullable(),
   brandId: z.string().optional().nullable(),
-}).superRefine((data, ctx) => {
-  if (data.template === "vakinha" && (data.campaignGoal == null || data.campaignGoal <= 0)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Meta da campanha é obrigatória", path: ["campaignGoal"] });
-  }
 });
 
 type FormData = z.infer<typeof productSchema>;
@@ -80,7 +69,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
     setValue,
     setError,
     control,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(productSchema),
@@ -97,7 +85,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           gtin: product.gtin ?? "",
           stock: product.stock,
           status: product.status as "draft" | "active",
-          template: ((product as { template?: string }).template === "vakinha" ? "vakinha" : (product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "mercadolivre" ? "mercadolivre" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre" | "vakinha",
+          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "mercadolivre" ? "mercadolivre" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre",
           tags: product.tags.join(", "),
           metaTitle: product.metaTitle ?? "",
           metaDescription: product.metaDescription ?? "",
@@ -107,13 +95,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           brandName: product.brandName ?? product.brand?.name ?? "",
           categoryId: product.categoryId ?? "",
           brandId: product.brandId ?? "",
-          pixKey: (product as { pixKey?: string | null }).pixKey ?? "",
-          campaignGoal: (product as { campaignGoal?: unknown }).campaignGoal != null ? Number((product as { campaignGoal?: unknown }).campaignGoal) : null,
-          campaignCollected: (product as { campaignCollected?: unknown }).campaignCollected != null ? Number((product as { campaignCollected?: unknown }).campaignCollected) : null,
-          beneficiaryName: (product as { beneficiaryName?: string | null }).beneficiaryName ?? "",
-          creatorName: (product as { creatorName?: string | null }).creatorName ?? "",
-          creatorAvatar: (product as { creatorAvatar?: string | null }).creatorAvatar ?? "",
-          campaignCategory: (product as { campaignCategory?: string | null }).campaignCategory ?? "",
         }
       : {
           status: "draft",
@@ -121,23 +102,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           template: "leroy",
           breadcrumbBackLabel: "",
           breadcrumbBackUrl: "",
-          pixKey: "",
-          campaignGoal: null,
-          campaignCollected: null,
-          beneficiaryName: "",
-          creatorName: "",
-          creatorAvatar: "",
-          campaignCategory: "",
         },
   });
-
-  const templateValue = watch("template");
-  const campaignGoal = watch("campaignGoal");
-  React.useEffect(() => {
-    if (templateValue === "vakinha" && campaignGoal != null && campaignGoal > 0) {
-      setValue("price", campaignGoal);
-    }
-  }, [templateValue, campaignGoal, setValue]);
 
   type ImageItem = { url: string; key?: string; alt?: string; order: number; isMain: boolean };
   const [images, setImages] = React.useState<ImageItem[]>(
@@ -173,14 +139,9 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
   async function onSubmit(data: FormData) {
     try {
       const slug = (data.slug?.trim() || slugify(String(data.name ?? "")) || "produto").slice(0, 200);
-      const isVakinha = data.template === "vakinha";
-      const price = isVakinha ? (data.campaignGoal ?? 0) : (data.price ?? 0);
-      const promotionalPrice = isVakinha ? (data.campaignCollected ?? null) : (data.promotionalPrice ?? null);
       const payload = {
         ...data,
         slug: slug || "produto",
-        price,
-        promotionalPrice,
         tags: data.tags ? data.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
         checkoutUrl: data.checkoutUrl || null,
         template: data.template || "leroy",
@@ -191,13 +152,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         brandId: data.brandId || null,
         promotionalPrice: data.promotionalPrice ?? null,
         installmentPrice: data.installmentPrice ?? null,
-        pixKey: data.pixKey?.trim() || null,
-        campaignGoal: data.campaignGoal ?? null,
-        campaignCollected: data.campaignCollected ?? 0,
-        beneficiaryName: data.beneficiaryName?.trim() || null,
-        creatorName: data.creatorName?.trim() || null,
-        creatorAvatar: data.creatorAvatar?.trim() || null,
-        campaignCategory: data.campaignCategory?.trim() || null,
         images,
         specifications: specs.map((s, i) => ({ ...s, order: i })),
         reviews: reviews
@@ -293,7 +247,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
         <div className="space-y-4">
-            {templateValue !== "vakinha" && (
             <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="price">Preço (R$)</Label>
@@ -327,15 +280,12 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   <p className="text-xs text-gray-500 mt-1">Quando definido, exibe este valor em vez do preço</p>
                 </div>
               </div>
-            )}
-            {templateValue !== "vakinha" && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="stock">Estoque</Label>
                   <Input id="stock" type="number" {...register("stock", { valueAsNumber: true })} />
                 </div>
               </div>
-            )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="status">Status</Label>
@@ -377,51 +327,12 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       <SelectItem value="decolar">Decolar (Pacotes)</SelectItem>
                       <SelectItem value="carrefour">Carrefour</SelectItem>
                       <SelectItem value="mercadolivre">Mercado Livre</SelectItem>
-                      <SelectItem value="vakinha">Vakinha (Vaquinha)</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
               />
             </div>
           </div>
-
-          {templateValue === "vakinha" && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 space-y-4">
-              <h4 className="font-medium text-amber-900">Campanha Vakinha</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="pixKey">Chave PIX</Label>
-                  <Input id="pixKey" placeholder="CPF, e-mail, telefone ou chave aleatória" {...register("pixKey")} />
-                </div>
-                <div>
-                  <Label htmlFor="campaignGoal">Meta da campanha (R$) *</Label>
-                  <Input id="campaignGoal" type="number" step="0.01" min="0" placeholder="Ex: 5000" {...register("campaignGoal", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })} />
-                  {errors.campaignGoal && <p className="text-sm text-red-600">{errors.campaignGoal.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="campaignCollected">Valor já arrecadado (R$)</Label>
-                  <Input id="campaignCollected" type="number" step="0.01" min="0" placeholder="Ex: 1200" {...register("campaignCollected", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })} />
-                </div>
-                <div>
-                  <Label htmlFor="campaignCategory">Categoria da campanha</Label>
-                  <Input id="campaignCategory" placeholder="Ex: Saúde / Tratamentos" {...register("campaignCategory")} />
-                </div>
-                <div>
-                  <Label htmlFor="beneficiaryName">Nome do beneficiário</Label>
-                  <Input id="beneficiaryName" placeholder="Em benefício de..." {...register("beneficiaryName")} />
-                </div>
-                <div>
-                  <Label htmlFor="creatorName">Nome do criador</Label>
-                  <Input id="creatorName" placeholder="Quem criou a vaquinha" {...register("creatorName")} />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label htmlFor="creatorAvatar">URL da foto do criador</Label>
-                  <Input id="creatorAvatar" type="url" placeholder="https://..." {...register("creatorAvatar")} />
-                </div>
-              </div>
-            </div>
-          )}
-
           <div>
                 <Label htmlFor="checkoutUrl">Link de Checkout</Label>
                 <Input
