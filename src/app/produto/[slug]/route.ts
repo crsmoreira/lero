@@ -402,6 +402,18 @@ export async function GET(
           ["{{VAKINHA_CORACOES}}", specMap["coracoes_recebidos"] ?? specMap["coracoes"] ?? "0"],
           ["{{VAKINHA_APOIADORES}}", specMap["num_doadores"] ?? specMap["apoiadores"] ?? "0"],
           ["{{VAKINHA_PIX}}", specMap["pix_chave"] ?? specMap["pix"] ?? ""],
+          ["{{VAKINHA_PIX_BLOCK}}", (() => {
+            const pix = specMap["pix_chave"] ?? specMap["pix"] ?? "";
+            if (!pix.trim()) return "";
+            const esc = escapeHtml(pix);
+            return `<div class="sc-f294cd4b-0 iSEAiO"><div class="sc-jXbUNg gAOWep"><div class="sc-fqkvVR cYzlCi">Você pode ajudar via Pix usando a chave:</div></div><span title="" class="" data-clipboard-text="${esc}"><div class="sc-jXbUNg drUFBp"><span class="sc-fqkvVR bNAxkZ">${esc}</span><svg class="sc-6a91f545-21 bkMRVd" viewBox="350 0 766 758" width="25" height="25"><title>Copiar link</title><path class="cls-2" d="M806.32,188.44H597.7a34.87,34.87,0,0,0-34.84,34.73V466.71H597.7V223.17H806.32Z"></path><path class="cls-2" d="M858.56,258v0H667.25a35,35,0,0,0-34.84,34.83V536.28a35,35,0,0,0,34.84,34.83H858.56a34.9,34.9,0,0,0,34.72-34.83V292.8A34.9,34.9,0,0,0,858.56,258Zm0,278.29H667.25V292.8H858.56Z"></path></svg></div></span></div>`;
+          })()],
+          ["{{VAKINHA_PIX_LINE}}", (() => {
+            const pix = specMap["pix_chave"] ?? specMap["pix"] ?? "";
+            if (!pix.trim()) return "";
+            const esc = escapeHtml(pix);
+            return `<div class="sc-fqkvVR grIjCO">Você também pode <strong>contribuir via Pix usando a chave:</strong> ${esc}</div>`;
+          })()],
           ["{{VAKINHA_DATA_CRIACAO}}", specMap["data_criacao"] ?? (() => {
             const d = product.createdAt instanceof Date ? product.createdAt : new Date(product.createdAt);
             return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
@@ -434,6 +446,11 @@ export async function GET(
 
   if (templateFile === "produto-template.html") {
     html = html.replace(/href="\/login"/g, 'href="javascript:void(0)"');
+  }
+
+  if (product.template === "vakinha") {
+    html = html.replace(/href="\/"><svg/g, 'href="javascript:void(0)" onclick="return false"><svg');
+    html = html.replace(/href="\/buscar-vaquinha"/g, 'href="javascript:void(0)" onclick="return false"');
   }
 
   return new NextResponse(html, {
