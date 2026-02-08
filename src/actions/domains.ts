@@ -40,36 +40,36 @@ export async function listDomains() {
 }
 
 export async function createDomain(data: z.infer<typeof createDomainSchema>) {
-  const parsed = createDomainSchema.safeParse(data);
-  if (!parsed.success) {
-    return { error: parsed.error.flatten().fieldErrors };
-  }
-
-  const { valid, error } = validateHostname(parsed.data.hostname);
-  if (!valid) {
-    return { error: { hostname: [error] } };
-  }
-
-  const workspaceId = await getWorkspaceId();
-  const hostname = parsed.data.hostname.trim().toLowerCase();
-  const canonicalHostname = canonicalizeHost(hostname);
-
-  const exists = await prisma.domain.findFirst({
-    where: { workspaceId, hostname },
-  });
-  if (exists) {
-    return { error: { hostname: ["Este domínio já está cadastrado"] } };
-  }
-
-  const isFirst = (await prisma.domain.count({ where: { workspaceId } })) === 0;
-
   try {
+    const parsed = createDomainSchema.safeParse(data);
+    if (!parsed.success) {
+      return { error: parsed.error.flatten().fieldErrors };
+    }
+
+    const { valid, error } = validateHostname(parsed.data.hostname);
+    if (!valid) {
+      return { error: { hostname: [error] } };
+    }
+
+    const workspaceId = await getWorkspaceId();
+    const hostname = parsed.data.hostname.trim().toLowerCase();
+    const canonicalHostname = canonicalizeHost(hostname);
+
+    const exists = await prisma.domain.findFirst({
+      where: { workspaceId, hostname },
+    });
+    if (exists) {
+      return { error: { hostname: ["Este domínio já está cadastrado"] } };
+    }
+
+    const isFirst = (await prisma.domain.count({ where: { workspaceId } })) === 0;
+
     const domain = await prisma.domain.create({
       data: {
         workspaceId,
         hostname,
         canonicalHostname,
-        status: "pending",
+        status: "active",
         isPrimary: isFirst,
       },
     });
@@ -78,7 +78,24 @@ export async function createDomain(data: z.infer<typeof createDomainSchema>) {
     return { data: domain };
   } catch (e) {
     console.error("createDomain error:", e);
-    return { error: { _form: ["Erro ao criar domínio"] } };
+    const msg =
+      e && typeof e === "object" && "message" in e
+        ? String((e as Error).message)
+        : "Erro ao criar domínio";
+    if (
+      msg.includes("does not exist") ||
+      msg.includes("relation") ||
+      msg.includes("table")
+    ) {
+      return {
+        error: {
+          _form: [
+            "Tabelas de domínio não existem. Execute: npm run db:push && npm run db:seed-domains",
+          ],
+        },
+      };
+    }
+    return { error: { _form: [msg] } };
   }
 }
 
@@ -146,16 +163,19 @@ export async function deleteDomain(id: string) {
 }
 
 export async function getProductDomains(productId: string) {
-  const workspaceId = await getWorkspaceId();
-  const contentDomains = await prisma.contentDomain.findMany({
-    where: {
-      workspaceId,
-      contentType: "product",
-      contentId: productId,
-    },
-    include: { domain: true },
-  });
-  return contentDomains;
+  try {
+    const workspaceId = await getWorkspaceId();
+    return prisma.contentDomain.findMany({
+      where: {
+        workspaceId,
+        contentType: "product",
+        contentId: productId,
+      },
+      include: { domain: true },
+    });
+  } catch {
+    return [];
+  }
 }
 
 const putProductDomainsSchema = z.object({

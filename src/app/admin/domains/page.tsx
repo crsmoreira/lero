@@ -53,16 +53,23 @@ export default function AdminDomainsPage() {
     e.preventDefault();
     if (!newHostname.trim()) return;
     setCreating(true);
-    const res = await createDomain({ hostname: newHostname.trim() });
-    setCreating(false);
-    if (res.error) {
-      const err = res.error as { hostname?: string[]; _form?: string[] };
-      toast.error(err.hostname?.[0] ?? err._form?.[0] ?? "Erro ao criar domínio");
-      return;
+    try {
+      const res = await createDomain({ hostname: newHostname.trim() });
+      if (res.error) {
+        const err = res.error as { hostname?: string[]; _form?: string[] };
+        toast.error(err.hostname?.[0] ?? err._form?.[0] ?? "Erro ao criar domínio");
+        return;
+      }
+      toast.success("Domínio adicionado");
+      setNewHostname("");
+      load();
+    } catch {
+      toast.error(
+        "Erro ao criar domínio. Execute: npm run db:push && npm run db:seed-domains"
+      );
+    } finally {
+      setCreating(false);
     }
-    toast.success("Domínio adicionado");
-    setNewHostname("");
-    load();
   };
 
   const handleSetPrimary = async (id: string) => {
@@ -148,9 +155,15 @@ export default function AdminDomainsPage() {
           {loading ? (
             <p className="text-sm text-muted-foreground py-4">Carregando...</p>
           ) : domains.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">
-              Nenhum domínio cadastrado. Adicione um domínio acima.
-            </p>
+            <div className="text-sm text-muted-foreground py-4 space-y-2">
+              <p>Nenhum domínio cadastrado. Adicione um domínio acima.</p>
+              <p className="text-amber-600">
+                Se o botão &quot;Adicionar&quot; não funcionar, execute no terminal:
+                <code className="block mt-2 p-2 bg-gray-100 rounded text-xs">
+                  npm run db:push && npm run db:seed-domains
+                </code>
+              </p>
+            </div>
           ) : (
             <Table>
               <TableHeader>

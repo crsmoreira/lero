@@ -70,7 +70,7 @@ npm run db:seed
 npm run db:seed-domains
 ```
 
-**Importante:** Após a implementação do sistema multi-domínio, é obrigatório rodar `db:push` e `db:seed-domains`. Sem isso, a página de produtos e domínios não funcionará.
+**Importante:** Para o sistema de domínios funcionar, rode `db:push` e `db:seed-domains`. Ver [PLANO-DOMINIOS.md](./PLANO-DOMINIOS.md) para o fluxo completo.
 
 ### 4. Rodar o projeto
 
