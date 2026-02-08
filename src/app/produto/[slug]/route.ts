@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMercadoLivre } from "./reviewsHtml";
-import { getVakinhaReplacements } from "./vakinhaReplacements";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,12 +8,6 @@ export const dynamic = "force-dynamic";
 
 function formatPrice(value: number): string {
   return value.toFixed(2).replace(".", ",");
-}
-
-function formatPriceBr(value: number): string {
-  const [intPart, decPart = "00"] = value.toFixed(2).split(".");
-  const withDots = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return `${withDots},${decPart}`;
 }
 
 function formatPriceDecolar(value: number): string {
@@ -71,9 +64,7 @@ export async function GET(
           ? "produto-template-carrefour.html"
           : product.template === "mercadolivre"
             ? "produto-template-mercadolivre.html"
-            : product.template === "vakinha"
-              ? "produto-template-vakinha.html"
-              : "produto-template.html";
+            : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
 
@@ -105,7 +96,7 @@ export async function GET(
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
   const specMap =
-    (product.template === "decolar" || product.template === "vakinha") && product.specifications.length > 0
+    product.template === "decolar" && product.specifications.length > 0
       ? Object.fromEntries(
           product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
         )
@@ -318,11 +309,6 @@ export async function GET(
   const mlDeviceType = isMobile ? "mobile" : "desktop";
   const mlDevicePlatform = isMobile ? "/web/mobile" : "/web/desktop";
 
-  const vakinhaReplacements =
-    product.template === "vakinha"
-      ? getVakinhaReplacements(product, specMap, brandName)
-      : [];
-
   const replacements: [string | RegExp, string][] = [
     ["{{PRODUCT_IMAGE_1}}", mainImage],
     ["{{PRODUCT_IMAGE_2}}", images[1] ?? mainImage],
@@ -368,7 +354,7 @@ export async function GET(
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
-    ["{{META_TITLE}}", product.metaTitle ?? (product.template === "vakinha" ? `${product.name} | Vaquinhas online` : `${product.name} | Loja`)],
+    ["{{META_TITLE}}", product.metaTitle ?? `${product.name} | Loja`],
     ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? product.name],
     ["{{PRODUCT_PRICE_VALID_UNTIL}}", new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)],
     ["{{PRODUCT_PRICE_VALID_DATE}}", (() => {
@@ -392,7 +378,6 @@ export async function GET(
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
         ]
       : []),
-    ...vakinhaReplacements,
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"
@@ -415,12 +400,6 @@ export async function GET(
 
   if (templateFile === "produto-template.html") {
     html = html.replace(/href="\/login"/g, 'href="javascript:void(0)"');
-  }
-
-  if (product.template === "vakinha") {
-    html = html.replace(/href="\/"><svg/g, 'href="javascript:void(0)" onclick="return false"><svg');
-    html = html.replace(/href="\/buscar-vaquinha"/g, 'href="javascript:void(0)" onclick="return false"');
-    html = html.replace(/class="sc-eldPxv gEHdXN"/g, 'class="sc-eldPxv gEHdXN vakinha-btn-doar"');
   }
 
   return new NextResponse(html, {
