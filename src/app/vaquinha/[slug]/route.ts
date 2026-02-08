@@ -55,15 +55,15 @@ export async function GET(
   const productUrl = `${baseUrl}/vaquinha/${slug}`;
 
   const mainImage = product.images[0]?.url ?? "";
-  const campaignGoal = Number(product.campaignGoal ?? product.price ?? 0);
-  const campaignCollected = Number(product.campaignCollected ?? product.promotionalPrice ?? 0);
+  const campaignGoal = Number(product.price ?? 0);
+  const campaignCollected = Number(product.promotionalPrice ?? 0);
   const percent = campaignGoal > 0 ? Math.min(100, Math.round((campaignCollected / campaignGoal) * 100)) : 0;
 
-  const pixKey = (product as { pixKey?: string | null }).pixKey ?? "";
-  const beneficiaryName = (product as { beneficiaryName?: string | null }).beneficiaryName ?? "";
-  const creatorName = (product as { creatorName?: string | null }).creatorName ?? "";
-  const creatorAvatar = (product as { creatorAvatar?: string | null }).creatorAvatar ?? "";
-  const campaignCategory = (product as { campaignCategory?: string | null }).campaignCategory ?? "";
+  const pixKey = "";
+  const beneficiaryName = "";
+  const creatorName = "";
+  const creatorAvatar = "";
+  const campaignCategory = "";
 
   const description = product.description ?? product.shortDescription ?? "";
   const descriptionEscaped = escapeForJson(stripHtml(description || product.name));
