@@ -223,20 +223,6 @@ export async function putProductDomains(
       });
     }
 
-    if (!product.workspaceId) {
-      await prisma.product.update({
-        where: { id: productId },
-        data: { workspaceId },
-      });
-    }
-
-    if (!product.baseSlug) {
-      await prisma.product.update({
-        where: { id: productId },
-        data: { baseSlug: product.slug },
-      });
-    }
-
     clearDomainCache();
     revalidatePath("/admin/produtos");
     revalidatePath(`/admin/produtos/${productId}/editar`);

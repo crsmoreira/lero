@@ -526,7 +526,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       {isEditing && product && (
         <ProductDomainsCard
           productId={product.id}
-          baseSlug={(product as { baseSlug?: string | null }).baseSlug ?? product.slug}
+          baseSlug={product.slug}
         />
       )}
 

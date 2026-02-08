@@ -150,10 +150,9 @@ export async function resolveProductByDomainAndSlug(domainId: string, slug: stri
     });
 
     if (!product) continue;
-    if (product.status !== "active" && product.status !== "published") continue;
-    if (product.publishedAt && product.publishedAt > new Date()) continue;
+    if (product.status !== "active") continue;
 
-    const effectiveSlug = (cd.slugOverride ?? product.baseSlug ?? product.slug ?? "").toLowerCase();
+    const effectiveSlug = (cd.slugOverride ?? product.slug ?? "").toLowerCase();
     if (effectiveSlug === slugNorm) return product;
   }
 
@@ -166,10 +165,7 @@ export async function resolveProductByDomainAndSlug(domainId: string, slug: stri
  */
 export async function resolveProductBySlugOnly(slug: string) {
   return prisma.product.findFirst({
-    where: {
-      OR: [{ slug }, { baseSlug: slug }],
-      status: { in: ["active", "published"] },
-    },
+    where: { slug, status: "active" },
     include: {
       images: { orderBy: { order: "asc" } },
       specifications: { orderBy: { order: "asc" } },

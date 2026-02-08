@@ -53,11 +53,10 @@ async function main() {
   }
 
   const products = await prisma.product.findMany({
-    select: { id: true, slug: true, baseSlug: true, workspaceId: true },
+    select: { id: true },
   });
 
   for (const p of products) {
-    const baseSlug = p.baseSlug ?? p.slug;
     const existing = await prisma.contentDomain.findFirst({
       where: {
         domainId: domain.id,
@@ -76,17 +75,6 @@ async function main() {
           isPrimary: true,
         },
       });
-      if (!p.baseSlug) {
-        await prisma.product.update({
-          where: { id: p.id },
-          data: { baseSlug: p.slug, workspaceId: workspace.id },
-        });
-      } else if (!p.workspaceId) {
-        await prisma.product.update({
-          where: { id: p.id },
-          data: { workspaceId: workspace.id },
-        });
-      }
     }
   }
   console.log("Vínculos content_domains criados para", products.length, "produtos");

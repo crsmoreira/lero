@@ -70,7 +70,6 @@ model Workspace {
   updatedAt DateTime @updatedAt
 
   domains        Domain[]
-  products       Product[]
   pages          Page[]
   contentDomains ContentDomain[]
 }
@@ -147,10 +146,8 @@ model Brand {
 // Products
 model Product {
   id              String    @id @default(cuid())
-  workspaceId     String?
   name            String
-  slug            String    @unique // legado; para multi-domínio use baseSlug + content_domains
-  baseSlug        String?   // slug base (usado quando slug_override é null)
+  slug            String    @unique
   shortDescription String?  @db.VarChar(160)
   description     String?   @db.Text // Rich text HTML
   price           Decimal   @db.Decimal(10, 2)
@@ -159,8 +156,7 @@ model Product {
   sku             String?
   gtin            String?
   stock           Int       @default(0)
-  status          String    @default("draft") // draft | active(published) | archived
-  publishedAt     DateTime?
+  status          String    @default("draft") // draft, active
   template        String    @default("leroy") // leroy | drogasil | decolar | carrefour | mercadolivre | vakinha
   tags            String[]  @default([])
   metaTitle       String?
@@ -175,7 +171,6 @@ model Product {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  workspace    Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   category     Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   brand        Brand?           @relation(fields: [brandId], references: [id], onDelete: SetNull)
   images       ProductImage[]

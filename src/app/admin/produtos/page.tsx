@@ -14,13 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { deleteProduct } from "@/actions/products";
 
 export default async function AdminProductsPage() {
-  let products: Awaited<
-    ReturnType<
-      typeof prisma.product.findMany<{ include: { images: true } }>
-    >
-  > = [];
-  const domainMap: Record<string, string[]> = {};
-
+  let products;
   try {
     products = await prisma.product.findMany({
       include: {
@@ -37,22 +31,6 @@ export default async function AdminProductsPage() {
         <a href="/admin/produtos" className="text-sm underline">Tentar novamente</a>
       </div>
     );
-  }
-
-  try {
-    const productIds = products.map((p) => p.id);
-    if (productIds.length > 0) {
-      const cds = await prisma.contentDomain.findMany({
-        where: { contentType: "product", contentId: { in: productIds } },
-        include: { domain: { select: { hostname: true } } },
-      });
-      cds.forEach((cd) => {
-        if (!domainMap[cd.contentId]) domainMap[cd.contentId] = [];
-        domainMap[cd.contentId].push(cd.domain.hostname);
-      });
-    }
-  } catch {
-    // Tabelas de domínio podem não existir ainda; ignora e segue sem chips
   }
 
   const productList = products ?? [];
@@ -74,7 +52,6 @@ export default async function AdminProductsPage() {
               <TableHead>Nome</TableHead>
               <TableHead>Preço</TableHead>
               <TableHead>Link</TableHead>
-              <TableHead>Domínios</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -120,17 +97,6 @@ export default async function AdminProductsPage() {
                   ) : (
                     "-"
                   )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1 max-w-[180px]">
-                    {(domainMap[product.id] ?? []).length > 0
-                      ? (domainMap[product.id] ?? []).map((h) => (
-                          <Badge key={h} variant="outline" className="text-xs font-normal">
-                            {h}
-                          </Badge>
-                        ))
-                      : "-"}
-                  </div>
                 </TableCell>
                 <TableCell>
                   <Badge variant={product.status === "active" ? "default" : "secondary"}>
