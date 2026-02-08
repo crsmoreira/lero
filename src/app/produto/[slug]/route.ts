@@ -245,14 +245,7 @@ export async function GET(
   const longDescription = product.description ?? "";
   const productDescription = product.description ?? product.shortDescription ?? ""; // para schema/SEO
 
-  const carrefourExcludeKeys = ["dimensões", "peso"];
-  const specsFiltered =
-    product.template === "carrefour"
-      ? product.specifications.filter((s) => {
-          const k = s.key.toLowerCase().trim();
-          return !carrefourExcludeKeys.some((ex) => k.includes(ex));
-        })
-      : product.specifications;
+  const specsFiltered = product.specifications;
   const specsRows = specsFiltered.map((s, i) =>
     product.template === "decolar"
       ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
@@ -269,6 +262,21 @@ export async function GET(
   const priceDiscountBlockCarrefour =
     product.template === "carrefour" && originalPrice && discountPercent
       ? `<span class="price-original">R$ ${formatPrice(Number(originalPrice))}</span><span class="discount-badge">${discountPercent}</span>`
+      : "";
+
+  const carrefourImages = images.length > 0 ? images : [mainImage];
+  const carrefourGalleryThumbnails =
+    product.template === "carrefour"
+      ? carrefourImages.map((img, i) => {
+          const sel = i === 0;
+          return `<button type="button" role="tab" aria-selected="${sel}" aria-label="Miniatura ${i + 1}" tabindex="${sel ? 0 : -1}" class="aspect-square w-16 h-16 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-royal"><img src="${escapeHtml(img)}" alt="" class="w-full h-full object-cover rounded-lg transition border border-gray-soft p-2 bg-white/30 ${sel ? "ring-2 ring-blue-royal shadow-md " : ""}hover:border-[#B8B8B8]"/></button>`;
+        }).join("")
+      : "";
+  const carrefourGalleryMain =
+    product.template === "carrefour"
+      ? carrefourImages.map((img, i) =>
+          `<div class="aspect-square snap-start"><img class="object-cover w-full h-full lg:cursor-zoom-image" src="${escapeHtml(img)}" loading="${i === 0 ? "eager" : "lazy"}" alt=""/><div class="hidden lg:block"><div style="display:none"></div><div class="new-zoom-image object-cover pdp-shadow rounded z-image-gallery" style="background-image:url(${escapeHtml(img)})"></div></div></div>`
+        ).join("")
       : "";
 
   const baseUrl =
@@ -345,6 +353,8 @@ export async function GET(
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],
     ["{{PRODUCT_DESCRIPTION}}", productDescription],
     ["{{PRODUCT_SPECIFICATIONS}}", specsHtml],
+    ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
+    ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
     ["{{META_TITLE}}", product.metaTitle ?? (product.template === "vakinha" ? `${product.name} | Vaquinhas online` : `${product.name} | Loja`)],
     ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? product.name],

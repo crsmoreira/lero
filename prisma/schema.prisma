@@ -100,7 +100,7 @@ model Product {
   price           Decimal   @db.Decimal(10, 2)
   promotionalPrice Decimal? @db.Decimal(10, 2)
   installmentPrice Decimal? @db.Decimal(10, 2) // Valor a prazo (exibe em vez de preço quando definido)
-  sku             String?   @unique
+  sku             String?
   gtin            String?
   stock           Int       @default(0)
   status          String    @default("draft") // draft, active
