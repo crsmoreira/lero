@@ -34,7 +34,7 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
-  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre", "vakinha"]).optional(),
+  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre"]).optional(),
   tags: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -86,7 +86,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           gtin: product.gtin ?? "",
           stock: product.stock,
           status: product.status as "draft" | "active",
-          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "mercadolivre" ? "mercadolivre" : (product as { template?: string }).template === "vakinha" ? "vakinha" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre" | "vakinha",
+          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "mercadolivre" ? "mercadolivre" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre",
           tags: product.tags.join(", "),
           metaTitle: product.metaTitle ?? "",
           metaDescription: product.metaDescription ?? "",
@@ -124,20 +124,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       .sort((a, b) => a.order - b.order)
       .map((s) => ({ key: s.key, value: s.value, order: s.order })) ?? []
   );
-
-  const template = watch("template") ?? "leroy";
-  const isVakinha = template === "vakinha";
-
-  const getVakinhaSpec = (key: string) =>
-    specs.find((s) => s.key.toLowerCase().trim() === key)?.value ?? "";
-  const setVakinhaSpec = (key: string, value: string) => {
-    const rest = specs.filter((s) => s.key.toLowerCase().trim() !== key);
-    if (value) {
-      setSpecs([...rest, { key, value, order: rest.length }]);
-    } else {
-      setSpecs(rest);
-    }
-  };
 
   const [reviews, setReviews] = React.useState<ReviewItem[]>(
     product?.reviews
@@ -218,7 +204,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="name">{isVakinha ? "Título" : "Nome"}</Label>
+            <Label htmlFor="name">Nome</Label>
             <Input
               id="name"
               {...register("name")}
@@ -239,7 +225,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
             )}
           </div>
           <div>
-            <Label htmlFor="shortDescription">{isVakinha ? "Descrição curta / Meta description (até 160 chars)" : "Descrição curta (até 160 chars)"}</Label>
+            <Label htmlFor="shortDescription">Descrição curta (até 160 chars)</Label>
             <Textarea
               id="shortDescription"
               {...register("shortDescription")}
@@ -248,7 +234,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
             />
           </div>
           <div>
-            <Label htmlFor="description">{isVakinha ? "Descrição" : "Descrição longa"}</Label>
+            <Label htmlFor="description">Descrição longa</Label>
             <Controller
               name="description"
               control={control}
@@ -262,44 +248,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
         <div className="space-y-4">
-          {(isVakinha ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="price">Meta (R$)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register("price", { valueAsNumber: true })}
-                />
-                {errors.price && (
-                  <p className="text-sm text-red-600">{errors.price.message}</p>
-                )}
-                <p className="text-xs text-gray-500 mt-1">Valor total que a vaquinha pretende arrecadar</p>
-              </div>
-              <div>
-                <Label htmlFor="promotionalPrice">Valor arrecadado (R$)</Label>
-                <Input
-                  id="promotionalPrice"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  {...register("promotionalPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
-                />
-                <p className="text-xs text-gray-500 mt-1">Valor já arrecadado até o momento</p>
-              </div>
-              <div>
-                <Label htmlFor="vakinha-num_doadores">Número de doadores</Label>
-                <Input
-                  id="vakinha-num_doadores"
-                  placeholder="Ex: 150"
-                  value={getVakinhaSpec("num_doadores")}
-                  onChange={(e) => setVakinhaSpec("num_doadores", e.target.value)}
-                />
-              </div>
-            </div>
-          ) : (
+          {(
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -341,7 +290,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                 </div>
               </div>
             </>
-          ))}
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="status">Status</Label>
@@ -383,16 +332,13 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       <SelectItem value="decolar">Decolar (Pacotes)</SelectItem>
                       <SelectItem value="carrefour">Carrefour</SelectItem>
                       <SelectItem value="mercadolivre">Mercado Livre</SelectItem>
-                      <SelectItem value="vakinha">Vakinha</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
               />
             </div>
           </div>
-          {!isVakinha && (
-            <>
-              <div>
+          <div>
                 <Label htmlFor="checkoutUrl">Link de Checkout</Label>
                 <Input
                   id="checkoutUrl"
@@ -443,8 +389,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   </div>
                 </div>
               </div>
-            </>
-          )}
+          </div>
         </div>
       </div>
 
@@ -453,20 +398,15 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         <ImageUploader images={images} onChange={setImages} uploadEnabled={uploadEnabled} />
       </div>
 
-      {!isVakinha && (
-        <div>
-          <h3 className="font-medium mb-4">Especificações</h3>
-          <SpecificationsEditor specs={specs} onChange={setSpecs} />
-        </div>
-      )}
+      <div>
+        <h3 className="font-medium mb-4">Especificações</h3>
+        <SpecificationsEditor specs={specs} onChange={setSpecs} />
+      </div>
 
-      {!isVakinha && (
-        <div>
-          <ReviewsEditor reviews={reviews} onChange={setReviews} uploadEnabled={uploadEnabled} />
-        </div>
-      )}
+      <div>
+        <ReviewsEditor reviews={reviews} onChange={setReviews} uploadEnabled={uploadEnabled} />
+      </div>
 
-      {!isVakinha && (
       <div className="border-t pt-6">
         <h3 className="font-medium mb-4">SEO</h3>
         <div className="space-y-4">
@@ -480,7 +420,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
       </div>
-      )}
 
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>

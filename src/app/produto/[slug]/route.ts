@@ -10,12 +10,6 @@ function formatPrice(value: number): string {
   return value.toFixed(2).replace(".", ",");
 }
 
-function formatPriceBr(value: number): string {
-  const [intPart, decPart] = value.toFixed(2).split(".");
-  const intFormatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return `${intFormatted},${decPart}`;
-}
-
 function formatPriceDecolar(value: number): string {
   const n = Math.round(value);
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -70,9 +64,7 @@ export async function GET(
           ? "produto-template-carrefour.html"
           : product.template === "mercadolivre"
             ? "produto-template-mercadolivre.html"
-            : product.template === "vakinha"
-              ? "produto-template-vakinha.html"
-              : "produto-template.html";
+            : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
 
@@ -104,7 +96,7 @@ export async function GET(
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
   const specMap =
-    (product.template === "decolar" || product.template === "vakinha") && product.specifications.length > 0
+    product.template === "decolar" && product.specifications.length > 0
       ? Object.fromEntries(
           product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
         )
@@ -291,10 +283,6 @@ export async function GET(
       : (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
   const productUrl = `${baseUrl}/produto/${slug}`;
 
-  const vakinhaMeta = Number(product.price);
-  const vakinhaArrecadado = product.promotionalPrice != null ? Number(product.promotionalPrice) : 0;
-  const vakinhaPercent = vakinhaMeta > 0 ? Math.min(100, Math.round((vakinhaArrecadado / vakinhaMeta) * 100)) : 0;
-  const vk = product.template === "vakinha" ? specMap : ({} as Record<string, string>);
   const reviews = "reviews" in product ? product.reviews : [];
   const reviewInputs = reviews.map((r) => ({
     userName: r.userName,
@@ -388,15 +376,6 @@ export async function GET(
           ["{{IS_MOBILE}}", mlIsMobile],
           ["{{DEVICE_TYPE}}", mlDeviceType],
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
-        ] as [string | RegExp, string][])
-      : []),
-    ...(product.template === "vakinha"
-      ? ([
-          ["{{VAKINHA_META}}", formatPriceBr(vakinhaMeta)],
-          ["{{VAKINHA_ARRECADADO}}", formatPriceBr(vakinhaArrecadado)],
-          ["{{VAKINHA_ARRECADADO_NUM}}", vakinhaArrecadado.toFixed(2)],
-          ["{{VAKINHA_PERCENT}}", String(vakinhaPercent)],
-          ["{{VAKINHA_NUM_DOADORES}}", vk["num_doadores"] ?? "0"],
         ] as [string | RegExp, string][])
       : []),
     [
