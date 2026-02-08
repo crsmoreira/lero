@@ -19,8 +19,15 @@ function formatPriceDrogasil(value: number): string {
   return `R$\u00A0${formatPrice(value)}`;
 }
 
+function isMobileRequest(req: NextRequest): boolean {
+  const cookie = req.cookies.get("device_force_view")?.value;
+  if (cookie === "mobile") return true;
+  const ua = req.headers.get("user-agent") ?? "";
+  return /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+}
+
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
@@ -289,6 +296,11 @@ export async function GET(
         ? buildReviewsHtmlMercadoLivre(reviewInputs, escapeHtml)
         : buildReviewsHtml(reviewInputs, escapeHtml);
 
+  const isMobile = product.template === "mercadolivre" && isMobileRequest(req);
+  const mlIsMobile = isMobile ? "true" : "false";
+  const mlDeviceType = isMobile ? "mobile" : "desktop";
+  const mlDevicePlatform = isMobile ? "/web/mobile" : "/web/desktop";
+
   const replacements: [string | RegExp, string][] = [
     ["{{PRODUCT_IMAGE_1}}", mainImage],
     ["{{PRODUCT_IMAGE_2}}", images[1] ?? mainImage],
@@ -349,6 +361,13 @@ export async function GET(
     ["{{PACKAGE_INCLUSIONS}}", packageInclusions],
     ["{{LOYALTY_POINTS}}", loyaltyPoints],
     ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
+    ...(product.template === "mercadolivre"
+      ? [
+          ["{{IS_MOBILE}}", mlIsMobile],
+          ["{{DEVICE_TYPE}}", mlDeviceType],
+          ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
+        ]
+      : []),
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"
@@ -374,6 +393,9 @@ export async function GET(
   }
 
   return new NextResponse(html, {
-    headers: { "Content-Type": "text/html; charset=utf-8" },
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+    },
   });
 }
