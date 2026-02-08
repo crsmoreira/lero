@@ -39,9 +39,13 @@ export async function GET(
 
   let product = null;
   const host = req.headers.get("host") ?? "";
-  const domainCtx = await getDomainContext(host);
-  if (domainCtx) {
-    product = await resolveProductByDomainAndSlug(domainCtx.domainId, slug);
+  try {
+    const domainCtx = await getDomainContext(host);
+    if (domainCtx) {
+      product = await resolveProductByDomainAndSlug(domainCtx.domainId, slug);
+    }
+  } catch (_) {
+    // Se resolução por domínio falhar, usa fallback por slug
   }
   if (!product) {
     const found = await resolveProductBySlugOnly(slug);
@@ -58,7 +62,7 @@ export async function GET(
       : (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
   const productUrl = `${baseUrl}/vaquinha/${slug}`;
 
-  const rawImage = product.images[0]?.url ?? "";
+  const rawImage = (product.images ?? [])[0]?.url ?? "";
   const mainImage =
     !rawImage ? ""
     : rawImage.startsWith("http://") || rawImage.startsWith("https://")

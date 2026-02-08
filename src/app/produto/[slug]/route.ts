@@ -34,6 +34,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  try {
   const { slug } = await params;
 
   if (slug === "modelo") {
@@ -47,9 +48,13 @@ export async function GET(
   let product = null;
   const host = req.headers.get("host") ?? "";
 
-  const domainCtx = await getDomainContext(host);
-  if (domainCtx) {
-    product = await resolveProductByDomainAndSlug(domainCtx.domainId, slug);
+  try {
+    const domainCtx = await getDomainContext(host);
+    if (domainCtx) {
+      product = await resolveProductByDomainAndSlug(domainCtx.domainId, slug);
+    }
+  } catch (_) {
+    // Se resolução por domínio falhar, usa fallback por slug
   }
   if (!product) {
     product = await resolveProductBySlugOnly(slug);
@@ -84,7 +89,7 @@ export async function GET(
       .replace(/"/g, "&quot;");
   }
 
-  const images = product.images.map((img) => img.url);
+  const images = (product.images ?? []).map((img) => img.url);
   const mainImage = images[0] ?? "";
   // À vista (cash) = sempre valor promocional ou preço
   const priceAvista = product.promotionalPrice ?? product.price;
@@ -103,10 +108,11 @@ export async function GET(
   const fallbackUrl = product.category ? `/produtos?categoria=${product.category.slug}` : "javascript:void(0)";
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
+  const specs = product.specifications ?? [];
   const specMap =
-    product.template === "decolar" && product.specifications.length > 0
+    product.template === "decolar" && specs.length > 0
       ? Object.fromEntries(
-          product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
+          specs.map((s) => [s.key.toLowerCase().trim(), s.value])
         )
       : {};
   const packageDaysNights =
@@ -251,7 +257,7 @@ export async function GET(
   const longDescription = product.description ?? "";
   const productDescription = product.description ?? product.shortDescription ?? ""; // para schema/SEO
 
-  const specsFiltered = product.specifications;
+  const specsFiltered = specs;
   const specsRows = specsFiltered.map((s, i) =>
     product.template === "decolar"
       ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
@@ -416,4 +422,11 @@ export async function GET(
       "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
     },
   });
+  } catch (err) {
+    console.error("[produto/route] Erro ao renderizar produto:", err);
+    return NextResponse.json(
+      { error: "Erro ao carregar o produto", details: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
+  }
 }
