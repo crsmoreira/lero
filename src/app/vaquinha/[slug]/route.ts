@@ -54,16 +54,23 @@ export async function GET(
       : (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
   const productUrl = `${baseUrl}/vaquinha/${slug}`;
 
-  const mainImage = product.images[0]?.url ?? "";
+  const rawImage = product.images[0]?.url ?? "";
+  const mainImage =
+    !rawImage ? ""
+    : rawImage.startsWith("http://") || rawImage.startsWith("https://")
+    ? rawImage
+    : `${baseUrl.replace(/\/$/, "")}${rawImage.startsWith("/") ? rawImage : `/${rawImage}`}`;
+
   const campaignGoal = Number(product.price ?? 0);
   const campaignCollected = Number(product.promotionalPrice ?? 0);
   const percent = campaignGoal > 0 ? Math.min(100, Math.round((campaignCollected / campaignGoal) * 100)) : 0;
 
-  const pixKey = "";
+  const pixKey = (product.breadcrumbBackLabel ?? "").trim();
   const beneficiaryName = "";
   const creatorName = "";
   const creatorAvatar = "";
-  const campaignCategory = "";
+  const campaignCategory = (product.brandName ?? "").trim();
+  const checkoutUrl = (product.checkoutUrl ?? productUrl).trim();
 
   const description = product.description ?? product.shortDescription ?? "";
   const descriptionEscaped = escapeForJson(stripHtml(description || product.name));
@@ -82,6 +89,7 @@ export async function GET(
     ["{{CAMPAIGN_CATEGORY}}", campaignCategory],
     ["{{PRODUCT_DESCRIPTION_ESCAPED}}", descriptionEscaped],
     ["{{PRODUCT_URL}}", productUrl],
+    ["{{CHECKOUT_URL}}", checkoutUrl],
   ];
 
   const templatePath = join(process.cwd(), "public", "vakinha-template.html");

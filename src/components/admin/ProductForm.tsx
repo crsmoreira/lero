@@ -69,6 +69,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
     setValue,
     setError,
     control,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(productSchema),
@@ -335,7 +336,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
             </div>
           </div>
           <div>
-                <Label htmlFor="checkoutUrl">Link de Checkout</Label>
+                <Label htmlFor="checkoutUrl">Link de Checkout / Doar</Label>
                 <Input
                   id="checkoutUrl"
                   type="url"
@@ -343,9 +344,30 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   {...register("checkoutUrl")}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  URL para onde os botões &quot;Comprar&quot; e &quot;Adicionar ao carrinho&quot; redirecionam
+                  {watch("template") === "vakinha" ? "URL do botão Quero Ajudar / Doar" : "URL para onde os botões Comprar e Adicionar ao carrinho redirecionam"}
                 </p>
               </div>
+              {watch("template") === "vakinha" && (
+                <>
+                  <div>
+                    <Label htmlFor="breadcrumbBackLabel">Chave PIX</Label>
+                    <Input
+                      id="breadcrumbBackLabel"
+                      placeholder="CPF, e-mail, telefone ou chave aleatória"
+                      {...register("breadcrumbBackLabel")}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Exibida na página da vaquinha para doações</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="brandName">Categoria da campanha</Label>
+                    <Input
+                      id="brandName"
+                      placeholder="Ex: Saúde / Tratamentos"
+                      {...register("brandName")}
+                    />
+                  </div>
+                </>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="sku">SKU</Label>
@@ -356,6 +378,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   <Input id="gtin" {...register("gtin")} />
                 </div>
               </div>
+              {watch("template") !== "vakinha" && (
               <div>
                 <Label htmlFor="brandName">Marca (opcional)</Label>
                 <Input
@@ -364,6 +387,8 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   {...register("brandName")}
                 />
               </div>
+              )}
+              {watch("template") !== "vakinha" && (
               <div>
                 <Label htmlFor="breadcrumbBackLabel">Link &quot;Voltar&quot; do breadcrumb</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
@@ -385,6 +410,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   </div>
                 </div>
               </div>
+              )}
         </div>
       </div>
 
