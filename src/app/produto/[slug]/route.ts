@@ -64,7 +64,9 @@ export async function GET(
           ? "produto-template-carrefour.html"
           : product.template === "mercadolivre"
             ? "produto-template-mercadolivre.html"
-            : "produto-template.html";
+            : product.template === "vakinha"
+              ? "produto-template-vakinha.html"
+              : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
 
@@ -96,7 +98,7 @@ export async function GET(
   const breadcrumbBackUrl = product.breadcrumbBackUrl ?? fallbackUrl;
 
   const specMap =
-    product.template === "decolar" && product.specifications.length > 0
+    (product.template === "decolar" || product.template === "vakinha") && product.specifications.length > 0
       ? Object.fromEntries(
           product.specifications.map((s) => [s.key.toLowerCase().trim(), s.value])
         )
@@ -344,7 +346,7 @@ export async function GET(
     ["{{PRODUCT_DESCRIPTION}}", productDescription],
     ["{{PRODUCT_SPECIFICATIONS}}", specsHtml],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
-    ["{{META_TITLE}}", product.metaTitle ?? `${product.name} | Loja`],
+    ["{{META_TITLE}}", product.metaTitle ?? (product.template === "vakinha" ? `${product.name} | Vaquinhas online` : `${product.name} | Loja`)],
     ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? product.name],
     ["{{PRODUCT_PRICE_VALID_UNTIL}}", new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)],
     ["{{PRODUCT_PRICE_VALID_DATE}}", (() => {
@@ -361,13 +363,39 @@ export async function GET(
     ["{{PACKAGE_INCLUSIONS}}", packageInclusions],
     ["{{LOYALTY_POINTS}}", loyaltyPoints],
     ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
-    ...(product.template === "mercadolivre"
+    ...((product.template === "mercadolivre"
       ? [
           ["{{IS_MOBILE}}", mlIsMobile],
           ["{{DEVICE_TYPE}}", mlDeviceType],
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
-        ]
-      : []),
+        ] as [string | RegExp, string][]
+      : [])),
+    ...((product.template === "vakinha"
+      ? [
+          ["{{VAKINHA_VALOR_ARRECADADO}}", (() => {
+            const spec = specMap["valor_arrecadado"];
+            if (spec) return spec;
+            const v = product.promotionalPrice != null ? Number(product.promotionalPrice) : Number(product.price);
+            return `R$ ${formatPrice(v)}`;
+          })()],
+          ["{{VAKINHA_DE_META}}", (() => {
+            const spec = specMap["meta"];
+            if (spec) return spec.startsWith("de ") ? spec : `de ${spec}`;
+            return `de R$ ${formatPrice(Number(product.price))}`;
+          })()],
+          ["{{VAKINHA_CORACOES}}", specMap["coracoes_recebidos"] ?? specMap["coracoes"] ?? "0"],
+          ["{{VAKINHA_APOIADORES}}", specMap["num_doadores"] ?? specMap["apoiadores"] ?? "0"],
+          ["{{VAKINHA_PIX}}", specMap["pix_chave"] ?? specMap["pix"] ?? ""],
+          ["{{VAKINHA_DATA_CRIACAO}}", specMap["data_criacao"] ?? (() => {
+            const d = product.createdAt instanceof Date ? product.createdAt : new Date(product.createdAt);
+            return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+          })()],
+          ["{{VAKINHA_NOME_CRIADOR}}", specMap["nome_criador"] ?? brandName ?? ""],
+          ["{{VAKINHA_BENEFICIARIO}}", specMap["beneficiario"] ?? product.name],
+          ["{{VAKINHA_CATEGORIA}}", specMap["categoria"] ?? "Vaquinha"],
+          ["{{VAKINHA_ID}}", product.sku ? `ID: ${product.sku}` : ""],
+        ] as [string | RegExp, string][]
+      : [])),
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"
