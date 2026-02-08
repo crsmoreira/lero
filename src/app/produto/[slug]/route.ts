@@ -16,12 +16,6 @@ function formatPriceBr(value: number): string {
   return `${intFormatted},${decPart}`;
 }
 
-function formatPriceBr(value: number): string {
-  const [intPart, decPart] = value.toFixed(2).split(".");
-  const intFormatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return `${intFormatted},${decPart}`;
-}
-
 function formatPriceDecolar(value: number): string {
   const n = Math.round(value);
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
