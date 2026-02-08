@@ -336,7 +336,7 @@ export async function GET(
     ["{{PRODUCT_IMAGE_8}}", images[7] ?? mainImage],
     ["{{PRODUCT_IMAGE_9}}", images[8] ?? mainImage],
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
-    ["{{PRODUCT_TITLE}}", product.name],
+    ["{{PRODUCT_TITLE}}", (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_BRAND}}", brandName],
     ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : product.template === "havan" ? `R$ ${formatPrice(Number(priceAvista))}` : `R$ ${formatPrice(Number(priceAvista))}`],
     ["{{PRICE_DISCOUNT_BLOCK}}", priceDiscountBlockCarrefour],
@@ -372,8 +372,8 @@ export async function GET(
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
-    ["{{META_TITLE}}", product.metaTitle ?? `${product.name} | Loja`],
-    ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? product.name],
+    ["{{META_TITLE}}", product.metaTitle ?? `${(product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)} | Loja`],
+    ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_PRICE_VALID_UNTIL}}", new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)],
     ["{{PRODUCT_PRICE_VALID_DATE}}", (() => {
       const d = new Date();

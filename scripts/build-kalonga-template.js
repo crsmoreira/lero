@@ -45,11 +45,15 @@ html = html.replace(
   '<link rel="canonical" href="{{PRODUCT_URL}}">'
 );
 
-// 4. Imagens do produto principal - todas as variantes
-html = html.replace(
-  /https:\/\/img\.kalunga\.com\.br\/fotosdeprodutos\/795755[a-z]?\.(jpg|webp|png)/g,
-  "{{PRODUCT_IMAGE_1}}"
-);
+// 4. Imagens do produto principal - galeria usa IMAGE_1..6, thumbnails (z) também
+const imgMap = [
+  ["795755d.jpg", 1], ["795755d_1.jpg", 2], ["795755d_2.jpg", 3], ["795755d_3.jpg", 4], ["795755d_4.jpg", 5], ["795755d_5.jpg", 6],
+  ["795755z.jpg", 1], ["795755z_1.jpg", 2], ["795755z_2.jpg", 3], ["795755z_3.jpg", 4], ["795755z_4.jpg", 5], ["795755z_5.jpg", 6],
+];
+imgMap.forEach(([suffix, num]) => {
+  const re = new RegExp(`https://img\\.kalunga\\.com\\.br/fotosdeprodutos/${suffix.replace(".", "\\.")}`, "g");
+  html = html.replace(re, `{{PRODUCT_IMAGE_${num}}}`);
+});
 
 // 5. Título do produto no body - múltiplas ocorrências
 const titleVariants = [
@@ -75,9 +79,9 @@ if (pricePattern.test(html)) {
 // Fallback: substituir todas as ocorrências de R$ 289,90 (é o preço principal)
 html = html.split("R$ 289,90").join("{{PRODUCT_PRICE}}");
 
-// 7. Botão Comprar - usar data-checkout para evitar problemas com aspas na URL
+// 7. Botão Comprar - link para checkout
 html = html.replace(
-  /onclick="Comprar\('795755', true\)"/g,
+  /onclick="Comprar\('795755', true\);"/g,
   'onclick="location.href=this.getAttribute(\'data-checkout\')||\'#\'" data-checkout="{{CHECKOUT_URL}}"'
 );
 
@@ -95,9 +99,24 @@ html = html.replace(
 html = html.replace(/AbrirDropdowFavoritos\('795755'\)/g, "AbrirDropdowFavoritos('{{PRODUCT_SKU}}')");
 html = html.replace(/iconFavoritos_title_795755/g, "iconFavoritos_title_{{PRODUCT_SKU}}");
 
-// 10. Descrição - se houver bloco de descrição do produto
-// A descrição longa pode estar em product description - usar placeholder genérico
-// html = html.replace(/Compre online e retire na loja[^<]*/g, "{{PRODUCT_SHORT_DESCRIPTION}}");
+// 10. Descrição (ocorrências no body - og:description já é {{META_DESCRIPTION}} no step 1)
+html = html.split("Compre online e retire na loja em até 2h! Mais de 220 lojas espalhadas por todo o Brasil.").join("{{PRODUCT_DESCRIPTION}}");
+
+// 11. Remover seção "Compre junto" (containerbox + script de btn-compre-junto)
+const compreJuntoStart =
+  '<div class="containerbox col-12"><p class="containerbox__titleblock border-bottom h2">Compre Junto</p>';
+const compreJuntoScriptStart =
+  '<script type="text/javascript">document.addEventListener("DOMContentLoaded",function(){var btncomprejunto=document.querySelectorAll(".btn-compre-junto")';
+const idxStart = html.indexOf(compreJuntoStart);
+const idxScript = html.indexOf(compreJuntoScriptStart);
+const idxScriptEnd = html.indexOf("</script>", idxScript) + 8;
+if (idxStart >= 0 && idxScript > idxStart && idxScriptEnd > idxScript) {
+  html = html.substring(0, idxStart) + html.substring(idxScriptEnd);
+}
+
+// 12. Script para desabilitar cliques em menu, rodapé, header (sem alterar visual)
+const clickBlocker = `<script>(function(){function blockNav(e){var t=e.target;if(t.closest("[data-checkout]"))return;if(t.closest("header")||t.closest("footer")||t.closest("nav")||t.closest(".componentheader")||t.closest(".page-header")||t.closest("[class*='megamenu']")||t.closest("[class*='footer']")){e.preventDefault();e.stopPropagation();}}document.addEventListener("click",blockNav,true);})();</script>`;
+html = html.replace("</body>", clickBlocker + "</body>");
 
 fs.writeFileSync(dest, html);
 console.log("Template gerado:", dest);
