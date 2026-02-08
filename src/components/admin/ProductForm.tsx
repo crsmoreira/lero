@@ -69,7 +69,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
     setValue,
     setError,
     control,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(productSchema),
