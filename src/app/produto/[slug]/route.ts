@@ -30,6 +30,14 @@ function isMobileRequest(req: NextRequest): boolean {
   return /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 }
 
+function escapeHtml(text: string): string {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -80,14 +88,6 @@ export async function GET(
             : "produto-template.html";
   const templatePath = join(process.cwd(), "public", templateFile);
   let html = await readFile(templatePath, "utf-8");
-
-  function escapeHtml(text: string): string {
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
 
   const images = (product.images ?? []).map((img) => img.url);
   const mainImage = images[0] ?? "";
