@@ -12,6 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:seed-admin": "npx tsx prisma/seed-admin-only.ts",
+    "db:seed-domains": "npx tsx prisma/seed-domains.ts",
     "db:migrate-analytics": "npx tsx prisma/apply-analytics-migration.ts"
   },
   "prisma": {

@@ -15,6 +15,7 @@ import { deleteProduct } from "@/actions/products";
 
 export default async function AdminProductsPage() {
   let products;
+  const domainMap: Record<string, string[]> = {};
   try {
     products = await prisma.product.findMany({
       include: {
@@ -22,6 +23,17 @@ export default async function AdminProductsPage() {
       },
       orderBy: { createdAt: "desc" },
     });
+    const productIds = (products ?? []).map((p) => p.id);
+    if (productIds.length > 0) {
+      const cds = await prisma.contentDomain.findMany({
+        where: { contentType: "product", contentId: { in: productIds } },
+        include: { domain: { select: { hostname: true } } },
+      });
+      cds.forEach((cd) => {
+        if (!domainMap[cd.contentId]) domainMap[cd.contentId] = [];
+        domainMap[cd.contentId].push(cd.domain.hostname);
+      });
+    }
   } catch (err) {
     console.error("Erro ao carregar produtos:", err);
     return (
@@ -52,6 +64,7 @@ export default async function AdminProductsPage() {
               <TableHead>Nome</TableHead>
               <TableHead>Preço</TableHead>
               <TableHead>Link</TableHead>
+              <TableHead>Domínios</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -97,6 +110,17 @@ export default async function AdminProductsPage() {
                   ) : (
                     "-"
                   )}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1 max-w-[180px]">
+                    {(domainMap[product.id] ?? []).length > 0
+                      ? (domainMap[product.id] ?? []).map((h) => (
+                          <Badge key={h} variant="outline" className="text-xs font-normal">
+                            {h}
+                          </Badge>
+                        ))
+                      : "-"}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <Badge variant={product.status === "active" ? "default" : "secondary"}>

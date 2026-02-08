@@ -1,7 +1,11 @@
-import { prisma } from "@/lib/prisma";
+import {
+  getDomainContext,
+  resolveProductByDomainAndSlug,
+  resolveProductBySlugOnly,
+} from "@/lib/domain";
 import { readFile } from "fs/promises";
 import { join } from "path";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
@@ -28,22 +32,21 @@ function escapeForJson(text: string): string {
 }
 
 export async function GET(
-  _req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
 
-  const product = await prisma.product.findUnique({
-    where: {
-      slug,
-      status: "active",
-      template: "vakinha",
-    },
-    include: {
-      images: { orderBy: { order: "asc" } },
-      specifications: true,
-    },
-  });
+  let product = null;
+  const host = req.headers.get("host") ?? "";
+  const domainCtx = await getDomainContext(host);
+  if (domainCtx) {
+    product = await resolveProductByDomainAndSlug(domainCtx.domainId, slug);
+  }
+  if (!product) {
+    const found = await resolveProductBySlugOnly(slug);
+    product = found?.template === "vakinha" ? found : null;
+  }
 
   if (!product) {
     return NextResponse.json({ error: "Vaquinha não encontrada" }, { status: 404 });
@@ -98,7 +101,7 @@ export async function GET(
     ["{{CAMPAIGN_PERCENT}}", String(percent)],
     ["{{PIX_KEY}}", pixKey],
     ["{{CREATOR_NAME}}", creatorName],
-    ["{{CREATOR_AVATAR}}", creatorAvatar],
+    ["{{CREATOR_AVATAR}}", creatorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(creatorName || "Creator")}&size=45&background=ddd&color=666`],
     ["{{BENEFICIARY_NAME}}", beneficiaryName],
     ["{{CAMPAIGN_CATEGORY}}", campaignCategory],
     ["{{CAMPAIGN_CREATED_AT}}", campaignCreatedAt],
@@ -108,6 +111,7 @@ export async function GET(
     ["{{PRODUCT_DESCRIPTION_ESCAPED}}", descriptionEscaped],
     ["{{PRODUCT_URL}}", productUrl],
     ["{{CHECKOUT_URL}}", checkoutUrl],
+    ["{{PIX_SECTION_STYLE}}", pixKey ? "" : "display:none"],
   ];
 
   const templatePath = join(process.cwd(), "public", "vakinha-template.html");

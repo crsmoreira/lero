@@ -1,4 +1,8 @@
-import { prisma } from "@/lib/prisma";
+import {
+  getDomainContext,
+  resolveProductByDomainAndSlug,
+  resolveProductBySlugOnly,
+} from "@/lib/domain";
 import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMercadoLivre } from "./reviewsHtml";
 import { readFile } from "fs/promises";
 import { join } from "path";
@@ -40,16 +44,16 @@ export async function GET(
     });
   }
 
-  const product = await prisma.product.findUnique({
-    where: { slug, status: "active" },
-    include: {
-      images: { orderBy: { order: "asc" } },
-      specifications: { orderBy: { order: "asc" } },
-      brand: true,
-      category: true,
-      reviews: { where: { approved: true }, orderBy: { createdAt: "desc" } },
-    },
-  });
+  let product = null;
+  const host = req.headers.get("host") ?? "";
+
+  const domainCtx = await getDomainContext(host);
+  if (domainCtx) {
+    product = await resolveProductByDomainAndSlug(domainCtx.domainId, slug);
+  }
+  if (!product) {
+    product = await resolveProductBySlugOnly(slug);
+  }
 
   if (!product) {
     return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });

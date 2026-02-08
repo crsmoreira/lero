@@ -19,6 +19,7 @@ import { ImageUploader } from "./ImageUploader";
 import { RichTextEditor } from "./RichTextEditor";
 import { ReviewsEditor, type ReviewItem } from "./ReviewsEditor";
 import { createProduct, updateProduct } from "@/actions/products";
+import { ProductDomainsCard } from "./ProductDomainsCard";
 import { toast } from "sonner";
 import type { Product, ProductImage, ProductSpecification } from "@prisma/client";
 
@@ -521,6 +522,13 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       <div>
         <ReviewsEditor reviews={reviews} onChange={setReviews} uploadEnabled={uploadEnabled} />
       </div>
+
+      {isEditing && product && (
+        <ProductDomainsCard
+          productId={product.id}
+          baseSlug={(product as { baseSlug?: string | null }).baseSlug ?? product.slug}
+        />
+      )}
 
       <div className="border-t pt-6">
         <h3 className="font-medium mb-4">SEO</h3>

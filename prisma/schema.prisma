@@ -62,6 +62,60 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// Multi-domain: Workspace (loja/tenant)
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  domains        Domain[]
+  products       Product[]
+  pages          Page[]
+  contentDomains ContentDomain[]
+}
+
+// Multi-domain: Domínios do workspace
+model Domain {
+  id                String  @id @default(cuid())
+  workspaceId       String
+  hostname          String  // lojaA.com (lowercase, sem protocolo)
+  canonicalHostname String? // hostname canônico (ex: sem www)
+  status           String   @default("pending") // pending | active | disabled
+  isPrimary        Boolean  @default(false)
+  settings         Json?    // { defaultLocale, currency, timezone }
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  contentDomains ContentDomain[]
+
+  @@unique([workspaceId, hostname])
+  @@index([workspaceId])
+  @@index([hostname])
+  @@index([canonicalHostname])
+}
+
+// Multi-domain: Pivô polimórfico (conteúdo ↔ domínios)
+model ContentDomain {
+  id          String   @id @default(cuid())
+  workspaceId String
+  domainId    String
+  contentType String   // "product" | "page" | "collection"
+  contentId   String
+  slugOverride String? // override do slug por domínio
+  isPrimary   Boolean  @default(false) // domínio principal deste conteúdo
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  domain    Domain    @relation(fields: [domainId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, domainId, contentType, contentId])
+  @@index([domainId, contentType])
+  @@index([contentType, contentId])
+}
+
 // Categories
 model Category {
   id          String    @id @default(cuid())
@@ -93,8 +147,10 @@ model Brand {
 // Products
 model Product {
   id              String    @id @default(cuid())
+  workspaceId     String?
   name            String
-  slug            String    @unique
+  slug            String    @unique // legado; para multi-domínio use baseSlug + content_domains
+  baseSlug        String?   // slug base (usado quando slug_override é null)
   shortDescription String?  @db.VarChar(160)
   description     String?   @db.Text // Rich text HTML
   price           Decimal   @db.Decimal(10, 2)
@@ -103,7 +159,8 @@ model Product {
   sku             String?
   gtin            String?
   stock           Int       @default(0)
-  status          String    @default("draft") // draft, active
+  status          String    @default("draft") // draft | active(published) | archived
+  publishedAt     DateTime?
   template        String    @default("leroy") // leroy | drogasil | decolar | carrefour | mercadolivre | vakinha
   tags            String[]  @default([])
   metaTitle       String?
@@ -118,6 +175,7 @@ model Product {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
+  workspace    Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
   category     Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   brand        Brand?           @relation(fields: [brandId], references: [id], onDelete: SetNull)
   images       ProductImage[]
@@ -125,6 +183,25 @@ model Product {
   variantGroups ProductVariantGroup[]
   reviews      Review[]
   questions    Question[]
+}
+
+// Pages (conteúdo publicável por domínio)
+model Page {
+  id          String    @id @default(cuid())
+  workspaceId String?
+  title       String
+  slug        String
+  baseSlug    String?
+  body        String?   @db.Text
+  status      String    @default("draft") // draft | active | archived
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+
+  @@unique([slug])
+  @@index([workspaceId])
 }
 
 model ProductImage {
