@@ -372,11 +372,11 @@ export async function GET(
     ["{{LOYALTY_POINTS}}", loyaltyPoints],
     ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
     ...(product.template === "mercadolivre"
-      ? [
+      ? ([
           ["{{IS_MOBILE}}", mlIsMobile],
           ["{{DEVICE_TYPE}}", mlDeviceType],
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
-        ]
+        ] as [string | RegExp, string][])
       : []),
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
