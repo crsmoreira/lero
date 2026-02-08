@@ -248,9 +248,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           </div>
         </div>
         <div className="space-y-4">
-          {(
-            <>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="price">Preço (R$)</Label>
                   <Input
@@ -289,8 +287,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   <Input id="stock" type="number" {...register("stock", { valueAsNumber: true })} />
                 </div>
               </div>
-            </>
-          )}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="status">Status</Label>
@@ -389,7 +385,6 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   </div>
                 </div>
               </div>
-          </div>
         </div>
       </div>
 
