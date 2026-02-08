@@ -14,7 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { deleteProduct } from "@/actions/products";
 
 export default async function AdminProductsPage() {
-  let products: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
+  let products: Awaited<
+    ReturnType<
+      typeof prisma.product.findMany<{ include: { images: true } }>
+    >
+  > = [];
   const domainMap: Record<string, string[]> = {};
 
   try {
