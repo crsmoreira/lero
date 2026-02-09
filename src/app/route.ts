@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 export async function GET() {
-  const filePath = path.join(process.cwd(), "public", "paguemenos-static.html");
+  const filePath = path.join(process.cwd(), "public", "madeiramadeira.html");
   try {
     const html = fs.readFileSync(filePath, "utf8");
     return new NextResponse(html, {
@@ -12,7 +12,7 @@ export async function GET() {
       },
     });
   } catch (err) {
-    console.error("Failed to serve paguemenos-static.html:", err);
+    console.error("Failed to serve madeiramadeira.html:", err);
     return new NextResponse("Page not found", { status: 404 });
   }
 }
