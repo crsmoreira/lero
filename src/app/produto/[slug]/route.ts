@@ -92,7 +92,9 @@ export async function GET(
               ? "produto-template-havan.html"
               : product.template === "kalonga"
                 ? "produto-template-kalonga.html"
-                : "produto-template.html";
+                : product.template === "mm"
+                  ? "produto-template-mm.html"
+                  : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
   const toAbsoluteUrl = (url: string) => {
