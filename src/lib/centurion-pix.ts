@@ -10,9 +10,9 @@ export type RetryPolicy = {
 
 export class ApiError extends Error {
   status: number;
-  raw: any;
+  raw: unknown;
   url: string;
-  constructor(message: string, status: number, raw: any, url: string) {
+  constructor(message: string, status: number, raw: unknown, url: string) {
     super(message);
     this.name = "ApiError";
     this.status = status;
@@ -24,7 +24,7 @@ export class ApiError extends Error {
 type HttpOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
-  body?: any;
+  body?: unknown;
   timeoutMs?: number;
   retry?: RetryPolicy;
 };
@@ -32,7 +32,7 @@ type HttpOptions = {
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 const onlyDigits = (s?: string) => (s ?? "").replace(/\D+/g, "");
 
-async function httpJson<T = any>(url: string, opts: HttpOptions = {}): Promise<T> {
+async function httpJson<T = unknown>(url: string, opts: HttpOptions = {}): Promise<T> {
   const {
     method = "GET",
     headers,
@@ -64,16 +64,18 @@ async function httpJson<T = any>(url: string, opts: HttpOptions = {}): Promise<T
       });
 
       const raw = await res.text();
-      let json: any = raw;
+      let json: unknown = raw;
       try {
         json = raw ? JSON.parse(raw) : {};
       } catch {
         // mantém raw se não for JSON
       }
 
+      const jsonObj = json as Record<string, unknown> | null;
       if (!res.ok) {
-        const msg =
-          (json && (json.error || json.message)) || raw || res.statusText || "HTTP error";
+        const msg = String(
+          (jsonObj && (jsonObj.error ?? jsonObj.message)) ?? raw ?? res.statusText ?? "HTTP error"
+        );
 
         const canRetry =
           (retry.retryOn || []).includes(res.status) && attempt < (retry.retries || 0);
