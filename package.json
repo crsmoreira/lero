@@ -15,7 +15,8 @@
     "db:seed-domains": "npx tsx prisma/seed-domains.ts",
     "db:migrate-analytics": "npx tsx prisma/apply-analytics-migration.ts",
     "build:kalonga": "node scripts/build-kalonga-template.js",
-    "build:paguemenos": "node scripts/build-paguemenos-static.js"
+    "build:paguemenos": "node scripts/build-paguemenos-static.js",
+    "build:santista": "node scripts/build-santista-static.js"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
