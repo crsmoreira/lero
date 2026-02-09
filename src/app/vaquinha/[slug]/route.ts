@@ -97,7 +97,48 @@ export async function GET(
   const shortDescription = (product.shortDescription ?? stripHtml(description).slice(0, 160) ?? "").trim();
   const descriptionEscaped = escapeForJson(stripHtml(description || product.name));
 
+  // Link "Quero Ajudar" abre modal em vez de ir ao checkout (deve vir antes do replace de {{CHECKOUT_URL}})
+  const linkQueroAjudarOriginal =
+    '<a href="{{CHECKOUT_URL}}" class="sc-eldPxv gEHdXN" style="text-decoration:none;display:inline-flex;cursor:pointer"><div class="sc-fqkvVR hXGXXh" data-cy="campaign-toolbar">Quero Ajudar</div></a>';
+  const linkQueroAjudarModal =
+    '<a href="#" id="vakinha-btn-doar" class="sc-eldPxv gEHdXN" style="text-decoration:none;display:inline-flex;cursor:pointer"><div class="sc-fqkvVR hXGXXh" data-cy="campaign-toolbar">Quero Ajudar</div></a>';
+
+  const modalDoacao = `
+<div id="vakinha-modal-doacao" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);font-family:'Lato',arial,sans-serif;">
+  <div style="background:#fff;border-radius:12px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
+    <div style="background:#24CA68;color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-weight:700;font-size:1.1rem;">Escolha o valor da sua doação</span>
+      <button type="button" id="vakinha-modal-fechar" aria-label="Fechar" style="background:transparent;border:none;color:#fff;cursor:pointer;padding:4px;font-size:1.5rem;line-height:1;">&times;</button>
+    </div>
+    <div style="padding:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+      <button type="button" class="vakinha-valor-btn" data-valor="30" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 30</button>
+      <button type="button" class="vakinha-valor-btn" data-valor="50" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 50</button>
+      <button type="button" class="vakinha-valor-btn" data-valor="100" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 100</button>
+      <button type="button" class="vakinha-valor-btn" data-valor="150" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 150</button>
+      <button type="button" class="vakinha-valor-btn" data-valor="200" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 200</button>
+      <button type="button" class="vakinha-valor-btn" data-valor="300" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 300</button>
+      <button type="button" class="vakinha-valor-btn" data-valor="500" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 500</button>
+      <button type="button" class="vakinha-valor-btn" data-valor="1000" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 1.000</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var modal = document.getElementById('vakinha-modal-doacao');
+  var btn = document.getElementById('vakinha-btn-doar');
+  var fechar = document.getElementById('vakinha-modal-fechar');
+  if (!modal || !btn) return;
+  btn.addEventListener('click', function(e){ e.preventDefault(); modal.style.display = 'flex'; });
+  if (fechar) fechar.addEventListener('click', function(){ modal.style.display = 'none'; });
+  modal.addEventListener('click', function(e){ if (e.target === modal) modal.style.display = 'none'; });
+  document.querySelectorAll('.vakinha-valor-btn').forEach(function(b){
+    b.addEventListener('click', function(){ /* por enquanto apenas fecha ou nada */ });
+  });
+})();
+</script>`;
+
   const replacements: [string | RegExp, string][] = [
+    [linkQueroAjudarOriginal, linkQueroAjudarModal],
     ["{{PRODUCT_TITLE}}", product.name],
     ["{{PRODUCT_IMAGE_1}}", mainImage],
     ["{{CAMPAIGN_GOAL}}", formatPrice(campaignGoal)],
@@ -124,6 +165,9 @@ export async function GET(
     const escaped = String(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     htmlContent = htmlContent.replace(new RegExp(escaped, "g"), value);
   }
+
+  // Injetar modal de doação antes do </body>
+  htmlContent = htmlContent.replace("</body>", modalDoacao + "\n</body>");
 
   return new NextResponse(htmlContent, {
     headers: {

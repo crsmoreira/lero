@@ -423,6 +423,8 @@ export async function GET(
 
   if (templateFile === "produto-template.html") {
     html = html.replace(/href="\/login"/g, 'href="javascript:void(0)"');
+    // Caixa "Leroy Merlin garante": clique não faz nada
+    html = html.replace(/href="https:\/\/www\.leroymerlin\.com\.br\/leroy-merlin-garante"/g, 'href="javascript:void(0)"');
   }
 
   return new NextResponse(html, {
