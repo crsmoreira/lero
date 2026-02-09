@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && npm run build:paguemenos && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
@@ -14,7 +14,8 @@
     "db:seed-admin": "npx tsx prisma/seed-admin-only.ts",
     "db:seed-domains": "npx tsx prisma/seed-domains.ts",
     "db:migrate-analytics": "npx tsx prisma/apply-analytics-migration.ts",
-    "build:kalonga": "node scripts/build-kalonga-template.js"
+    "build:kalonga": "node scripts/build-kalonga-template.js",
+    "build:paguemenos": "node scripts/build-paguemenos-static.js"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

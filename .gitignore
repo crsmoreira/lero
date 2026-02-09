@@ -32,6 +32,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# uploads (API nativa - em Vercel use UploadThing)
+/public/uploads
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
