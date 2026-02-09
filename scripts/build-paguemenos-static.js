@@ -10,6 +10,11 @@ const path = require('path');
 const inputPath = path.join(__dirname, '../public/paguemenos.html');
 const outputPath = path.join(__dirname, '../public/paguemenos-static.html');
 
+if (!fs.existsSync(inputPath)) {
+  console.log('paguemenos.html not found, skipping build');
+  process.exit(0);
+}
+
 let html = fs.readFileSync(inputPath, 'utf8');
 
 // 1. Remove o bloco inline com asyncQueue, enqueueScripts, runScript, etc.
