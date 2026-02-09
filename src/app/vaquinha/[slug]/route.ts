@@ -106,19 +106,30 @@ export async function GET(
   const modalDoacao = `
 <div id="vakinha-modal-doacao" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);font-family:'Lato',arial,sans-serif;">
   <div style="background:#fff;border-radius:12px;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
-    <div style="background:#24CA68;color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-weight:700;font-size:1.1rem;">Escolha o valor da sua doação</span>
-      <button type="button" id="vakinha-modal-fechar" aria-label="Fechar" style="background:transparent;border:none;color:#fff;cursor:pointer;padding:4px;font-size:1.5rem;line-height:1;">&times;</button>
+    <div style="background:#24CA68;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">
+      <span id="vakinha-modal-titulo" style="font-weight:700;font-size:1.1rem;color:#ffffff !important;">Escolha o valor da sua doação</span>
+      <button type="button" id="vakinha-modal-fechar" aria-label="Fechar" style="background:transparent;border:none;color:#ffffff !important;cursor:pointer;padding:4px;font-size:1.5rem;line-height:1;">&times;</button>
     </div>
-    <div style="padding:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-      <button type="button" class="vakinha-valor-btn" data-valor="30" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 30</button>
-      <button type="button" class="vakinha-valor-btn" data-valor="50" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 50</button>
-      <button type="button" class="vakinha-valor-btn" data-valor="100" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 100</button>
-      <button type="button" class="vakinha-valor-btn" data-valor="150" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 150</button>
-      <button type="button" class="vakinha-valor-btn" data-valor="200" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 200</button>
-      <button type="button" class="vakinha-valor-btn" data-valor="300" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 300</button>
-      <button type="button" class="vakinha-valor-btn" data-valor="500" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 500</button>
-      <button type="button" class="vakinha-valor-btn" data-valor="1000" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 1.000</button>
+    <div id="vakinha-modal-conteudo" style="padding:24px;">
+      <div id="vakinha-modal-valores" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+        <button type="button" class="vakinha-valor-btn" data-valor="30" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 30</button>
+        <button type="button" class="vakinha-valor-btn" data-valor="50" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 50</button>
+        <button type="button" class="vakinha-valor-btn" data-valor="100" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 100</button>
+        <button type="button" class="vakinha-valor-btn" data-valor="150" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 150</button>
+        <button type="button" class="vakinha-valor-btn" data-valor="200" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 200</button>
+        <button type="button" class="vakinha-valor-btn" data-valor="300" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 300</button>
+        <button type="button" class="vakinha-valor-btn" data-valor="500" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 500</button>
+        <button type="button" class="vakinha-valor-btn" data-valor="1000" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:14px;font-weight:700;font-size:1rem;cursor:pointer;">R$ 1.000</button>
+      </div>
+      <div id="vakinha-modal-pix" style="display:none;text-align:center;">
+        <div id="vakinha-modal-loading" style="display:none;padding:24px;color:#333;">Gerando Pix...</div>
+        <div id="vakinha-modal-qr-area" style="display:none;">
+          <p style="margin:0 0 12px;font-weight:600;color:#333;">Escaneie o QR Code ou copie o Pix Copia e Cola</p>
+          <img id="vakinha-qr-img" alt="QR Code Pix" style="max-width:260px;height:auto;margin:0 auto 16px;display:block;" />
+          <button type="button" id="vakinha-btn-copiar" style="background:#24CA68;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-weight:700;cursor:pointer;width:100%;margin-bottom:12px;">Copiar Pix Copia e Cola</button>
+          <button type="button" id="vakinha-btn-outro-valor" style="background:transparent;color:#24CA68;border:2px solid #24CA68;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;width:100%;">Escolher outro valor</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -127,12 +138,60 @@ export async function GET(
   var modal = document.getElementById('vakinha-modal-doacao');
   var btn = document.getElementById('vakinha-btn-doar');
   var fechar = document.getElementById('vakinha-modal-fechar');
+  var titulo = document.getElementById('vakinha-modal-titulo');
+  var valores = document.getElementById('vakinha-modal-valores');
+  var pixPanel = document.getElementById('vakinha-modal-pix');
+  var loading = document.getElementById('vakinha-modal-loading');
+  var qrArea = document.getElementById('vakinha-modal-qr-area');
+  var qrImg = document.getElementById('vakinha-qr-img');
+  var btnCopiar = document.getElementById('vakinha-btn-copiar');
+  var btnOutroValor = document.getElementById('vakinha-btn-outro-valor');
+  var qrcodeAtual = '';
+
   if (!modal || !btn) return;
-  btn.addEventListener('click', function(e){ e.preventDefault(); modal.style.display = 'flex'; });
+
+  function mostrarValores() {
+    titulo.textContent = 'Escolha o valor da sua doação';
+    valores.style.display = 'grid';
+    pixPanel.style.display = 'none';
+    loading.style.display = 'none';
+    qrArea.style.display = 'none';
+  }
+
+  function mostrarPix(valor, qrcode) {
+    qrcodeAtual = qrcode;
+    titulo.textContent = 'Pague com Pix - R$ ' + valor;
+    valores.style.display = 'none';
+    pixPanel.style.display = 'block';
+    loading.style.display = 'none';
+    qrArea.style.display = 'block';
+    qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&qzone=1&data=' + encodeURIComponent(qrcode);
+  }
+
+  btn.addEventListener('click', function(e){ e.preventDefault(); mostrarValores(); modal.style.display = 'flex'; });
   if (fechar) fechar.addEventListener('click', function(){ modal.style.display = 'none'; });
   modal.addEventListener('click', function(e){ if (e.target === modal) modal.style.display = 'none'; });
+
+  if (btnOutroValor) btnOutroValor.addEventListener('click', mostrarValores);
+
+  if (btnCopiar) btnCopiar.addEventListener('click', function(){
+    if (!qrcodeAtual) return;
+    navigator.clipboard.writeText(qrcodeAtual).then(function(){ btnCopiar.textContent = 'Copiado!'; setTimeout(function(){ btnCopiar.textContent = 'Copiar Pix Copia e Cola'; }, 2000); }).catch(function(){ alert('Código Pix: ' + qrcodeAtual); });
+  });
+
   document.querySelectorAll('.vakinha-valor-btn').forEach(function(b){
-    b.addEventListener('click', function(){ /* por enquanto apenas fecha ou nada */ });
+    b.addEventListener('click', function(){
+      var valor = b.getAttribute('data-valor');
+      if (!valor) return;
+      valores.style.display = 'none';
+      pixPanel.style.display = 'block';
+      loading.style.display = 'block';
+      qrArea.style.display = 'none';
+      fetch('/api/pix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amountReais: parseInt(valor, 10) }) })
+        .then(function(r){ return r.json().then(function(j){ if (!r.ok) throw new Error(j.error || 'Erro ao gerar Pix'); return j; }); })
+        .then(function(j){ mostrarPix(valor, j.qrcode); })
+        .catch(function(err){ alert(err.message || 'Erro ao gerar Pix. Tente novamente.'); mostrarValores(); });
+    });
   });
 })();
 </script>`;
