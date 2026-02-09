@@ -46,10 +46,11 @@ html = html.replace(
   ""
 );
 
-// 6. Esconde o spinner de loading (.khhug) que fica no meio da página
-const hideSpinner = `<style id="santista-static-fix">.khhug,.khhug:before,.khhug:after{display:none!important}</style>`;
+// 6. Esconde o overlay de loading full-screen (.ggUAdu) e o spinner (.khhug)
+// O overlay cobre toda a tela e bloqueia o conteúdo; sem React ele nunca é removido
+const hideLoading = `<style id="santista-static-fix">.ggUAdu,.eLmXB,.khhug,.khhug:before,.khhug:after{display:none!important;visibility:hidden!important}</style>`;
 if (!html.includes("santista-static-fix")) {
-  html = html.replace("</head>", hideSpinner + "\n</head>");
+  html = html.replace("</head>", hideLoading + "\n</head>");
 }
 
 // Limpar linhas vazias em excesso
