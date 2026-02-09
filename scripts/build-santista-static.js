@@ -46,12 +46,19 @@ html = html.replace(
   ""
 );
 
-// 6. Esconde o overlay de loading full-screen (.ggUAdu) e o spinner (.khhug)
-// O overlay cobre toda a tela e bloqueia o conteúdo; sem React ele nunca é removido
-const hideLoading = `<style id="santista-static-fix">.ggUAdu,.eLmXB,.khhug,.khhug:before,.khhug:after{display:none!important;visibility:hidden!important}</style>`;
+// 6. Remove o overlay de loading do DOM (garante que não aparece)
+html = html.replace(
+  /<div class="sc-1pq0p8k-0 ggUAdu"><div class="xr42vr-0 eLmXB"><div class="xr42vr-1 khhug"><\/div><\/div><\/div>/g,
+  "<!-- overlay de loading removido -->"
+);
+
+// 7. CSS de fallback no head e no final do body (prioridade máxima)
+const hideLoadingCss =
+  ".ggUAdu,.eLmXB,.khhug,.khhug:before,.khhug:after{display:none!important;visibility:hidden!important;height:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important}";
 if (!html.includes("santista-static-fix")) {
-  html = html.replace("</head>", hideLoading + "\n</head>");
+  html = html.replace("</head>", `<style id="santista-static-fix">${hideLoadingCss}</style>\n</head>`);
 }
+html = html.replace("</body>", `<style id="santista-static-fix-end">${hideLoadingCss}</style>\n</body>`);
 
 // Limpar linhas vazias em excesso
 html = html.replace(/\n{4,}/g, "\n\n\n");
