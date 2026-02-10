@@ -5,7 +5,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const src = path.join(__dirname, "../../kalonga.html");
+const src = path.join(__dirname, "../public/kalonga.html");
 const dest = path.join(__dirname, "../public/produto-template-kalonga.html");
 
 if (!fs.existsSync(src)) {
