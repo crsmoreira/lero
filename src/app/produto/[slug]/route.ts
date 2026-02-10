@@ -293,10 +293,10 @@ export async function GET(
     product.template === "mm" && Array.isArray(variantGroups) && variantGroups.length > 0
       ? variantGroups
           .map(
-            (g: { name: string; variants: { name: string; extraPrice: unknown; imageUrl?: string }[] }) =>
+            (g: { name: string; variants: { name: string; extraPrice: unknown; imageUrl?: string | null }[] }) =>
               `<div style="margin-bottom:16px"><strong style="display:block;margin-bottom:8px">${escapeHtml(g.name)}</strong><div style="display:flex;flex-wrap:wrap;gap:8px">${(g.variants ?? [])
                 .map(
-                  (v: { name: string; imageUrl?: string }) => {
+                  (v: { name: string; imageUrl?: string | null }) => {
                     const img = v.imageUrl && v.imageUrl.startsWith("http") ? `<img src="${escapeHtml(v.imageUrl)}" alt="${escapeHtml(v.name)}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:4px;vertical-align:middle" loading="lazy"/>` : "";
                     return `<span style="padding:8px 16px;border:1px solid #ccc;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center">${img}${escapeHtml(v.name)}</span>`;
                   }

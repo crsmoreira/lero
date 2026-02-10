@@ -25,6 +25,15 @@ export default async function EditProductPage({
 
   if (!product) notFound();
 
+  // Normalizar variantGroups para compatibilidade com ProductForm (imageUrl: null → undefined)
+  const productForForm = {
+    ...product,
+    variantGroups: product.variantGroups?.map((g) => ({
+      ...g,
+      variants: g.variants.map((v) => ({ ...v, imageUrl: v.imageUrl ?? undefined })),
+    })),
+  };
+
   const publicUrl = (product as { template?: string }).template === "vakinha"
     ? `/vaquinha/${product.slug}`
     : `/produto/${product.slug}`;
@@ -43,7 +52,7 @@ export default async function EditProductPage({
         )}
       </div>
 
-      <ProductForm product={product} uploadEnabled={!!process.env.UPLOADTHING_TOKEN} />
+      <ProductForm product={productForForm} uploadEnabled={!!process.env.UPLOADTHING_TOKEN} />
     </div>
   );
 }

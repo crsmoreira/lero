@@ -51,13 +51,13 @@ type FormData = z.infer<typeof productSchema>;
 
 type ReviewWithProduct = { id: string; userName: string; rating: number; title: string | null; comment: string | null; images: string[]; createdAt: Date };
 
-type VariantGroupItem = { name: string; order: number; variants: { name: string; extraPrice: number; stock: number; order: number; imageUrl?: string }[] };
+type VariantGroupItem = { name: string; order: number; variants: { name: string; extraPrice: number; stock: number; order: number; imageUrl?: string | null }[] };
 
 type ProductFormProps = {
   product?: Product & {
     images: ProductImage[];
     specifications: ProductSpecification[];
-    variantGroups?: { name: string; order: number; variants: { name: string; extraPrice: unknown; stock: number; order: number; imageUrl?: string }[] }[];
+    variantGroups?: { name: string; order: number; variants: { name: string; extraPrice: unknown; stock: number; order: number; imageUrl?: string | null }[] }[];
     reviews?: ReviewWithProduct[];
     brand?: { name: string } | null;
   };
