@@ -293,11 +293,13 @@ export async function GET(
     product.template === "mm" && Array.isArray(variantGroups) && variantGroups.length > 0
       ? variantGroups
           .map(
-            (g: { name: string; variants: { name: string; extraPrice: unknown }[] }) =>
+            (g: { name: string; variants: { name: string; extraPrice: unknown; imageUrl?: string }[] }) =>
               `<div style="margin-bottom:16px"><strong style="display:block;margin-bottom:8px">${escapeHtml(g.name)}</strong><div style="display:flex;flex-wrap:wrap;gap:8px">${(g.variants ?? [])
                 .map(
-                  (v: { name: string }) =>
-                    `<span style="padding:8px 16px;border:1px solid #ccc;border-radius:4px;cursor:pointer">${escapeHtml(v.name)}</span>`
+                  (v: { name: string; imageUrl?: string }) => {
+                    const img = v.imageUrl && v.imageUrl.startsWith("http") ? `<img src="${escapeHtml(v.imageUrl)}" alt="${escapeHtml(v.name)}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:4px;vertical-align:middle" loading="lazy"/>` : "";
+                    return `<span style="padding:8px 16px;border:1px solid #ccc;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center">${img}${escapeHtml(v.name)}</span>`;
+                  }
                 )
                 .join("")}</div></div>`
           )
@@ -396,6 +398,9 @@ export async function GET(
     ["{{PRODUCT_DESCRIPTION}}", productDescription],
     ["{{PRODUCT_SPECIFICATIONS}}", specsHtml],
     ["{{MM_VARIANTS_SECTION}}", product.template === "mm" ? (mmVariantsHtml ? `<div class="mm-variants" style="padding:16px;margin:16px 0"><h4 style="margin-bottom:12px">Personalize sua compra</h4>${mmVariantsHtml}</div>` : "") : ""],
+    ["{{MM_OLD_PRICE_BLOCK}}", product.template === "mm" && originalPrice && discountPercent
+      ? `<div class="cav--c-lesPJm"><span class="cav--c-HUuYm"> <span class="cav--c-gNPphv cav--c-gNPphv-ieGIEOA-css">R$ ${formatPrice(Number(originalPrice))}</span></span><span class="cav--c-gNPphv cav--c-gNPphv-igVZJSe-css"><i class="cav--c-PJLV cav--c-PJLV-ibHuZgG-css"><svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="arrow-down" class="svg-inline--fa fa-arrow-down " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M174.6 472.6c4.5 4.7 10.8 7.4 17.4 7.4s12.8-2.7 17.4-7.4l168-176c9.2-9.6 8.8-24.8-.8-33.9s-24.8-8.8-33.9 .8L216 396.1 216 56c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 340.1L41.4 263.4c-9.2-9.6-24.3-9.9-33.9-.8s-9.9 24.3-.8 33.9l168 176z"></path></svg></i> ${discountPercent}</span></div>`
+      : product.template === "mm" ? "" : ""],
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],

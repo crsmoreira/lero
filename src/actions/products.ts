@@ -58,7 +58,7 @@ const productSchema = z.object({
         name: z.string(),
         order: z.number(),
         variants: z.array(
-          z.object({ name: z.string(), extraPrice: z.number().default(0), stock: z.number().default(0), order: z.number() })
+          z.object({ name: z.string(), extraPrice: z.number().default(0), stock: z.number().default(0), order: z.number(), imageUrl: z.string().optional() })
         ),
       })
     )
@@ -129,6 +129,7 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
               extraPrice: (v.extraPrice ?? 0) as unknown as Decimal,
               stock: v.stock ?? 0,
               order: v.order ?? vi,
+              imageUrl: (v as { imageUrl?: string }).imageUrl ?? null,
             })),
           },
         })),
@@ -234,6 +235,7 @@ export async function updateProduct(
               extraPrice: (v.extraPrice ?? 0) as unknown as Decimal,
               stock: v.stock ?? 0,
               order: v.order ?? vi,
+              imageUrl: (v as { imageUrl?: string }).imageUrl ?? null,
             })),
           },
         })),

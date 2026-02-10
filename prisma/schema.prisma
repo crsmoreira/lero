@@ -239,6 +239,7 @@ model ProductVariant {
   stock      Int      @default(0)
   groupId    String
   order      Int      @default(0)
+  imageUrl   String?  // URL da imagem da variante (ex: cor específica)
 
   group ProductVariantGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
 }

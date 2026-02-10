@@ -51,13 +51,13 @@ type FormData = z.infer<typeof productSchema>;
 
 type ReviewWithProduct = { id: string; userName: string; rating: number; title: string | null; comment: string | null; images: string[]; createdAt: Date };
 
-type VariantGroupItem = { name: string; order: number; variants: { name: string; extraPrice: number; stock: number; order: number }[] };
+type VariantGroupItem = { name: string; order: number; variants: { name: string; extraPrice: number; stock: number; order: number; imageUrl?: string }[] };
 
 type ProductFormProps = {
   product?: Product & {
     images: ProductImage[];
     specifications: ProductSpecification[];
-    variantGroups?: { name: string; order: number; variants: { name: string; extraPrice: unknown; stock: number; order: number }[] }[];
+    variantGroups?: { name: string; order: number; variants: { name: string; extraPrice: unknown; stock: number; order: number; imageUrl?: string }[] }[];
     reviews?: ReviewWithProduct[];
     brand?: { name: string } | null;
   };
@@ -162,6 +162,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         extraPrice: Number(v.extraPrice ?? 0),
         stock: v.stock ?? 0,
         order: v.order ?? 0,
+        imageUrl: (v as { imageUrl?: string }).imageUrl ?? "",
       })),
     })) ?? []
   );
@@ -200,7 +201,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         variantGroups: variantGroups.map((g, gi) => ({
           name: g.name,
           order: gi,
-          variants: g.variants.map((v, vi) => ({ name: v.name, extraPrice: v.extraPrice, stock: v.stock, order: vi })),
+          variants: g.variants.map((v, vi) => ({ name: v.name, extraPrice: v.extraPrice, stock: v.stock, order: vi, imageUrl: v.imageUrl || undefined })),
         })),
         reviews: reviews
           .filter((r) => r.userName.trim())
@@ -592,7 +593,7 @@ function VariantGroupsEditor({
   onChange: (g: VariantGroupItem[]) => void;
 }) {
   const addGroup = () => {
-    onChange([...groups, { name: "", order: groups.length, variants: [{ name: "", extraPrice: 0, stock: 0, order: 0 }] }]);
+    onChange([...groups, { name: "", order: groups.length, variants: [{ name: "", extraPrice: 0, stock: 0, order: 0, imageUrl: "" }] }]);
   };
   const updateGroup = (gi: number, field: "name", value: string) => {
     const next = [...groups];
@@ -603,10 +604,10 @@ function VariantGroupsEditor({
   const addVariant = (gi: number) => {
     const next = [...groups];
     const v = next[gi]!.variants;
-    next[gi] = { ...next[gi]!, variants: [...v, { name: "", extraPrice: 0, stock: 0, order: v.length }] };
+    next[gi] = { ...next[gi]!, variants: [...v, { name: "", extraPrice: 0, stock: 0, order: v.length, imageUrl: "" }] };
     onChange(next);
   };
-  const updateVariant = (gi: number, vi: number, field: "name" | "extraPrice", value: string | number) => {
+  const updateVariant = (gi: number, vi: number, field: "name" | "extraPrice" | "imageUrl", value: string | number) => {
     const next = [...groups];
     const v = [...next[gi]!.variants];
     v[vi] = { ...v[vi]!, [field]: value };
@@ -633,9 +634,10 @@ function VariantGroupsEditor({
           </div>
           <div className="pl-4 space-y-2">
             {g.variants.map((v, vi) => (
-              <div key={vi} className="flex gap-2 items-center">
-                <Input placeholder="Nome (ex: Preto, P)" value={v.name} onChange={(e) => updateVariant(gi, vi, "name", e.target.value)} className="flex-1" />
+              <div key={vi} className="flex flex-wrap gap-2 items-center">
+                <Input placeholder="Nome (ex: Preto, P)" value={v.name} onChange={(e) => updateVariant(gi, vi, "name", e.target.value)} className="flex-1 min-w-[120px]" />
                 <Input type="number" step="0.01" placeholder="Acréscimo R$" value={v.extraPrice || ""} onChange={(e) => updateVariant(gi, vi, "extraPrice", parseFloat(e.target.value) || 0)} className="w-24" />
+                <Input type="url" placeholder="URL imagem (opcional)" value={v.imageUrl || ""} onChange={(e) => updateVariant(gi, vi, "imageUrl", e.target.value)} className="flex-1 min-w-[180px]" />
                 <Button type="button" variant="outline" size="icon" onClick={() => removeVariant(gi, vi)}>×</Button>
               </div>
             ))}

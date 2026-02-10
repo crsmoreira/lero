@@ -68,21 +68,18 @@ html = html.split("R$ 79,99").join("{{PRODUCT_PRICE_APRAZO}}");
 html = html.replace(/\b539,99\b/g, "{{PRODUCT_PRICE}}");
 html = html.replace(/\b79,99\b/g, "{{PRODUCT_PRICE_APRAZO}}");
 html = html.replace(/\b539\.99\b/g, "{{PRODUCT_PRICE_META}}");
+// Preço original (sem desconto) - bloco completo: preço riscado + badge %
+const oldPriceBlockRegex = /<div class="cav--c-lesPJm"><span class="cav--c-HUuYm">\s*<span class="cav--c-gNPphv cav--c-gNPphv-ieGIEOA-css">R\$<!-- -->739,99<\/span><\/span><span class="cav--c-gNPphv cav--c-gNPphv-igVZJSe-css">[\s\S]*?<\/span><\/div>/;
+html = html.replace(oldPriceBlockRegex, "{{MM_OLD_PRICE_BLOCK}}");
 
-// 8. Remove script do chat (Zendesk)
-html = html.replace(/<script[^>]*id="ze-snippet"[^>]*src="https:\/\/static\.zdassets\.com\/[^"]*"[^>]*><\/script>/g, "");
+// 8. Remove script do chat (Zendesk) - múltiplos padrões para garantir
+html = html.replace(/<script[^>]*id="ze-snippet"[^>]*>[\s\S]*?<\/script>/gi, "");
+html = html.replace(/<script[^>]*src="[^"]*zdassets\.com[^"]*"[^>]*><\/script>/gi, "");
+html = html.replace(/<script[^>]*src="[^"]*ekr\/snippet[^"]*"[^>]*><\/script>/gi, "");
 
-// 9. Remove seções "Geralmente comprado junto" e "apenas para você"
-html = html.replace(/Geralmente comprado junto/gi, "<!-- removido-gcj -->");
-html = html.replace(/apenas para você/gi, "<!-- removido-apv -->");
-html = html.replace(/apenas para voce/gi, "<!-- removido-apv -->");
-// Esconde span que contém "Geralmente comprado junto" e seu container
-html = html.replace(
-  /<span[^>]*>[\s\S]*?<!-- removido-gcj -->[\s\S]*?<\/span>/gi,
-  '<span style="display:none!important"><!-- Geralmente comprado junto removido --></span>'
-);
-
-// 10. Placeholder para variantes (Personalize seu produto / Personalize sua compra)
+// 9. Placeholder para variantes - substitui o BLOCO INTEIRO (incluindo opções Cor/Tamanho originais)
+const variantesBlockRegex = /<div class="cav--c-lesPJm cav--c-lesPJm-idkKucX-css"><p[^>]*>Personalize sua compra<\/p><\/div><div class="cav--c-lesPJm">[\s\S]*?<\/div>\s*<\/div>/;
+html = html.replace(variantesBlockRegex, "{{MM_VARIANTS_SECTION}}");
 html = html.replace(/Personalize seu produto/gi, "{{MM_VARIANTS_SECTION}}");
 html = html.replace(/Personalize sua compra/gi, "{{MM_VARIANTS_SECTION}}");
 
@@ -94,11 +91,11 @@ html = html.replace(
 
 // 12. Esconde ícone do chat e remove "Geralmente comprado junto" / "apenas para você"
 const hideChatCss = `<style id="mm-hide-chat">[id*="launcher"],[class*="launcher"],[data-testid*="chat"],[class*="zE"],[id*="Embed"]{display:none!important;visibility:hidden!important}</style>`;
-const hideSectionsScript = `<script>(function(){var t=["Geralmente comprado junto","apenas para você","apenas para voce"];function hideParent(el){var p=el;while(p&&p!==document.body){if(/^(DIV|SECTION|ARTICLE|ASIDE)$/i.test(p.tagName)){p.style.display="none!important";p.style.visibility="hidden!important";return}p=p.parentElement}}var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);var n;while(n=w.nextNode()){var v=n.textContent||"";t.forEach(function(s){if(v.indexOf(s)>=0)hideParent(n.parentElement)})}})();</script>`;
+const hideSectionsScript = `<script id="mm-hide-sections">(function(){var t=["Geralmente comprado junto","apenas para você","apenas para voce","Peso bruto","Peso líquido","Dimensões do produto","Dimensões da embalagem","Características do produto","Peso:","Altura:","Largura:","Profundidade:","Dimensão","característica padrão"];function hideParent(el){var p=el;while(p&&p!==document.body){if(/^(DIV|SECTION|ARTICLE|ASIDE|TR|LI)$/i.test(p.tagName)){p.style.display="none!important";p.style.visibility="hidden!important";return}p=p.parentElement}}var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);var n;while(n=w.nextNode()){var v=n.textContent||"";t.forEach(function(s){if(v.indexOf(s)>=0)hideParent(n.parentElement)})}})();</script>`;
 if (!html.includes("mm-hide-chat")) {
   html = html.replace("</head>", hideChatCss + "\n</head>");
 }
-if (!html.includes("hideSectionsScript")) {
+if (!html.includes('id="mm-hide-sections"')) {
   html = html.replace("</body>", hideSectionsScript + "\n</body>");
 }
 
