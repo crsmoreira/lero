@@ -404,6 +404,13 @@ export async function GET(
     ["{{KALUNGA_OLD_PRICE_BLOCK}}", product.template === "kalonga" && originalPrice && discountPercent
       ? `<p class="produtoinfos__text produtoinfos__text--grey pe-2" id="depor"><input id="txtDePor" name="txtDePor" type="hidden" class="visually-hidden" value="De: R$ ${formatPrice(Number(originalPrice))}"><del>De: R$ ${formatPrice(Number(originalPrice))}</del></p><span class="produtoinfos__badge" title="Economize à vista" id="economize"><i class="fas fa-arrow-down me-1"></i> Economize à vista ${discountPercent} </span>`
       : product.template === "kalonga" ? "" : ""],
+    ["{{KALUNGA_INSTALLMENT_INFO}}", (() => {
+      if (product.template !== "kalonga") return "";
+      const val = Number(priceAvista);
+      if (val <= 0) return "";
+      const parcela = val / 10;
+      return `em até 10x de R$ ${formatPrice(parcela)} sem juros`;
+    })()],
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],

@@ -122,13 +122,18 @@ html = html.replace(
 );
 // Área de descrição longa: substituir iframe por conteúdo editável do admin
 const descricaoIframeBlock = /<div class="descricaoproduto__adicional[^"]*"[^>]*>[\s\S]*?<iframe[^>]*src="https:\/\/epson\.conteudoespecial\.com\.br\/l3250\/html\/"[^>]*><\/iframe>\s*<hr>/;
-html = html.replace(descricaoIframeBlock, '<div class="descricaoproduto__adicional d-none d-lg-block" id="dvEspecificacaoAdicionalTop"><div class="produto-descricao-admin">{{PRODUCT_DESCRIPTION}}</div><hr>');
+html = html.replace(descricaoIframeBlock, '<div class="descricaoproduto__adicional" id="dvEspecificacaoAdicionalTop"><div class="produto-descricao-admin">{{PRODUCT_DESCRIPTION}}</div><hr>');
 
 // 10b. "Carregando..." -> "para todo Brasil" (frete)
 html = html.replace(/Carregando\.\.\./g, "para todo Brasil");
 
-// 10c. Esconder "Mais produtos marca", Características do Produto e Especificações
-const kalungaHideCss = '<style id="kalunga-hide">#mais_produtos_marca,.mais_produtos_marca,#descricaoPadrao,.descricaoPadrao{display:none!important}</style>';
+// 10c. Parcelamento: usar preço à vista (placeholder) e manter "Ver parcelas"
+const parcelamentoBlock = '<p class="produtoinfos__text produtoinfos__text--black" id="parcelamento"> Ou <input id="txtTotalPrazo" name="txtTotalPrazo" type="hidden" class="visually-hidden" placeholder="txtTotalPrazo" aria-label="txtTotalPrazo" aria-describedby="basic-addon1" value="R$ 1.221,11"><span class="produtoinfos__text--weight-6" id="total_prazo">R$ 1.221,11</span> em até <span class="produtoinfos__text--weight-6">10x de R$ 122,11</span><a tabindex="0" class="produtoinfos__ver-parcelas produtoinfos__link ms-2 d-none d-sm-inline-block" data-bs-toggle="collapse" href="#exibir-parcelas" role="button" aria-expanded="false" aria-controls="exibir-parcelas"><u class="pointer" title="ver parcelas">Ver parcelas</u></a></p>';
+const parcelamentoReplacement = '<p class="produtoinfos__text produtoinfos__text--black" id="parcelamento"> Ou {{KALUNGA_INSTALLMENT_INFO}}<a tabindex="0" class="produtoinfos__ver-parcelas produtoinfos__link ms-2 d-none d-sm-inline-block" data-bs-toggle="collapse" href="#exibir-parcelas" role="button" aria-expanded="false" aria-controls="exibir-parcelas"><u class="pointer" title="ver parcelas">Ver parcelas</u></a></p>';
+html = html.replace(parcelamentoBlock, parcelamentoReplacement);
+
+// 10d. Esconder "Mais produtos marca", Características, Especificações; reduzir espaço vazio do frete e quantidade
+const kalungaHideCss = '<style id="kalunga-hide">#mais_produtos_marca,.mais_produtos_marca,#descricaoPadrao,.descricaoPadrao{display:none!important}#acrescimo{display:none!important}#barraFrete,.seloprod,#content-btn-comprar,#dvQuantidadeProduto{margin-top:0!important;margin-bottom:0!important;padding-top:.25rem!important;padding-bottom:.25rem!important;min-height:0!important}#content-btn-comprar .produtoinfos__choiceqtd{margin-top:0!important;padding-top:0!important}</style>';
 if (!html.includes("kalunga-hide")) {
   html = html.replace("</head>", kalungaHideCss + "\n</head>");
 }
