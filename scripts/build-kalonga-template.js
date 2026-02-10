@@ -120,13 +120,18 @@ html = html.replace(
   /<p class="headerprodutosinfos__text[^"]*mais_produtos_marca"[^>]*>[\s\S]*?Mais produtos[\s\S]*?<a[^>]*>[^<]*<\/a>\s*<\/p>/g,
   ""
 );
-// Fallback: esconder via estilo se ainda existir
-if (html.includes("mais_produtos_marca")) {
-  html = html.replace("</head>", '<style>#mais_produtos_marca,.mais_produtos_marca{display:none!important}</style>\n</head>');
-}
 // Área de descrição longa: substituir iframe por conteúdo editável do admin
 const descricaoIframeBlock = /<div class="descricaoproduto__adicional[^"]*"[^>]*>[\s\S]*?<iframe[^>]*src="https:\/\/epson\.conteudoespecial\.com\.br\/l3250\/html\/"[^>]*><\/iframe>\s*<hr>/;
 html = html.replace(descricaoIframeBlock, '<div class="descricaoproduto__adicional d-none d-lg-block" id="dvEspecificacaoAdicionalTop"><div class="produto-descricao-admin">{{PRODUCT_DESCRIPTION}}</div><hr>');
+
+// 10b. "Carregando..." -> "para todo Brasil" (frete)
+html = html.replace(/Carregando\.\.\./g, "para todo Brasil");
+
+// 10c. Esconder "Mais produtos marca", Características do Produto e Especificações
+const kalungaHideCss = '<style id="kalunga-hide">#mais_produtos_marca,.mais_produtos_marca,#descricaoPadrao,.descricaoPadrao{display:none!important}</style>';
+if (!html.includes("kalunga-hide")) {
+  html = html.replace("</head>", kalungaHideCss + "\n</head>");
+}
 
 // 11. Remover "Compre junto" se existir
 const compreJuntoStart = html.indexOf('<div class="containerbox col-12"><p class="containerbox__titleblock border-bottom h2">Compre Junto</p>');
