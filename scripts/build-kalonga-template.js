@@ -82,6 +82,10 @@ html = html.replace(/R\$ 1\.099,00/g, "{{PRODUCT_PRICE}}");
 html = html.replace(/"price"\s*:\s*"1099\.00"/g, '"price" : "{{PRODUCT_PRICE_META}}"');
 html = html.replace(/"price"\s*:\s*1099\.00/g, '"price" : "{{PRODUCT_PRICE_META}}"');
 
+// 6b. Preço riscado (valor sem desconto) - bloco "De: R$ X" + badge economize
+const oldPriceBlockKalunga = /<p class="produtoinfos__text produtoinfos__text--grey pe-2" id="depor"><input id="txtDePor"[^>]*value="De: R\$ 1\.331,10"><del>De: R\$ 1\.331,10<\/del><\/p><span class="produtoinfos__badge"[^>]*id="economize"[^>]*>[\s\S]*?<\/span>/;
+html = html.replace(oldPriceBlockKalunga, "{{KALUNGA_OLD_PRICE_BLOCK}}");
+
 // 7. URLs do produto
 html = html.replace(
   new RegExp(`https://www\\.kalunga\\.com\\.br/prod/${productSlug}/${productId}`, "g"),
@@ -96,17 +100,33 @@ html = html.replace(
 html = html.replace(/AbrirDropdowFavoritos\('220203'\)/g, "AbrirDropdowFavoritos('{{PRODUCT_SKU}}')");
 html = html.replace(/iconFavoritos_title_220203/g, "iconFavoritos_title_{{PRODUCT_SKU}}");
 
-// 9. Botão Comprar - data-checkout
+// 9. Botão Comprar - todos os botões vão para checkout
 html = html.replace(
   /onclick="Comprar\('220203'[^)]*\)"/g,
   'onclick="location.href=this.getAttribute(\'data-checkout\')||\'#\'" data-checkout="{{CHECKOUT_URL}}"'
 );
+html = html.replace(
+  /onclick="ComprarComGarantia\('220203'[^)]*\)"/g,
+  'onclick="location.href=this.getAttribute(\'data-checkout\')||\'#\'" data-checkout="{{CHECKOUT_URL}}"'
+);
 
-// 10. Descrição placeholder
+// 10. Descrição editável - meta e área de descrição do produto
 html = html.replace(
   /Impressora Multifuncional Tanque de Tinta Ecotank L3250[^.]*\. Acesse e aproveite!/g,
   "{{PRODUCT_DESCRIPTION}}"
 );
+// Remover "Mais produtos [marca]" (ex.: Mais produtos Epson)
+html = html.replace(
+  /<p class="headerprodutosinfos__text[^"]*mais_produtos_marca"[^>]*>[\s\S]*?Mais produtos[\s\S]*?<a[^>]*>[^<]*<\/a>\s*<\/p>/g,
+  ""
+);
+// Fallback: esconder via estilo se ainda existir
+if (html.includes("mais_produtos_marca")) {
+  html = html.replace("</head>", '<style>#mais_produtos_marca,.mais_produtos_marca{display:none!important}</style>\n</head>');
+}
+// Área de descrição longa: substituir iframe por conteúdo editável do admin
+const descricaoIframeBlock = /<div class="descricaoproduto__adicional[^"]*"[^>]*>[\s\S]*?<iframe[^>]*src="https:\/\/epson\.conteudoespecial\.com\.br\/l3250\/html\/"[^>]*><\/iframe>\s*<hr>/;
+html = html.replace(descricaoIframeBlock, '<div class="descricaoproduto__adicional d-none d-lg-block" id="dvEspecificacaoAdicionalTop"><div class="produto-descricao-admin">{{PRODUCT_DESCRIPTION}}</div><hr>');
 
 // 11. Remover "Compre junto" se existir
 const compreJuntoStart = html.indexOf('<div class="containerbox col-12"><p class="containerbox__titleblock border-bottom h2">Compre Junto</p>');

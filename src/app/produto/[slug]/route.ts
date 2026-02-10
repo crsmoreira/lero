@@ -401,6 +401,9 @@ export async function GET(
     ["{{MM_OLD_PRICE_BLOCK}}", product.template === "mm" && originalPrice && discountPercent
       ? `<div class="cav--c-lesPJm"><span class="cav--c-HUuYm"> <span class="cav--c-gNPphv cav--c-gNPphv-ieGIEOA-css">R$ ${formatPrice(Number(originalPrice))}</span></span><span class="cav--c-gNPphv cav--c-gNPphv-igVZJSe-css"><i class="cav--c-PJLV cav--c-PJLV-ibHuZgG-css"><svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="arrow-down" class="svg-inline--fa fa-arrow-down " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M174.6 472.6c4.5 4.7 10.8 7.4 17.4 7.4s12.8-2.7 17.4-7.4l168-176c9.2-9.6 8.8-24.8-.8-33.9s-24.8-8.8-33.9 .8L216 396.1 216 56c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 340.1L41.4 263.4c-9.2-9.6-24.3-9.9-33.9-.8s-9.9 24.3-.8 33.9l168 176z"></path></svg></i> ${discountPercent}</span></div>`
       : product.template === "mm" ? "" : ""],
+    ["{{KALUNGA_OLD_PRICE_BLOCK}}", product.template === "kalonga" && originalPrice && discountPercent
+      ? `<p class="produtoinfos__text produtoinfos__text--grey pe-2" id="depor"><input id="txtDePor" name="txtDePor" type="hidden" class="visually-hidden" value="De: R$ ${formatPrice(Number(originalPrice))}"><del>De: R$ ${formatPrice(Number(originalPrice))}</del></p><span class="produtoinfos__badge" title="Economize à vista" id="economize"><i class="fas fa-arrow-down me-1"></i> Economize à vista ${discountPercent} </span>`
+      : product.template === "kalonga" ? "" : ""],
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
