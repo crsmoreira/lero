@@ -240,7 +240,7 @@ export function ImageUploader({ images, onChange, uploadEnabled = false }: Image
           {images.map((img: ImageItem | ProductImage, index: number) => (
             <div
               key={img.url + index}
-              className="relative group border rounded-lg overflow-hidden bg-gray-100 aspect-square"
+              className="relative group border rounded-lg overflow-hidden bg-muted aspect-square"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

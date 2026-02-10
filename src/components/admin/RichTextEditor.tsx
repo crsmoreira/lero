@@ -46,13 +46,13 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
 
   return (
     <div className="border rounded-md overflow-hidden">
-      <div className="flex gap-1 p-2 border-b bg-gray-50">
+      <div className="flex gap-1 p-2 border-b bg-muted">
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={editor.isActive("bold") ? "bg-gray-200" : ""}
+          className={editor.isActive("bold") ? "bg-accent" : ""}
         >
           <Bold size={16} />
         </Button>
@@ -61,7 +61,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={editor.isActive("italic") ? "bg-gray-200" : ""}
+          className={editor.isActive("italic") ? "bg-accent" : ""}
         >
           <Italic size={16} />
         </Button>
@@ -70,7 +70,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={editor.isActive("bulletList") ? "bg-gray-200" : ""}
+          className={editor.isActive("bulletList") ? "bg-accent" : ""}
         >
           <List size={16} />
         </Button>
@@ -79,7 +79,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={editor.isActive("orderedList") ? "bg-gray-200" : ""}
+          className={editor.isActive("orderedList") ? "bg-accent" : ""}
         >
           <ListOrdered size={16} />
         </Button>
@@ -91,7 +91,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
             const url = window.prompt("URL do link:");
             if (url) editor.chain().focus().setLink({ href: url }).run();
           }}
-          className={editor.isActive("link") ? "bg-gray-200" : ""}
+          className={editor.isActive("link") ? "bg-accent" : ""}
         >
           <Link2 size={16} />
         </Button>

@@ -412,7 +412,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                     step="0.01"
                     {...register("installmentPrice", { valueAsNumber: true, setValueAs: (v) => (v === "" || isNaN(v) ? null : v) })}
                   />
-                  <p className="text-xs text-gray-500 mt-1">Quando definido, exibe este valor em vez do preço</p>
+                  <p className="text-xs text-muted-foreground mt-1">Quando definido, exibe este valor em vez do preço</p>
                 </div>
               </div>
             )}
@@ -484,7 +484,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                   placeholder="https://..."
                   {...register("checkoutUrl")}
                 />
-                <p className="text-xs text-gray-500 mt-1">URL para onde os botões Comprar e Adicionar ao carrinho redirecionam</p>
+                <p className="text-xs text-muted-foreground mt-1">URL para onde os botões Comprar e Adicionar ao carrinho redirecionam</p>
               </div>
               )}
               <div className="grid grid-cols-2 gap-4">
@@ -517,7 +517,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       placeholder="Ex: Todos os Modelos de Espelho para Banheiro"
                       {...register("breadcrumbBackLabel")}
                     />
-                    <p className="text-xs text-gray-500 mt-1">Texto exibido no link</p>
+                    <p className="text-xs text-muted-foreground mt-1">Texto exibido no link</p>
                   </div>
                   <div>
                     <Input
@@ -525,7 +525,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       placeholder="Ex: /produtos?categoria=espelhos ou https://..."
                       {...register("breadcrumbBackUrl")}
                     />
-                    <p className="text-xs text-gray-500 mt-1">URL de destino ao clicar</p>
+                    <p className="text-xs text-muted-foreground mt-1">URL de destino ao clicar</p>
                   </div>
                 </div>
               </div>

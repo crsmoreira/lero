@@ -47,7 +47,7 @@ export function QuestionForm({ question }: { question: Question }) {
         <DialogHeader>
           <DialogTitle>Responder pergunta</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-gray-600 mb-4">{question.question}</p>
+        <p className="text-sm text-muted-foreground mb-4">{question.question}</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="answer">Resposta</Label>

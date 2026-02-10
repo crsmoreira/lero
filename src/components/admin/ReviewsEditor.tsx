@@ -103,7 +103,7 @@ function ReviewImagesList({
           {images.map((url, i) => (
             <div key={url + i} className="relative group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={url} alt="" className="w-16 h-16 object-cover rounded border" />
+              <img src={url} alt="" className="w-16 h-16 object-cover rounded border border-border" />
               <Button
                 type="button"
                 size="icon"
@@ -150,7 +150,7 @@ export function ReviewsEditor({ reviews, onChange, uploadEnabled = false }: Revi
       </div>
 
       {reviews.length === 0 ? (
-        <p className="text-sm text-gray-500 border rounded-lg p-4 bg-gray-50">
+        <p className="text-sm text-muted-foreground border border-border rounded-lg p-4 bg-muted">
           Nenhuma avaliação. Clique em &quot;Adicionar avaliação&quot; para incluir avaliações que aparecerão na página do produto.
         </p>
       ) : (
@@ -158,16 +158,16 @@ export function ReviewsEditor({ reviews, onChange, uploadEnabled = false }: Revi
           {reviews.map((review, index) => (
             <div
               key={index}
-              className="border rounded-lg p-4 space-y-4 bg-white"
+              className="border border-border rounded-lg p-4 space-y-4 bg-card"
             >
               <div className="flex justify-between items-start">
-                <span className="text-sm font-medium text-gray-600">Avaliação #{index + 1}</span>
+                <span className="text-sm font-medium text-muted-foreground">Avaliação #{index + 1}</span>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => removeReview(index)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 size={16} />
                 </Button>
