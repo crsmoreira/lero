@@ -143,6 +143,7 @@ export async function resolveProductByDomainAndSlug(domainId: string, slug: stri
       include: {
         images: { orderBy: { order: "asc" } },
         specifications: { orderBy: { order: "asc" } },
+        variantGroups: { include: { variants: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } },
         brand: true,
         category: true,
         reviews: { where: { approved: true }, orderBy: { createdAt: "desc" } },
@@ -169,6 +170,7 @@ export async function resolveProductBySlugOnly(slug: string) {
     include: {
       images: { orderBy: { order: "asc" } },
       specifications: { orderBy: { order: "asc" } },
+      variantGroups: { include: { variants: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } },
       brand: true,
       category: true,
       reviews: { where: { approved: true }, orderBy: { createdAt: "desc" } },

@@ -17,6 +17,7 @@ export default async function EditProductPage({
     include: {
       images: { orderBy: { order: "asc" } },
       specifications: { orderBy: { order: "asc" } },
+      variantGroups: { include: { variants: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } },
       reviews: { orderBy: { createdAt: "desc" } },
       brand: true,
     },

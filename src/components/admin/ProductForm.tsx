@@ -51,10 +51,13 @@ type FormData = z.infer<typeof productSchema>;
 
 type ReviewWithProduct = { id: string; userName: string; rating: number; title: string | null; comment: string | null; images: string[]; createdAt: Date };
 
+type VariantGroupItem = { name: string; order: number; variants: { name: string; extraPrice: number; stock: number; order: number }[] };
+
 type ProductFormProps = {
   product?: Product & {
     images: ProductImage[];
     specifications: ProductSpecification[];
+    variantGroups?: { name: string; order: number; variants: { name: string; extraPrice: unknown; stock: number; order: number }[] }[];
     reviews?: ReviewWithProduct[];
     brand?: { name: string } | null;
   };
@@ -150,6 +153,19 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
       })) ?? []
   );
 
+  const [variantGroups, setVariantGroups] = React.useState<VariantGroupItem[]>(
+    product?.variantGroups?.map((g) => ({
+      name: g.name,
+      order: g.order,
+      variants: (g.variants ?? []).map((v) => ({
+        name: v.name,
+        extraPrice: Number(v.extraPrice ?? 0),
+        stock: v.stock ?? 0,
+        order: v.order ?? 0,
+      })),
+    })) ?? []
+  );
+
   async function onSubmit(data: FormData) {
     try {
       const slug = (data.slug?.trim() || slugify(String(data.name ?? "")) || "produto").slice(0, 200);
@@ -181,6 +197,11 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         installmentPrice: data.installmentPrice ?? null,
         images,
         specifications: allSpecs,
+        variantGroups: variantGroups.map((g, gi) => ({
+          name: g.name,
+          order: gi,
+          variants: g.variants.map((v, vi) => ({ name: v.name, extraPrice: v.extraPrice, stock: v.stock, order: vi })),
+        })),
         reviews: reviews
           .filter((r) => r.userName.trim())
           .map((r) => ({
@@ -522,6 +543,13 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         <SpecificationsEditor specs={specs} onChange={setSpecs} />
       </div>
 
+      {watch("template") === "mm" && (
+        <div>
+          <h3 className="font-medium mb-4">Variantes (Personalize sua compra)</h3>
+          <VariantGroupsEditor groups={variantGroups} onChange={setVariantGroups} />
+        </div>
+      )}
+
       <div>
         <ReviewsEditor reviews={reviews} onChange={setReviews} uploadEnabled={uploadEnabled} />
       </div>
@@ -553,6 +581,70 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
         </Button>
       </div>
     </form>
+  );
+}
+
+function VariantGroupsEditor({
+  groups,
+  onChange,
+}: {
+  groups: VariantGroupItem[];
+  onChange: (g: VariantGroupItem[]) => void;
+}) {
+  const addGroup = () => {
+    onChange([...groups, { name: "", order: groups.length, variants: [{ name: "", extraPrice: 0, stock: 0, order: 0 }] }]);
+  };
+  const updateGroup = (gi: number, field: "name", value: string) => {
+    const next = [...groups];
+    next[gi] = { ...next[gi]!, [field]: value };
+    onChange(next);
+  };
+  const removeGroup = (gi: number) => onChange(groups.filter((_, i) => i !== gi));
+  const addVariant = (gi: number) => {
+    const next = [...groups];
+    const v = next[gi]!.variants;
+    next[gi] = { ...next[gi]!, variants: [...v, { name: "", extraPrice: 0, stock: 0, order: v.length }] };
+    onChange(next);
+  };
+  const updateVariant = (gi: number, vi: number, field: "name" | "extraPrice", value: string | number) => {
+    const next = [...groups];
+    const v = [...next[gi]!.variants];
+    v[vi] = { ...v[vi]!, [field]: value };
+    next[gi] = { ...next[gi]!, variants: v };
+    onChange(next);
+  };
+  const removeVariant = (gi: number, vi: number) => {
+    const next = [...groups];
+    next[gi] = { ...next[gi]!, variants: next[gi]!.variants.filter((_, i) => i !== vi) };
+    onChange(next);
+  };
+  return (
+    <div className="space-y-4">
+      {groups.map((g, gi) => (
+        <div key={gi} className="border rounded-lg p-4 space-y-3">
+          <div className="flex gap-2 items-center">
+            <Input
+              placeholder="Nome do grupo (ex: Cor, Tamanho)"
+              value={g.name}
+              onChange={(e) => updateGroup(gi, "name", e.target.value)}
+              className="flex-1"
+            />
+            <Button type="button" variant="outline" size="icon" onClick={() => removeGroup(gi)}>×</Button>
+          </div>
+          <div className="pl-4 space-y-2">
+            {g.variants.map((v, vi) => (
+              <div key={vi} className="flex gap-2 items-center">
+                <Input placeholder="Nome (ex: Preto, P)" value={v.name} onChange={(e) => updateVariant(gi, vi, "name", e.target.value)} className="flex-1" />
+                <Input type="number" step="0.01" placeholder="Acréscimo R$" value={v.extraPrice || ""} onChange={(e) => updateVariant(gi, vi, "extraPrice", parseFloat(e.target.value) || 0)} className="w-24" />
+                <Button type="button" variant="outline" size="icon" onClick={() => removeVariant(gi, vi)}>×</Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" onClick={() => addVariant(gi)}>+ Variante</Button>
+          </div>
+        </div>
+      ))}
+      <Button type="button" variant="outline" onClick={addGroup}>+ Grupo de variantes</Button>
+    </div>
   );
 }
 

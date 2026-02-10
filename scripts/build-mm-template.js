@@ -62,16 +62,53 @@ if (html.includes(descStart)) {
 // 6. SKU 935194802 no JSON
 html = html.replace(/"sku":"935194802"/g, '"sku":"{{PRODUCT_SKU}}"');
 
-// 7. Preço exibido R$ 539,99
+// 7. Preço exibido - todos os formatos (ordem importa)
 html = html.split("R$ 539,99").join("{{PRODUCT_PRICE}}");
+html = html.split("R$ 79,99").join("{{PRODUCT_PRICE_APRAZO}}");
+html = html.replace(/\b539,99\b/g, "{{PRODUCT_PRICE}}");
+html = html.replace(/\b79,99\b/g, "{{PRODUCT_PRICE_APRAZO}}");
+html = html.replace(/\b539\.99\b/g, "{{PRODUCT_PRICE_META}}");
 
-// 8. Preload da primeira imagem
+// 8. Remove script do chat (Zendesk)
+html = html.replace(/<script[^>]*id="ze-snippet"[^>]*src="https:\/\/static\.zdassets\.com\/[^"]*"[^>]*><\/script>/g, "");
+
+// 9. Remove seções "Geralmente comprado junto" e "apenas para você"
+html = html.replace(/Geralmente comprado junto/gi, "<!-- removido-gcj -->");
+html = html.replace(/apenas para você/gi, "<!-- removido-apv -->");
+html = html.replace(/apenas para voce/gi, "<!-- removido-apv -->");
+// Esconde span que contém "Geralmente comprado junto" e seu container
+html = html.replace(
+  /<span[^>]*>[\s\S]*?<!-- removido-gcj -->[\s\S]*?<\/span>/gi,
+  '<span style="display:none!important"><!-- Geralmente comprado junto removido --></span>'
+);
+
+// 10. Placeholder para variantes (Personalize seu produto / Personalize sua compra)
+html = html.replace(/Personalize seu produto/gi, "{{MM_VARIANTS_SECTION}}");
+html = html.replace(/Personalize sua compra/gi, "{{MM_VARIANTS_SECTION}}");
+
+// 11. Inserir placeholder para especificações (editáveis no admin)
+html = html.replace(
+  /<main id="control-box-content"/,
+  '<section class="mm-specs" style="padding:16px;margin:16px 0;border:1px solid #eee;border-radius:8px"><table style="width:100%;border-collapse:collapse"><tbody>{{PRODUCT_SPECIFICATIONS}}</tbody></table></section><main id="control-box-content"'
+);
+
+// 12. Esconde ícone do chat e remove "Geralmente comprado junto" / "apenas para você"
+const hideChatCss = `<style id="mm-hide-chat">[id*="launcher"],[class*="launcher"],[data-testid*="chat"],[class*="zE"],[id*="Embed"]{display:none!important;visibility:hidden!important}</style>`;
+const hideSectionsScript = `<script>(function(){var t=["Geralmente comprado junto","apenas para você","apenas para voce"];function hideParent(el){var p=el;while(p&&p!==document.body){if(/^(DIV|SECTION|ARTICLE|ASIDE)$/i.test(p.tagName)){p.style.display="none!important";p.style.visibility="hidden!important";return}p=p.parentElement}}var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);var n;while(n=w.nextNode()){var v=n.textContent||"";t.forEach(function(s){if(v.indexOf(s)>=0)hideParent(n.parentElement)})}})();</script>`;
+if (!html.includes("mm-hide-chat")) {
+  html = html.replace("</head>", hideChatCss + "\n</head>");
+}
+if (!html.includes("hideSectionsScript")) {
+  html = html.replace("</body>", hideSectionsScript + "\n</body>");
+}
+
+// 13. Preload da primeira imagem
 html = html.replace(
   /href="https:\/\/product-hub-prd\.madeiramadeira\.com\.br\/935194802\/images\/8f0946a8[^"]*" as="image"/,
   'href="{{PRODUCT_IMAGE_1}}" as="image"'
 );
 
-// 9. Fallback: qualquer URL de imagem do produto 935194802 restante
+// 14. Fallback: qualquer URL de imagem do produto 935194802 restante
 html = html.replace(
   /https:\/\/product-hub-prd\.madeiramadeira\.com\.br\/935194802\/images\/[^"&\s]+/g,
   "{{PRODUCT_IMAGE_1}}"

@@ -50,7 +50,8 @@ export async function GET(
       : (process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin);
 
   if (slug === "modelo") {
-    const html = await loadTemplate("produto-modelo.html", baseUrl);
+    let html = await loadTemplate("produto-modelo.html", baseUrl);
+    html = html.replace(/href="https:\/\/www\.leroymerlin\.com\.br\/leroy-merlin-garante"/g, 'href="javascript:void(0)"');
     return new NextResponse(html, {
       headers: { "Content-Type": "text/html; charset=utf-8" },
     });
@@ -276,13 +277,31 @@ export async function GET(
       ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
       : product.template === "carrefour"
         ? `<tr class="text-zinc-medium text-sm ${i % 2 === 0 ? "bg-background-gray" : ""}"><td class="p-2 w-1/3">${escapeHtml(s.key)}</td><td class="p-2 w-2/3">${escapeHtml(s.value)}</td></tr>`
-        : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
+        : product.template === "mm"
+          ? `<tr style="border-bottom:1px solid #eee"><td style="padding:8px 12px;font-weight:600">${escapeHtml(s.key)}</td><td style="padding:8px 12px">${escapeHtml(s.value)}</td></tr>`
+          : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
   );
   const specsHtml =
     specsRows.length > 0
       ? product.template === "decolar"
         ? `<table><tbody>${specsRows.join("")}</tbody></table>`
         : specsRows.join("")
+      : "";
+
+  const variantGroups = "variantGroups" in product ? product.variantGroups : [];
+  const mmVariantsHtml =
+    product.template === "mm" && Array.isArray(variantGroups) && variantGroups.length > 0
+      ? variantGroups
+          .map(
+            (g: { name: string; variants: { name: string; extraPrice: unknown }[] }) =>
+              `<div style="margin-bottom:16px"><strong style="display:block;margin-bottom:8px">${escapeHtml(g.name)}</strong><div style="display:flex;flex-wrap:wrap;gap:8px">${(g.variants ?? [])
+                .map(
+                  (v: { name: string }) =>
+                    `<span style="padding:8px 16px;border:1px solid #ccc;border-radius:4px;cursor:pointer">${escapeHtml(v.name)}</span>`
+                )
+                .join("")}</div></div>`
+          )
+          .join("")
       : "";
   const priceDiscountBlockCarrefour =
     product.template === "carrefour" && originalPrice && discountPercent
@@ -376,6 +395,7 @@ export async function GET(
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],
     ["{{PRODUCT_DESCRIPTION}}", productDescription],
     ["{{PRODUCT_SPECIFICATIONS}}", specsHtml],
+    ["{{MM_VARIANTS_SECTION}}", product.template === "mm" ? (mmVariantsHtml ? `<div class="mm-variants" style="padding:16px;margin:16px 0"><h4 style="margin-bottom:12px">Personalize sua compra</h4>${mmVariantsHtml}</div>` : "") : ""],
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],

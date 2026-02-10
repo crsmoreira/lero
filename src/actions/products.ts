@@ -52,6 +52,17 @@ const productSchema = z.object({
       })
     )
     .default([]),
+  variantGroups: z
+    .array(
+      z.object({
+        name: z.string(),
+        order: z.number(),
+        variants: z.array(
+          z.object({ name: z.string(), extraPrice: z.number().default(0), stock: z.number().default(0), order: z.number() })
+        ),
+      })
+    )
+    .default([]),
 });
 
 export async function createProduct(data: z.infer<typeof productSchema>) {
@@ -60,7 +71,7 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { images, specifications, reviews, ...rest } = parsed.data;
+  const { images, specifications, reviews, variantGroups, ...rest } = parsed.data;
 
   const baseSlug = rest.slug.trim() || "produto";
   let slug = baseSlug;
@@ -106,6 +117,20 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
           comment: r.comment ?? null,
           images: r.images ?? [],
           approved: true,
+        })),
+      },
+      variantGroups: {
+        create: (variantGroups ?? []).map((g, gi) => ({
+          name: g.name,
+          order: g.order ?? gi,
+          variants: {
+            create: (g.variants ?? []).map((v, vi) => ({
+              name: v.name,
+              extraPrice: (v.extraPrice ?? 0) as unknown as Decimal,
+              stock: v.stock ?? 0,
+              order: v.order ?? vi,
+            })),
+          },
         })),
       },
     },
@@ -154,7 +179,7 @@ export async function updateProduct(
     return { error: parsed.error.flatten().fieldErrors };
   }
 
-  const { images, specifications, reviews, ...rest } = parsed.data;
+  const { images, specifications, reviews, variantGroups, ...rest } = parsed.data;
 
   try {
   await prisma.product.update({
@@ -196,6 +221,21 @@ export async function updateProduct(
           comment: r.comment ?? null,
           images: r.images ?? [],
           approved: true,
+        })),
+      },
+      variantGroups: {
+        deleteMany: {},
+        create: (variantGroups ?? []).map((g, gi) => ({
+          name: g.name,
+          order: g.order ?? gi,
+          variants: {
+            create: (g.variants ?? []).map((v, vi) => ({
+              name: v.name,
+              extraPrice: (v.extraPrice ?? 0) as unknown as Decimal,
+              stock: v.stock ?? 0,
+              order: v.order ?? vi,
+            })),
+          },
         })),
       },
     },
