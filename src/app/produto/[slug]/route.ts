@@ -315,13 +315,13 @@ export async function GET(
     product.template === "carrefour"
       ? carrefourImages.map((img, i) => {
           const sel = i === 0;
-          return `<button type="button" role="tab" aria-selected="${sel}" aria-label="Miniatura ${i + 1}" tabindex="${sel ? 0 : -1}" class="aspect-square w-16 h-16 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-royal"><img src="${escapeHtml(img)}" alt="" class="w-full h-full object-cover rounded-lg transition border border-gray-soft p-2 bg-white/30 ${sel ? "ring-2 ring-blue-royal shadow-md " : ""}hover:border-[#B8B8B8]"/></button>`;
+          return `<button type="button" role="tab" aria-selected="${sel}" aria-label="Miniatura ${i + 1}" tabindex="${sel ? 0 : -1}" class="aspect-square w-16 h-16 flex-shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-royal"><img src="${escapeHtml(img)}" alt="" class="w-full h-full object-cover rounded-lg transition border border-gray-soft p-2 bg-white/30 ${sel ? "ring-2 ring-blue-royal shadow-md " : ""}hover:border-[#B8B8B8]"/></button>`;
         }).join("")
       : "";
   const carrefourGalleryMain =
     product.template === "carrefour"
       ? carrefourImages.map((img, i) =>
-          `<div class="aspect-square snap-start"><img class="object-cover w-full h-full lg:cursor-zoom-image" src="${escapeHtml(img)}" loading="${i === 0 ? "eager" : "lazy"}" alt=""/><div class="hidden lg:block"><div style="display:none"></div><div class="new-zoom-image object-cover pdp-shadow rounded z-image-gallery" style="background-image:url(${escapeHtml(img)})"></div></div></div>`
+          `<div class="aspect-square snap-start flex-shrink-0 min-w-full"><img class="object-cover w-full h-full lg:cursor-zoom-image" src="${escapeHtml(img)}" loading="${i === 0 ? "eager" : "lazy"}" alt=""/><div class="hidden lg:block"><div style="display:none"></div><div class="new-zoom-image object-cover pdp-shadow rounded z-image-gallery" style="background-image:url(${escapeHtml(img)})"></div></div></div>`
         ).join("")
       : "";
 
@@ -404,13 +404,14 @@ export async function GET(
     ["{{KALUNGA_OLD_PRICE_BLOCK}}", product.template === "kalonga" && originalPrice && discountPercent
       ? `<p class="produtoinfos__text produtoinfos__text--grey pe-2" id="depor"><input id="txtDePor" name="txtDePor" type="hidden" class="visually-hidden" value="De: R$ ${formatPrice(Number(originalPrice))}"><del>De: R$ ${formatPrice(Number(originalPrice))}</del></p><span class="produtoinfos__badge" title="Economize à vista" id="economize"><i class="fas fa-arrow-down me-1"></i> Economize à vista ${discountPercent} </span>`
       : product.template === "kalonga" ? "" : ""],
-    ["{{KALUNGA_INSTALLMENT_INFO}}", (() => {
+    ["{{KALUNGA_TOTAL_PRAZO}}", product.template === "kalonga" && Number(priceAPrazo) > 0 ? `R$ ${formatPrice(Number(priceAPrazo))}` : ""],
+    ["{{KALUNGA_PARCELAS}}", (() => {
       if (product.template !== "kalonga") return "";
-      const val = Number(priceAvista);
+      const val = Number(priceAPrazo);
       if (val <= 0) return "";
-      const parcela = val / 10;
-      return `em até 10x de R$ ${formatPrice(parcela)} sem juros`;
+      return `10x de R$ ${formatPrice(val / 10)}`;
     })()],
+    ["{{KALUNGA_FRETE_TEXT}}", product.template === "kalonga" ? "para todo Brasil" : ""],
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
@@ -441,7 +442,7 @@ export async function GET(
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"
-        ? `[class*="shimmer"]{display:none!important}header~*div[class*="order-3"]:has([class*="animate-pulse"]){display:none!important}div:has([id*="securiti"]),div:has([id*="onetrust"]),div:has([class*="cookie-banner"]),div:has([class*="cookie-consent"]),div:has([class*="consent-banner"]),div:has([class*="cookie"]),section:has([class*="cookie"]),[id*="securiti"],[id*="privaci"],[id*="onetrust"],[id*="cookie"],[class*="cookie-consent"],[class*="cookie-banner"],[class*="cookie"],[class*="gdpr"],[class*="consent-banner"]{display:none!important}a,button{pointer-events:none!important;cursor:default!important}nav ul[data-testid="store-types"] a{pointer-events:none!important}a[data-testid="pdp-buy-button"],a[href*="avaliac"],a[href*="#avali"],button[aria-label*="Avalie"],[aria-label*="avalie"],[data-testid*="avalie"],a[data-checkout],button[data-checkout]{pointer-events:auto!important;cursor:pointer!important}`
+        ? `[class*="shimmer"]{display:none!important}header~*div[class*="order-3"]:has([class*="animate-pulse"]){display:none!important}div:has([id*="securiti"]),div:has([id*="onetrust"]),div:has([class*="cookie-banner"]),div:has([class*="cookie-consent"]),div:has([class*="consent-banner"]),div:has([class*="cookie"]),section:has([class*="cookie"]),[id*="securiti"],[id*="privaci"],[id*="onetrust"],[id*="cookie"],[class*="cookie-consent"],[class*="cookie-banner"],[class*="cookie"],[class*="gdpr"],[class*="consent-banner"]{display:none!important}a,button{pointer-events:none!important;cursor:default!important}nav ul[data-testid="store-types"] a{pointer-events:none!important}a[data-testid="pdp-buy-button"],a[href*="avaliac"],a[href*="#avali"],button[aria-label*="Avalie"],[aria-label*="avalie"],[data-testid*="avalie"],a[data-checkout],button[data-checkout]{pointer-events:auto!important;cursor:pointer!important}@media(max-width:768px){.grid-container.snap-x{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;-webkit-overflow-scrolling:touch!important}.grid-container.snap-x>*{flex:0 0 100%!important;min-width:100%!important;scroll-snap-align:start!important}[role="tablist"][aria-label="Miniaturas da galeria"]{overflow-x:auto!important;overflow-y:hidden!important;flex-direction:row!important;flex-wrap:nowrap!important;snap-type:none!important;-webkit-overflow-scrolling:touch!important}}`
         : "",
     ],
   ];

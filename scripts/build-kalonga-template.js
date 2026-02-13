@@ -5,7 +5,9 @@
 const fs = require("fs");
 const path = require("path");
 
-const src = path.join(__dirname, "../public/kalonga.html");
+const srcDefault = path.join(__dirname, "../public/kalonga.html");
+const srcUser = path.join(require("os").homedir(), "Downloads/kalunga.html");
+const src = fs.existsSync(srcUser) ? srcUser : srcDefault;
 const dest = path.join(__dirname, "../public/produto-template-kalonga.html");
 
 if (!fs.existsSync(src)) {
@@ -100,15 +102,10 @@ html = html.replace(
 html = html.replace(/AbrirDropdowFavoritos\('220203'\)/g, "AbrirDropdowFavoritos('{{PRODUCT_SKU}}')");
 html = html.replace(/iconFavoritos_title_220203/g, "iconFavoritos_title_{{PRODUCT_SKU}}");
 
-// 9. Botão Comprar - todos os botões vão para checkout
-html = html.replace(
-  /onclick="Comprar\('220203'[^)]*\)"/g,
-  'onclick="location.href=this.getAttribute(\'data-checkout\')||\'#\'" data-checkout="{{CHECKOUT_URL}}"'
-);
-html = html.replace(
-  /onclick="ComprarComGarantia\('220203'[^)]*\)"/g,
-  'onclick="location.href=this.getAttribute(\'data-checkout\')||\'#\'" data-checkout="{{CHECKOUT_URL}}"'
-);
+// 9. Botão Comprar / Comprar agora - todos os botões vão para checkout do admin
+const checkoutOnclick = 'onclick="location.href=this.getAttribute(\'data-checkout\')||\'#\'" data-checkout="{{CHECKOUT_URL}}"';
+html = html.replace(/onclick="Comprar\([^"]*"/g, checkoutOnclick);
+html = html.replace(/onclick="ComprarComGarantia\([^"]*"/g, checkoutOnclick);
 
 // 10. Descrição editável - meta e área de descrição do produto
 html = html.replace(
@@ -124,16 +121,15 @@ html = html.replace(
 const descricaoIframeBlock = /<div class="descricaoproduto__adicional[^"]*"[^>]*>[\s\S]*?<iframe[^>]*src="https:\/\/epson\.conteudoespecial\.com\.br\/l3250\/html\/"[^>]*><\/iframe>\s*<hr>/;
 html = html.replace(descricaoIframeBlock, '<div class="descricaoproduto__adicional" id="dvEspecificacaoAdicionalTop"><div class="produto-descricao-admin">{{PRODUCT_DESCRIPTION}}</div><hr>');
 
-// 10b. "Carregando..." -> "para todo Brasil" (frete)
-html = html.replace(/Carregando\.\.\./g, "para todo Brasil");
+// 10b. Frete, parcelas, CEP - substituir apenas valores (estrutura 100% idêntica)
+html = html.replace(/Carregando\.\.\./g, "{{KALUNGA_FRETE_TEXT}}");
+html = html.replace(/value="R\$ 1\.221,11"/g, 'value="{{KALUNGA_TOTAL_PRAZO}}"');
+html = html.replace(/>R\$ 1\.221,11</g, ">{{KALUNGA_TOTAL_PRAZO}}<");
+html = html.replace(/value="10x de R\$ 122,11"/g, 'value="{{KALUNGA_PARCELAS}}"');
+html = html.replace(/>10x de R\$ 122,11</g, ">{{KALUNGA_PARCELAS}}<");
 
-// 10c. Parcelamento: usar preço à vista (placeholder) e manter "Ver parcelas"
-const parcelamentoBlock = '<p class="produtoinfos__text produtoinfos__text--black" id="parcelamento"> Ou <input id="txtTotalPrazo" name="txtTotalPrazo" type="hidden" class="visually-hidden" placeholder="txtTotalPrazo" aria-label="txtTotalPrazo" aria-describedby="basic-addon1" value="R$ 1.221,11"><span class="produtoinfos__text--weight-6" id="total_prazo">R$ 1.221,11</span> em até <span class="produtoinfos__text--weight-6">10x de R$ 122,11</span><a tabindex="0" class="produtoinfos__ver-parcelas produtoinfos__link ms-2 d-none d-sm-inline-block" data-bs-toggle="collapse" href="#exibir-parcelas" role="button" aria-expanded="false" aria-controls="exibir-parcelas"><u class="pointer" title="ver parcelas">Ver parcelas</u></a></p>';
-const parcelamentoReplacement = '<p class="produtoinfos__text produtoinfos__text--black" id="parcelamento"> Ou {{KALUNGA_INSTALLMENT_INFO}}<a tabindex="0" class="produtoinfos__ver-parcelas produtoinfos__link ms-2 d-none d-sm-inline-block" data-bs-toggle="collapse" href="#exibir-parcelas" role="button" aria-expanded="false" aria-controls="exibir-parcelas"><u class="pointer" title="ver parcelas">Ver parcelas</u></a></p>';
-html = html.replace(parcelamentoBlock, parcelamentoReplacement);
-
-// 10d. Esconder "Mais produtos marca", Características, Especificações; reduzir espaço vazio do frete e quantidade
-const kalungaHideCss = '<style id="kalunga-hide">#mais_produtos_marca,.mais_produtos_marca,#descricaoPadrao,.descricaoPadrao{display:none!important}#acrescimo{display:none!important}#barraFrete,.seloprod,#content-btn-comprar,#dvQuantidadeProduto{margin-top:0!important;margin-bottom:0!important;padding-top:.25rem!important;padding-bottom:.25rem!important;min-height:0!important}#content-btn-comprar .produtoinfos__choiceqtd{margin-top:0!important;padding-top:0!important}</style>';
+// 10c. Esconder apenas "Mais produtos marca" e Características/Especificações
+const kalungaHideCss = '<style id="kalunga-hide">#mais_produtos_marca,.mais_produtos_marca,#descricaoPadrao,.descricaoPadrao{display:none!important}</style>';
 if (!html.includes("kalunga-hide")) {
   html = html.replace("</head>", kalungaHideCss + "\n</head>");
 }
@@ -147,6 +143,12 @@ if (compreJuntoStart >= 0 && compreJuntoScript > compreJuntoStart) {
     html = html.substring(0, compreJuntoStart) + html.substring(scriptEnd);
   }
 }
+
+// 11b. Banner Volta às Aulas: clicar não faz nada
+html = html.replace(
+  /href="https:\/\/www\.kalunga\.com\.br\/hotsite\/volta-as-aulas"/,
+  'href="javascript:void(0)" onclick="event.preventDefault();return false"'
+);
 
 // 12. Bloqueio de cliques em header/footer
 const clickBlocker = `<script>(function(){function blockNav(e){var t=e.target;if(t.closest("[data-checkout]"))return;if(t.closest("header")||t.closest("footer")||t.closest("nav")||t.closest(".componentheader")||t.closest(".page-header")||t.closest("[class*='megamenu']")||t.closest("[class*='footer']")){e.preventDefault();e.stopPropagation();}}document.addEventListener("click",blockNav,true);})();</script>`;
