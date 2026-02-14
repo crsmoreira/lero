@@ -15,6 +15,24 @@ if (!fs.existsSync(src)) {
 
 let html = fs.readFileSync(src, "utf8");
 
+// 0. Anti-React: impede hidratação para preservar o HTML substituído pelo admin
+const antiReactScript = `
+<script>
+(function(){
+  var i=setInterval(function(){
+    if(window.ReactDOM){
+      var h=window.ReactDOM.hydrate;var r=window.ReactDOM.render;
+      if(h){window.ReactDOM.hydrate=function(){};}
+      if(r){window.ReactDOM.render=function(v,n,c){if(c)c();};}
+      clearInterval(i);
+    }
+  },20);
+  setTimeout(function(){clearInterval(i);},8e3);
+})();
+</script>
+`;
+html = html.replace("<head>", "<head>" + antiReactScript);
+
 // 1. Meta tags - og:title, og:description, og:image, og:url
 html = html.replace(
   /<meta property="og:title" content="[^"]*"([^>]*)>/,
@@ -72,9 +90,22 @@ html = html.replace(
   "{{PRODUCT_IMAGE_1}}"
 );
 
-// 5. Descrição do produto (texto longo)
-const descricaoOriginal = "Mergulhe em seus conteúdos na ampla tela de 6.7 polegadas, que oferece uma visualização imersiva para vídeos e jogos. Feito para o dia a dia, o Galaxy A07 ainda conta com certificação IP54, oferecendo resistência contra poeira e respingos d'água para sua tranquilidade. É a combinação ideal de estilo, potência e autonomia.";
-html = html.split(descricaoOriginal).join("{{PRODUCT_DESCRIPTION}}");
+// 5. Descrição do produto - todos os parágrafos (body e __NEXT_DATA__)
+const descricaoParagrafo1 = "Mergulhe em seus conteúdos na ampla tela de 6.7 polegadas, que oferece uma visualização imersiva para vídeos e jogos. Feito para o dia a dia, o Galaxy A07 ainda conta com certificação IP54, oferecendo resistência contra poeira e respingos d'água para sua tranquilidade. É a combinação ideal de estilo, potência e autonomia.";
+const descricaoParagrafo2 = "Viva com mais liberdade e menos preocupação com a tomada. Com uma poderosa bateria de 5000mAh, o Galaxy A07 tem energia de sobra para um dia inteiro de uso intenso, seja para maratonar séries, jogar ou navegar nas redes sociais. E quando precisar recarregar, o Carregamento Rápido de 25W garante que você volte à ação em pouco tempo.";
+const descricaoParagrafo3 = "Desempenho ágil para todas as suas tarefas. O processador Octa-Core, combinado com a tecnologia RAM Plus que otimiza a memória RAM, garante uma experiência fluida ao alternar entre aplicativos. E com 128GB de armazenamento interno, você terá espaço de sobra para guardar todas as suas fotos, vídeos e apps favoritos sem se preocupar.";
+[descricaoParagrafo1, descricaoParagrafo2, descricaoParagrafo3].forEach((p) => {
+  html = html.split(p).join("{{PRODUCT_DESCRIPTION}}");
+});
+// Descrição completa no __NEXT_DATA__ (JSON com \n)
+const descricaoCompletaJson = "O Samsung Galaxy A07 é a escolha perfeita para quem busca performance, uma bateria incrível e câmeras de alta qualidade. Desenhado para o seu dia a dia, ele combina um design moderno com todos os recursos que você precisa para se conectar, criar e se divertir.\\nViva com mais liberdade e menos preocupação com a tomada. Com uma poderosa bateria de 5000mAh, o Galaxy A07 tem energia de sobra para um dia inteiro de uso intenso, seja para maratonar séries, jogar ou navegar nas redes sociais. E quando precisar recarregar, o Carregamento Rápido de 25W garante que você volte à ação em pouco tempo.\\nCapture o mundo com detalhes impressionantes. A câmera traseira dupla, com um sensor principal de 50MP, permite tirar fotos nítidas e ricas em cores. Seja um retrato, uma paisagem ou um momento especial, seus registros terão qualidade surpreendente. A câmera frontal de 8MP garante selfies perfeitas para compartilhar.\\nDesempenho ágil para todas as suas tarefas. O processador Octa-Core, combinado com a tecnologia RAM Plus que otimiza a memória RAM, garante uma experiência fluida ao alternar entre aplicativos. E com 128GB de armazenamento interno, você terá espaço de sobra para guardar todas as suas fotos, vídeos e apps favoritos sem se preocupar.\\nMergulhe em seus conteúdos na ampla tela de 6.7 polegadas, que oferece uma visualização imersiva para vídeos e jogos. Feito para o dia a dia, o Galaxy A07 ainda conta com certificação IP54, oferecendo resistência contra poeira e respingos d'água para sua tranquilidade. É a combinação ideal de estilo, potência e autonomia.";
+html = html.split(descricaoCompletaJson).join("{{PRODUCT_DESCRIPTION}}");
+// Intro da descrição (pode aparecer separado)
+html = html.replace(/O Samsung Galaxy A07 é a escolha perfeita para quem busca performance[^"]*Desenhado para o seu dia a dia[^"]*se divertir\./g, "{{PRODUCT_DESCRIPTION}}");
+// Galaxy A07 em breadcrumb, title, name
+html = html.replace(/Celulares e Smartphones > Galaxy A07/g, "{{PRODUCT_BRAND}} > {{PRODUCT_TITLE}}");
+html = html.replace(/"name":"Galaxy A07"/g, '"name":"{{PRODUCT_TITLE}}"');
+html = html.replace(/title="Galaxy A07"/g, 'title="{{PRODUCT_TITLE}}"');
 
 // 6. Ficha Técnica - substituir tbody da tabela por placeholder
 const factsheetTableMatch = html.match(/<table[^>]*data-testid="table-factsheet"[^>]*>[\s\S]*?<tbody>([\s\S]*?)<\/tbody>\s*<\/table>/);
@@ -85,20 +116,26 @@ if (factsheetTableMatch) {
   );
 }
 
-// 7. Título do produto - Smartphone Samsung A07...
-html = html.replace(
-  /Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7" Câm\. Dupla \+ Selfie 8MP/g,
-  "{{PRODUCT_TITLE}}"
-);
-html = html.replace(
-  /Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7&quot; Câm\. Dupla \+ Selfie 8MP/g,
-  "{{PRODUCT_TITLE}}"
-);
+// 7. Título do produto - todas as variações (HTML, JSON com \", &quot;)
+// Ordem: "Imagem de" primeiro, depois o título genérico
+html = html.replace(/Imagem de Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7&quot; Câm\. Dupla \+ Selfie 8MP/g, "Imagem de {{PRODUCT_TITLE}}");
+html = html.replace(/Imagem de Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7\\" Câm\. Dupla \+ Selfie 8MP/g, "Imagem de {{PRODUCT_TITLE}}");
+html = html.replace(/Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7" Câm\. Dupla \+ Selfie 8MP/g, "{{PRODUCT_TITLE}}");
+html = html.replace(/Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7&quot; Câm\. Dupla \+ Selfie 8MP/g, "{{PRODUCT_TITLE}}");
+html = html.replace(/Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7\\" Câm\. Dupla \+ Selfie 8MP/g, "{{PRODUCT_TITLE}}");
+html = html.replace(/> Galaxy A07</g, "> {{PRODUCT_TITLE}}<");
+html = html.replace(/Smartphone Samsung A07 128GB(?![^<]*Preto)/g, "{{PRODUCT_TITLE}}");
+html = html.replace(/>Smartphone Samsung</g, ">{{PRODUCT_TITLE}}");
+html = html.replace(/"Smartphone Samsung"/g, '"{{PRODUCT_TITLE}}"');
+html = html.replace(/"Smartphone Samsung A07 128GB"/g, '"{{PRODUCT_TITLE}}"');
+html = html.replace(/"Smartphone A07 128GB"/g, '"{{PRODUCT_TITLE}}"');
+html = html.replace(/"Smartphone A07"/g, '"{{PRODUCT_TITLE}}"');
 
-// 8. Schema/JSON-LD price (se existir)
+// 8. Preço em Schema/JSON-LD e __NEXT_DATA__
 html = html.replace(/"price"\s*:\s*"[0-9.]+"/g, '"price" : "{{PRODUCT_PRICE_META}}"');
-html = html.replace(/"lowPrice"\s*:\s*[0-9.]+/g, '"lowPrice" : {{PRODUCT_PRICE_META}}');
-html = html.replace(/"highPrice"\s*:\s*[0-9.]+/g, '"highPrice" : {{PRODUCT_PRICE_META}}');
+html = html.replace(/"lowPrice"\s*:\s*[0-9.]+/g, '"lowPrice":{{PRODUCT_PRICE_META}}');
+html = html.replace(/"highPrice"\s*:\s*[0-9.]+/g, '"highPrice":{{PRODUCT_PRICE_META}}');
+html = html.replace(/"listPrice"\s*:\s*[0-9.]+/g, '"listPrice":{{PRODUCT_PRICE_META}}');
 
 // 9. Botões Comprar / Adicionar - injetar script que redireciona para checkout
 const checkoutScript = `
