@@ -74,6 +74,13 @@ if (html.includes('data-testid="table-factsheet"')) {
 }
 html = html.replace(/<div([^>]*data-testid="tab-product-factsheet"[^>]*)>/, (m) => m.replace(/\bhidden\s+/g, 'block ').replace(/\s+hidden\b/g, ''));
 
+// 5b. Descrição e ficha técnica - exibir toda no mobile (remover max-height e overflow que cortam)
+// O container tab-product-detail-view-container tem max-h-[445px] overflow-hidden no mobile
+html = html.replace(
+  /(data-testid="tab-product-detail-view-container"[^>]*class="[^"]*?)max-h-\[445px\]\s+overflow-hidden\s+md:max-h-none(\s+md:pb-md)?/g,
+  '$1md:pb-md'
+);
+
 // 6. Preço JSON
 html = html.replace(/"price"\s*:\s*[0-9.]+/g, '"price":{{PRODUCT_PRICE_META}}');
 html = html.replace(/"lowPrice"\s*:\s*[0-9.]+/g, '"lowPrice":{{PRODUCT_PRICE_META}}');
@@ -123,7 +130,7 @@ html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => m.includes(",") ? "{{PRODUCT_PR
 html = html.replace(/<script([^>]*)\ssrc="https:\/\/m\.magazineluiza\.com\.br\/mixer-web\/[^"]*"([^>]*)>/gi, '<script$1 src="data:text/javascript,void 0" data-magalu-disabled$2>');
 
 // 11. CSS hide + bandeja mobile
-const magaluHide = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}[data-testid="attribute-selector-container"],[data-testid="attribute-selector"]{display:none!important}#magalu-bandeja-mobile{display:none}@media(max-width:743px){#magalu-bandeja-mobile{display:flex!important}}</style>';
+const magaluHide = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}[data-testid="attribute-selector-container"],[data-testid="attribute-selector"]{display:none!important}#magalu-bandeja-mobile{display:none}@media(max-width:743px){#magalu-bandeja-mobile{display:flex!important}}[data-testid="tab-product-detail-view-container"]{max-height:none!important;overflow:visible!important}[data-testid="tab-product-active-section-container"]{overflow:visible!important}</style>';
 if (!html.includes("magalu-hide")) html = html.replace("</head>", magaluHide + "\n</head>");
 
 // 11b. Bandeja fixa no mobile - preço + parcelamento + Adicionar à sacola
@@ -132,24 +139,37 @@ if (!html.includes("magalu-bandeja-mobile")) {
   html = html.replace("</body>", bandejaMobile + "\n</body>");
 }
 
-// 12. Galeria - id na imagem principal + script para trocar ao clicar nas miniaturas
+// 12. Galeria - id na imagem principal + script para carrossel (slide ao clicar nas miniaturas, igual magalu-novo)
 if (!html.includes("magalu-main-image")) {
   html = html.replace(/<img([^>]*class="[^"]*max-h-\\[344px\\][^"]*")([^>]*data-testid="image")/, '<img id="magalu-main-image"$1$2');
 }
 const galeriaScript = `<script>
 (function(){
   function init(){
-    var main=document.getElementById("magalu-main-image");
-    if(!main)return;
-    var thumbs=document.querySelectorAll("[data-testid=thumbnail-item] img");
-    thumbs.forEach(function(t){
-      var el=t.closest("[data-testid=thumbnail-item]");
-      if(el)el.addEventListener("click",function(){
-        var s=t.getAttribute("src");
-        if(s){main.setAttribute("src",s);}
-        thumbs.forEach(function(x){var p=x.closest("[data-testid=thumbnail-item]");if(p){p.setAttribute("data-selected","false");p.classList.remove("ring-2","ring-interaction-default");p.classList.add("ring-on-surface-7");}});
-        if(el){el.setAttribute("data-selected","true");el.classList.add("ring-2","ring-interaction-default");el.classList.remove("ring-on-surface-7");}
+    var content=document.querySelector("[data-testid=carousel-content]");
+    var thumbs=document.querySelectorAll("[data-testid=thumbnail-item]");
+    var indicators=document.querySelectorAll("[data-testid=carousel-indicator]");
+    if(!content||!thumbs.length)return;
+    function goTo(idx){
+      var pct=-(idx*25);
+      content.style.transition="transform 0.3s ease";
+      content.style.transform="translateX("+pct+"%)";
+      content.setAttribute("data-active-item",String(idx));
+      thumbs.forEach(function(el,i){
+        el.setAttribute("data-selected",i===idx?"true":"false");
+        el.classList.toggle("ring-2",i===idx);el.classList.toggle("ring-interaction-default",i===idx);
+        el.classList.toggle("ring-on-surface-7",i!==idx);el.classList.toggle("ring-1",i!==idx);
       });
+      indicators.forEach(function(btn,i){
+        btn.classList.toggle("bg-surface-container-highest",i===idx);
+        btn.classList.toggle("bg-surface-container-mid",i!==idx);
+      });
+    }
+    thumbs.forEach(function(el,i){
+      el.addEventListener("click",function(){goTo(i);});
+    });
+    if(indicators.length)indicators.forEach(function(btn,i){
+      btn.addEventListener("click",function(){goTo(i);});
     });
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
