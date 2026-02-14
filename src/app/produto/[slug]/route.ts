@@ -411,7 +411,7 @@ export async function GET(
     ["{{SITE_URL}}", baseUrl],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],
-    ["{{PRODUCT_DESCRIPTION}}", product.template === "magalu" ? escapeHtml(productDescription || "").replace(/\n/g, "<br>") : productDescription],
+    ["{{PRODUCT_DESCRIPTION}}", product.template === "magalu" ? (productDescription || "").replace(/\n/g, "<br>") : productDescription],
     ["{{PRODUCT_SPECIFICATIONS}}", specsHtml],
     ["{{MM_VARIANTS_SECTION}}", product.template === "mm" ? (mmVariantsHtml ? `<div class="mm-variants" style="padding:16px;margin:16px 0"><h4 style="margin-bottom:12px">Personalize sua compra</h4>${mmVariantsHtml}</div>` : "") : ""],
     ["{{MM_OLD_PRICE_BLOCK}}", product.template === "mm" && originalPrice && discountPercent
