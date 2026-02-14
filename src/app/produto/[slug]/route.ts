@@ -437,12 +437,23 @@ export async function GET(
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
     ["{{PRODUCT_FAQ}}", (() => {
       if (product.template !== "magalu-novo") return "";
-      const qs = (product.questions ?? []) as { question: string; answer: string | null }[];
-      const items = qs
-        .filter((q) => q.answer)
+      const faqItems: { question: string; answer: string }[] = [
+        { question: "Qual o prazo de entrega?", answer: "O prazo varia conforme sua região. Informe seu CEP na página do produto para consultar prazos e valores. Em geral, entregas em capitais levam de 3 a 10 dias úteis." },
+        { question: "A compra é segura?", answer: "Sim! Utilizamos ambiente seguro e criptografado. Seus dados são protegidos e não compartilhamos informações com terceiros." },
+        { question: "Como funciona a devolução?", answer: "Você tem até 7 dias para solicitar a devolução, conforme o Código de Defesa do Consumidor. Entre em contato conosco e orientaremos todo o processo." },
+        { question: "Quais as formas de pagamento?", answer: "Aceitamos cartão de crédito em até 12x, PIX com desconto, e boleto bancário. Parcelas e condições podem variar conforme o produto." },
+        { question: "O produto tem garantia?", answer: "Sim. Todos os produtos possuem garantia de fábrica. O prazo varia conforme o fabricante e está indicado na ficha técnica do produto." },
+        { question: "Posso parcelar a compra?", answer: "Sim! Oferecemos parcelamento no cartão de crédito em até 12x, com parcelas fixas. O PIX também pode ter desconto à vista." },
+      ];
+      const customQs = (product.questions ?? []) as { question: string; answer: string | null }[];
+      const customAnswered = customQs.filter((q) => q.answer);
+      const allItems = customAnswered.length > 0
+        ? customAnswered.map((q) => ({ question: q.question, answer: q.answer ?? "" }))
+        : faqItems;
+      const items = allItems
         .map(
           (q) =>
-            `<div class="box-border flex w-full flex-wrap items-center no-underline cursor-pointer flex" data-testid="item-question"><div class="box-border flex w-full no-underline items-center justify-between gap-sm py-sm !px-[0px]" data-testid="item"><h3 data-testid="heading" class="text-on-surface-2 font-md-bold">${escapeHtml(q.question)}</h3><i class="icon icon-chevron-right font-lg-bold text-on-surface-4" data-testid="item-icon"></i></div><div class="basis-full text-justify overflow-hidden grid transition-[grid-template-rows,max-height] duration-[0.3s] ease-out text-on-surface-3 font-xsm-regular max-h-[0px]" data-testid="item-content">${escapeHtml(q.answer ?? "")}</div></div>`
+            `<div class="box-border flex w-full flex-wrap items-center no-underline cursor-pointer flex" data-testid="item-question"><div class="box-border flex w-full no-underline items-center justify-between gap-sm py-sm !px-[0px]" data-testid="item"><h3 data-testid="heading" class="text-on-surface-2 font-md-bold">${escapeHtml(q.question)}</h3><i class="icon icon-chevron-right font-lg-bold text-on-surface-4" data-testid="item-icon"></i></div><div class="basis-full text-justify overflow-hidden grid transition-[grid-template-rows,max-height] duration-[0.3s] ease-out text-on-surface-3 font-xsm-regular max-h-[0px]" data-testid="item-content">${escapeHtml(q.answer)}</div></div>`
         )
         .join("");
       if (!items) return "";
