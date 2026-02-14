@@ -68,11 +68,11 @@ html = html.replace(/"name":"Tablet Samsung Galaxy Tab A11[^"]*"/g, '"name":"{{P
 html = html.replace(/alt="Tablet Samsung Galaxy Tab A11[^"]*"/g, 'alt="{{PRODUCT_TITLE}}"');
 html = html.replace(/title="Tablet Samsung Galaxy Tab A11[^"]*"/g, 'title="{{PRODUCT_TITLE}}"');
 
-// 5. Ficha técnica
+// 5. Ficha técnica - visible no mobile (remover hidden, manter block)
 if (html.includes('data-testid="table-factsheet"')) {
   html = html.replace(/<table[^>]*data-testid="table-factsheet"[^>]*>[\s\S]*?<tbody>[\s\S]*?<\/tbody>\s*<\/table>/, '<table class="w-full list-none" data-testid="table-factsheet"><tbody>{{PRODUCT_SPECIFICATIONS}}</tbody></table>');
 }
-html = html.replace(/<div([^>]*data-testid="tab-product-factsheet"[^>]*)>/, (m) => m.replace(/\bhidden\s+/g, '').replace(/\s+hidden\b/g, ''));
+html = html.replace(/<div([^>]*data-testid="tab-product-factsheet"[^>]*)>/, (m) => m.replace(/\bhidden\s+/g, 'block ').replace(/\s+hidden\b/g, ''));
 
 // 6. Preço JSON
 html = html.replace(/"price"\s*:\s*[0-9.]+/g, '"price":{{PRODUCT_PRICE_META}}');
@@ -113,16 +113,71 @@ html = html.replace(/href="\/review\/[^"]*"([^>]*data-testid="button-container")
 // 9. Preço HTML - o preço principal está em spans separados (R$ | 1.008 | , | 00)
 html = html.replace(/(data-testid="price-value-integer">)[\d.]+(<\/span>)/g, "$1{{PRODUCT_PRICE_INTEGER}}$2");
 html = html.replace(/data-testid="price-value-split-cents-decimal">,<\/span><span[^>]*data-testid="price-value-split-cents-fraction">\d+<\/span>/g, 'data-testid="price-value-split-cents-decimal">{{PRODUCT_PRICE_DECIMAL}}</span>');
-// Também o preço "R$ X,XX" em texto (ex: parcelamento)
+// Parcelamento: 8x de R$ 126,00 - ANTES do replace geral para não substituir o valor da parcela
+html = html.replace(/em <!-- -->\d+<!-- -->x de<!-- --> <!-- -->R\$\s*[\d.,]+<!-- -->/g, 'em <!-- -->{{PRODUCT_INSTALLMENT_COUNT}}<!-- -->x de<!-- --> <!-- -->{{PRODUCT_INSTALLMENT_PARCEL}}<!-- -->');
+// Preço "R$ X,XX" em texto (ex: parcelamento total à vista)
 html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => m.includes(",") ? "{{PRODUCT_PRICE}}" : m);
 
 // 10. Desabilitar scripts React/Next da Magalu - evitam a tela "Oops! ALGUMA COISA DEU ERRADO"
 // Esses scripts fazem hidratação e sobrescrevem o HTML; ao rodar fora do domínio Magalu ou com dados modificados, mostram erro
 html = html.replace(/<script([^>]*)\ssrc="https:\/\/m\.magazineluiza\.com\.br\/mixer-web\/[^"]*"([^>]*)>/gi, '<script$1 src="data:text/javascript,void 0" data-magalu-disabled$2>');
 
-// 11. CSS hide
-const magaluHide = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}[data-testid="attribute-selector-container"],[data-testid="attribute-selector"]{display:none!important}</style>';
+// 11. CSS hide + bandeja mobile
+const magaluHide = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}[data-testid="attribute-selector-container"],[data-testid="attribute-selector"]{display:none!important}#magalu-bandeja-mobile{display:none}@media(max-width:743px){#magalu-bandeja-mobile{display:flex!important}}</style>';
 if (!html.includes("magalu-hide")) html = html.replace("</head>", magaluHide + "\n</head>");
+
+// 11b. Bandeja fixa no mobile - preço + parcelamento + Adicionar à sacola
+const bandejaMobile = '<div id="magalu-bandeja-mobile" class="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-md px-md py-md bg-surface-container-lowest border-t border-on-surface-8 shadow-[0_-4px_12px_rgba(0,0,0,0.08)]" style="display:none" data-checkout-url="{{CHECKOUT_URL}}"><div class="flex flex-col min-w-0"><span class="text-on-surface-2 font-2xlg-bold leading-tight">{{PRODUCT_PRICE}}<span class="font-xsm-regular font-normal text-on-surface-3"> no Pix</span></span><span class="text-on-surface-3 font-xsm-regular mt-2xsm">ou {{PRODUCT_INSTALLMENT_COUNT}}x de {{PRODUCT_INSTALLMENT_PARCEL}}</span></div><a href="{{CHECKOUT_URL}}" class="btn btn-lg btn-success shrink-0 px-lg flex items-center gap-xsm" id="magalu-bandeja-btn"><i class="icon icon-shopping-bag font-md-regular"></i>Adicionar à sacola</a></div>';
+if (!html.includes("magalu-bandeja-mobile")) {
+  html = html.replace("</body>", bandejaMobile + "\n</body>");
+}
+
+// 12. Galeria - id na imagem principal + script para trocar ao clicar nas miniaturas
+if (!html.includes("magalu-main-image")) {
+  html = html.replace(/<img([^>]*class="[^"]*max-h-\\[344px\\][^"]*")([^>]*data-testid="image")/, '<img id="magalu-main-image"$1$2');
+}
+const galeriaScript = `<script>
+(function(){
+  function init(){
+    var main=document.getElementById("magalu-main-image");
+    if(!main)return;
+    var thumbs=document.querySelectorAll("[data-testid=thumbnail-item] img");
+    thumbs.forEach(function(t){
+      var el=t.closest("[data-testid=thumbnail-item]");
+      if(el)el.addEventListener("click",function(){
+        var s=t.getAttribute("src");
+        if(s){main.setAttribute("src",s);}
+        thumbs.forEach(function(x){var p=x.closest("[data-testid=thumbnail-item]");if(p){p.setAttribute("data-selected","false");p.classList.remove("ring-2","ring-interaction-default");p.classList.add("ring-on-surface-7");}});
+        if(el){el.setAttribute("data-selected","true");el.classList.add("ring-2","ring-interaction-default");el.classList.remove("ring-on-surface-7");}
+      });
+    });
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>`;
+html = html.replace("</body>", galeriaScript + "\n</body>");
+
+// 13. Calcular frete e prazo - adicionar seção após parcelamento (usa CHECKOUT_URL no handler)
+const freteBlock = '<div class="mb-md" data-testid="magalu-frete"><div class="flex gap-xsm"><input type="text" placeholder="Digite seu CEP" maxlength="9" class="flex-1 px-md py-sm rounded-lg border border-on-surface-8 font-xsm-regular" id="magalu-cep-input" aria-label="CEP"/><button type="button" class="btn btn-md btn-primary px-md" id="magalu-frete-btn">Calcular</button></div><p class="text-on-surface-3 font-2xsm-regular mt-xsm" id="magalu-frete-result"></p></div>';
+const freteScript = `<script>
+(function(){
+  var btn=document.getElementById("magalu-frete-btn");
+  var inp=document.getElementById("magalu-cep-input");
+  var res=document.getElementById("magalu-frete-result");
+  if(btn&&inp&&res){
+    btn.addEventListener("click",function(){
+      var cep=(inp.value||"").replace(/\\D/g,"");
+      if(cep.length!==8){res.textContent="Digite um CEP válido (8 dígitos)";return;}
+      var c=document.querySelector("[data-checkout-url]")?.getAttribute("data-checkout-url")||"{{CHECKOUT_URL}}";
+      if(c&&c!=="#"&&c!=="{{CHECKOUT_URL}}"){window.location.href=c+(c.indexOf("?")>=0?"&":"?")+"cep="+cep;}else{res.textContent="Frete calculado no checkout. CEP: "+cep.replace(/(\\d{5})(\\d{3})/,"$1-$2");}
+    });
+  }
+})();
+</script>`;
+if (!html.includes("magalu-frete")) {
+  html = html.replace(/(<span[^>]*data-testid="price-installment"[^>]*>[\s\S]*?<\/span>)/, "$1" + freteBlock);
+}
+html = html.replace("</body>", freteScript + "\n</body>");
 
 fs.writeFileSync(dest, html);
 console.log("Template gerado:", dest);

@@ -377,9 +377,14 @@ export async function GET(
       ? (() => {
           const magaluPrice = Number(priceAvista).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
           const [intPart, decPart] = magaluPrice.includes(",") ? magaluPrice.split(",") : [magaluPrice, "00"];
+          const magaluInstallmentCount = 8;
+          const magaluParcelValue = Number(priceAvista) / magaluInstallmentCount;
+          const magaluParcelStr = `R$ ${magaluParcelValue.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
           return [
             ["{{PRODUCT_PRICE_INTEGER}}", intPart],
             ["{{PRODUCT_PRICE_DECIMAL}}", "," + decPart],
+            ["{{PRODUCT_INSTALLMENT_COUNT}}", String(magaluInstallmentCount)],
+            ["{{PRODUCT_INSTALLMENT_PARCEL}}", magaluParcelStr],
           ] as [string | RegExp, string][];
         })()
       : []),
