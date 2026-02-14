@@ -100,7 +100,7 @@ async function main() {
 
   const espelho = await prisma.product.upsert({
     where: { slug: "espelho-decorativo-organico-60x40cm" },
-    update: {},
+    update: { template: "magalu-novo" },
     create: {
       name: "Espelho Decorativo Orgânico com Moldura, 60x40 cm",
       slug: "espelho-decorativo-organico-60x40cm",
@@ -117,6 +117,7 @@ async function main() {
       checkoutUrl: "https://exemplo.com/checkout/espelho-60x40",
       categoryId: catEspelhos.id,
       brandId: brandSmart.id,
+      template: "magalu-novo",
     },
   });
 
