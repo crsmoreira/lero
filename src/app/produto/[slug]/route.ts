@@ -370,7 +370,7 @@ export async function GET(
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
     ["{{PRODUCT_TITLE}}", (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_BRAND}}", brandName],
-    ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : product.template === "havan" ? `R$ ${formatPrice(Number(priceAvista))}` : `R$ ${formatPrice(Number(priceAvista))}`],
+    ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : product.template === "havan" ? `R$ ${formatPrice(Number(priceAvista))}` : product.template === "magalu" ? `R$ ${Number(priceAvista).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}` : `R$ ${formatPrice(Number(priceAvista))}`],
     ["{{PRICE_DISCOUNT_BLOCK}}", priceDiscountBlockCarrefour],
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? (product.template === "drogasil" ? formatPriceDrogasil(Number(originalPrice)) : `R$ ${formatPrice(Number(originalPrice))}`) : ""],
     ["{{PRICE_DISCOUNT_HAVAN}}", product.template === "havan" && discountPercent ? `<div class="tag-discont green-tag"><div class="discont"><div class="label-discount"><span class="sale-product-icon">${discountPercent}</span></div></div></div>` : ""],
