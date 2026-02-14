@@ -90,13 +90,16 @@ html = html.replace(
   "{{PRODUCT_IMAGE_1}}"
 );
 
-// 5. Descrição do produto - todos os parágrafos (body e __NEXT_DATA__)
+// 5. Descrição do produto - um único bloco (evitar duplicação)
 const descricaoParagrafo1 = "Mergulhe em seus conteúdos na ampla tela de 6.7 polegadas, que oferece uma visualização imersiva para vídeos e jogos. Feito para o dia a dia, o Galaxy A07 ainda conta com certificação IP54, oferecendo resistência contra poeira e respingos d'água para sua tranquilidade. É a combinação ideal de estilo, potência e autonomia.";
 const descricaoParagrafo2 = "Viva com mais liberdade e menos preocupação com a tomada. Com uma poderosa bateria de 5000mAh, o Galaxy A07 tem energia de sobra para um dia inteiro de uso intenso, seja para maratonar séries, jogar ou navegar nas redes sociais. E quando precisar recarregar, o Carregamento Rápido de 25W garante que você volte à ação em pouco tempo.";
 const descricaoParagrafo3 = "Desempenho ágil para todas as suas tarefas. O processador Octa-Core, combinado com a tecnologia RAM Plus que otimiza a memória RAM, garante uma experiência fluida ao alternar entre aplicativos. E com 128GB de armazenamento interno, você terá espaço de sobra para guardar todas as suas fotos, vídeos e apps favoritos sem se preocupar.";
-[descricaoParagrafo1, descricaoParagrafo2, descricaoParagrafo3].forEach((p) => {
+const descricaoParagrafo4 = "Capture o mundo com detalhes impressionantes. A câmera traseira dupla, com um sensor principal de 50MP, permite tirar fotos nítidas e ricas em cores. Seja um retrato, uma paisagem ou um momento especial, seus registros terão qualidade surpreendente. A câmera frontal de 8MP garante selfies perfeitas para compartilhar.";
+[descricaoParagrafo1, descricaoParagrafo2, descricaoParagrafo3, descricaoParagrafo4].forEach((p) => {
   html = html.split(p).join("{{PRODUCT_DESCRIPTION}}");
 });
+// Colapsar múltiplos {{PRODUCT_DESCRIPTION}} consecutivos em um só (evitar duplicação)
+html = html.replace(/({{PRODUCT_DESCRIPTION}}\s*)+/g, "{{PRODUCT_DESCRIPTION}}");
 // Descrição completa no __NEXT_DATA__ (JSON com \n)
 const descricaoCompletaJson = "O Samsung Galaxy A07 é a escolha perfeita para quem busca performance, uma bateria incrível e câmeras de alta qualidade. Desenhado para o seu dia a dia, ele combina um design moderno com todos os recursos que você precisa para se conectar, criar e se divertir.\\nViva com mais liberdade e menos preocupação com a tomada. Com uma poderosa bateria de 5000mAh, o Galaxy A07 tem energia de sobra para um dia inteiro de uso intenso, seja para maratonar séries, jogar ou navegar nas redes sociais. E quando precisar recarregar, o Carregamento Rápido de 25W garante que você volte à ação em pouco tempo.\\nCapture o mundo com detalhes impressionantes. A câmera traseira dupla, com um sensor principal de 50MP, permite tirar fotos nítidas e ricas em cores. Seja um retrato, uma paisagem ou um momento especial, seus registros terão qualidade surpreendente. A câmera frontal de 8MP garante selfies perfeitas para compartilhar.\\nDesempenho ágil para todas as suas tarefas. O processador Octa-Core, combinado com a tecnologia RAM Plus que otimiza a memória RAM, garante uma experiência fluida ao alternar entre aplicativos. E com 128GB de armazenamento interno, você terá espaço de sobra para guardar todas as suas fotos, vídeos e apps favoritos sem se preocupar.\\nMergulhe em seus conteúdos na ampla tela de 6.7 polegadas, que oferece uma visualização imersiva para vídeos e jogos. Feito para o dia a dia, o Galaxy A07 ainda conta com certificação IP54, oferecendo resistência contra poeira e respingos d'água para sua tranquilidade. É a combinação ideal de estilo, potência e autonomia.";
 html = html.split(descricaoCompletaJson).join("{{PRODUCT_DESCRIPTION}}");
@@ -107,7 +110,7 @@ html = html.replace(/Celulares e Smartphones > Galaxy A07/g, "{{PRODUCT_BRAND}} 
 html = html.replace(/"name":"Galaxy A07"/g, '"name":"{{PRODUCT_TITLE}}"');
 html = html.replace(/title="Galaxy A07"/g, 'title="{{PRODUCT_TITLE}}"');
 
-// 6. Ficha Técnica - substituir tbody da tabela por placeholder
+// 6. Ficha Técnica - substituir tbody da tabela por placeholder e remover hidden (mostrar em mobile)
 const factsheetTableMatch = html.match(/<table[^>]*data-testid="table-factsheet"[^>]*>[\s\S]*?<tbody>([\s\S]*?)<\/tbody>\s*<\/table>/);
 if (factsheetTableMatch) {
   html = html.replace(
@@ -115,6 +118,11 @@ if (factsheetTableMatch) {
     '<table class="w-full list-none" data-testid="table-factsheet"><tbody>{{PRODUCT_SPECIFICATIONS}}</tbody></table>'
   );
 }
+// Mostrar ficha técnica em mobile (remover "hidden" do wrapper)
+html = html.replace(
+  /<div([^>]*data-testid="tab-product-factsheet"[^>]*)>/,
+  (m) => m.replace(/\bhidden\s+/g, '').replace(/\s+hidden\b/g, '')
+);
 
 // 7. Título do produto - todas as variações (HTML, JSON com \", &quot;)
 // Ordem: "Imagem de" primeiro, depois o título genérico
@@ -131,11 +139,13 @@ html = html.replace(/"Smartphone Samsung A07 128GB"/g, '"{{PRODUCT_TITLE}}"');
 html = html.replace(/"Smartphone A07 128GB"/g, '"{{PRODUCT_TITLE}}"');
 html = html.replace(/"Smartphone A07"/g, '"{{PRODUCT_TITLE}}"');
 
-// 8. Preço em Schema/JSON-LD e __NEXT_DATA__
+// 8. Preço em Schema/JSON-LD e __NEXT_DATA__ (incluindo Pix/bestPrice)
 html = html.replace(/"price"\s*:\s*"[0-9.]+"/g, '"price" : "{{PRODUCT_PRICE_META}}"');
 html = html.replace(/"lowPrice"\s*:\s*[0-9.]+/g, '"lowPrice":{{PRODUCT_PRICE_META}}');
 html = html.replace(/"highPrice"\s*:\s*[0-9.]+/g, '"highPrice":{{PRODUCT_PRICE_META}}');
 html = html.replace(/"listPrice"\s*:\s*[0-9.]+/g, '"listPrice":{{PRODUCT_PRICE_META}}');
+// Preço no Pix (bestPrice.totalAmount) - usado pelo Magalu para exibir "R$ X no Pix"
+html = html.replace(/"paymentMethodId":"pix","totalAmount"\s*:\s*[0-9.]+/g, '"paymentMethodId":"pix","totalAmount":"{{PRODUCT_PRICE_META}}"');
 
 // 9. Botões Comprar / Adicionar - injetar script que redireciona para checkout
 const checkoutScript = `
@@ -158,18 +168,33 @@ if (!html.includes("CHECKOUT_URL")) {
   html = html.replace("</body>", checkoutScript + "</body>");
 }
 
-// 10. Área de avaliações - marcador para substituição (Magalu pode ter estrutura específica)
-// Se existir seção de reviews, substituir por placeholder
-const reviewsMarker = '<div id="magalu-reviews-placeholder">{{PRODUCT_REVIEWS}}</div>';
-if (!html.includes("{{PRODUCT_REVIEWS}}")) {
-  html = html.replace(
-    /<div[^>]*data-testid="tab-reviews"[^>]*>[\s\S]*?<\/div>\s*(?=<div|$)/,
-    (m) => m.replace(/<div[\s\S]*/, reviewsMarker)
-  );
+// 10. Área de avaliações - substituir conteúdo Magalu pelo do admin
+const reviewsMarker = "{{PRODUCT_REVIEWS}}";
+const gridOpen = '<div class="flex grid grid-cols-1 gap-lg md:grid-cols-[3fr_7fr] md:items-start" data-testid="row">';
+const idxAv = html.indexOf("Avaliações dos clientes");
+const idxGrid = html.indexOf(gridOpen, idxAv > 0 ? idxAv - 500 : 0);
+if (idxAv >= 0 && idxGrid >= 0) {
+  const afterOpen = idxGrid + gridOpen.length;
+  let depth = 1;
+  let pos = afterOpen;
+  while (depth > 0 && pos < html.length) {
+    const nextOpen = html.indexOf("<div", pos);
+    const nextClose = html.indexOf("</div>", pos);
+    if (nextClose < 0) break;
+    if (nextOpen >= 0 && nextOpen < nextClose) {
+      depth++;
+      pos = nextOpen + 4;
+    } else {
+      depth--;
+      pos = nextClose + 6;
+    }
+  }
+  if (depth === 0) {
+    html = html.substring(0, afterOpen) + reviewsMarker + html.substring(pos - 6);
+  }
 }
-// Fallback: inserir antes do footer
 if (!html.includes("{{PRODUCT_REVIEWS}}")) {
-  html = html.replace("</body>", reviewsMarker + "\n</body>");
+  html = html.replace("</body>", '<div id="magalu-reviews-placeholder">{{PRODUCT_REVIEWS}}</div>\n</body>');
 }
 
 // 11. Preço no HTML - padrões comuns R$ X.XXX,XX
@@ -178,8 +203,18 @@ html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => {
   return m;
 });
 
-// 12. Esconder cookie/consent banners que quebram fora do Magalu
-const magaluHideCss = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}</style>';
+// 12. Esconder cookie/consent e seções indesejadas
+const magaluHideCss = `<style id="magalu-hide">
+[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}
+[data-testid="attribute-selector-container"],[data-testid="attribute-selector"]{display:none!important}
+</style>
+<script>
+(function(){
+  var h=['Explore e aproveite','Principais características','Feito pra durar','Feito para durar'];
+  function hide(){ document.querySelectorAll('[data-testid="row"]').forEach(function(r){ var t=r.textContent||''; if(h.some(function(x){return t.indexOf(x)>=0})) r.style.display='none'; }); }
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',hide):hide();
+})();
+</script>`;
 if (!html.includes("magalu-hide")) {
   html = html.replace("</head>", magaluHideCss + "\n</head>");
 }
