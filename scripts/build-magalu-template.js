@@ -49,11 +49,12 @@ html = html.replace(/https:\/\/[^"'\s]*9ad98c65e448753e49d60013bf53fe9d[^"'\s]*/
 html = html.replace(/https:\/\/[^"'\s]*f7122fbb4f9db57e0af1e443f6ad4114[^"'\s]*/g, "{{PRODUCT_IMAGE_4}}");
 html = html.replace(/https:\/\/[^"'\s]*(?:mlcdn|magazineluiza)[^"'\s]*240612300[^"'\s]*/g, "{{PRODUCT_IMAGE_1}}");
 
-// 3. Descrição
-const descMag = "É equipado com sistema operacional Android 15, oferecendo os recursos mais recentes de segurança e usabilidade. Mantenha-se sempre conectado com Wi-Fi e Bluetooth para todos os seus acessórios.";
-html = html.split(descMag).join("{{PRODUCT_DESCRIPTION}}");
-const descJson = 'O Tablet Samsung Galaxy Tab A11 oferece a combinação entre design e potência. Projetado para quem busca versatilidade, é ideal para estudos, trabalho e entretenimento, combinando especificações robustas em um corpo compacto e elegante.\\nA tela imersiva de 8,7" oferece uma experiência visual vibrante, perfeita para streaming, leitura ou videochamadas, mantendo a portabilidade para uso em qualquer lugar.\\nÉ impulsionado pelo processador Helio G99, que, aliado aos 4GB de Memória RAM, garante uma performance fluida e ágil, mesmo em multitarefa. Com 64GB de armazenamento interno, você tem espaço de sobra para seus aplicativos essenciais, fotos e documentos.\\nÉ equipado com sistema operacional Android 15, oferecendo os recursos mais recentes de segurança e usabilidade. Mantenha-se sempre conectado com Wi-Fi e Bluetooth para todos os seus acessórios.';
-html = html.split(descJson).join("{{PRODUCT_DESCRIPTION}}");
+// 3. Descrição - substituir TODOS os parágrafos do Tablet pela descrição do admin
+const desc1 = "O Tablet Samsung Galaxy Tab A11 oferece a combinação entre design e potência. Projetado para quem busca versatilidade, é ideal para estudos, trabalho e entretenimento, combinando especificações robustas em um corpo compacto e elegante.";
+const desc2 = 'A tela imersiva de 8,7" oferece uma experiência visual vibrante, perfeita para streaming, leitura ou videochamadas, mantendo a portabilidade para uso em qualquer lugar.';
+const desc3 = "É impulsionado pelo processador Helio G99, que, aliado aos 4GB de Memória RAM, garante uma performance fluida e ágil, mesmo em multitarefa. Com 64GB de armazenamento interno, você tem espaço de sobra para seus aplicativos essenciais, fotos e documentos.";
+const desc4 = "É equipado com sistema operacional Android 15, oferecendo os recursos mais recentes de segurança e usabilidade. Mantenha-se sempre conectado com Wi-Fi e Bluetooth para todos os seus acessórios.";
+[desc1, desc2, desc3, desc4].forEach((d) => { html = html.split(d).join("{{PRODUCT_DESCRIPTION}}"); });
 html = html.replace(/({{PRODUCT_DESCRIPTION}}\s*)+/g, "{{PRODUCT_DESCRIPTION}}");
 
 // 4. Título e breadcrumb
@@ -103,7 +104,10 @@ if (idxAv >= 0 && idxGrid >= 0) {
 }
 if (!html.includes("{{PRODUCT_REVIEWS}}")) html = html.replace("</body>", '<div id="magalu-reviews-placeholder">{{PRODUCT_REVIEWS}}</div>\n</body>');
 
-// 9. Preço HTML
+// 9. Preço HTML - o preço principal está em spans separados (R$ | 1.008 | , | 00)
+html = html.replace(/(data-testid="price-value-integer">)[\d.]+(<\/span>)/g, "$1{{PRODUCT_PRICE_INTEGER}}$2");
+html = html.replace(/data-testid="price-value-split-cents-decimal">,<\/span><span[^>]*data-testid="price-value-split-cents-fraction">\d+<\/span>/g, 'data-testid="price-value-split-cents-decimal">{{PRODUCT_PRICE_DECIMAL}}</span>');
+// Também o preço "R$ X,XX" em texto (ex: parcelamento)
 html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => m.includes(",") ? "{{PRODUCT_PRICE}}" : m);
 
 // 10. Desabilitar scripts React/Next da Magalu - evitam a tela "Oops! ALGUMA COISA DEU ERRADO"

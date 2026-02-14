@@ -371,6 +371,16 @@ export async function GET(
     ["{{PRODUCT_TITLE}}", (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_BRAND}}", brandName],
     ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : product.template === "havan" ? `R$ ${formatPrice(Number(priceAvista))}` : product.template === "magalu" ? `R$ ${Number(priceAvista).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}` : `R$ ${formatPrice(Number(priceAvista))}`],
+    ...(product.template === "magalu"
+      ? (() => {
+          const magaluPrice = Number(priceAvista).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          const [intPart, decPart] = magaluPrice.includes(",") ? magaluPrice.split(",") : [magaluPrice, "00"];
+          return [
+            ["{{PRODUCT_PRICE_INTEGER}}", intPart],
+            ["{{PRODUCT_PRICE_DECIMAL}}", "," + decPart],
+          ] as [string | RegExp, string][];
+        })()
+      : []),
     ["{{PRICE_DISCOUNT_BLOCK}}", priceDiscountBlockCarrefour],
     ["{{PRODUCT_OLD_PRICE}}", originalPrice ? (product.template === "drogasil" ? formatPriceDrogasil(Number(originalPrice)) : `R$ ${formatPrice(Number(originalPrice))}`) : ""],
     ["{{PRICE_DISCOUNT_HAVAN}}", product.template === "havan" && discountPercent ? `<div class="tag-discont green-tag"><div class="discont"><div class="label-discount"><span class="sale-product-icon">${discountPercent}</span></div></div></div>` : ""],
@@ -399,7 +409,7 @@ export async function GET(
     ["{{SITE_URL}}", baseUrl],
     ["{{PRODUCT_SHORT_DESCRIPTION}}", shortDescription],
     ["{{PRODUCT_LONG_DESCRIPTION}}", longDescription],
-    ["{{PRODUCT_DESCRIPTION}}", productDescription],
+    ["{{PRODUCT_DESCRIPTION}}", product.template === "magalu" ? escapeHtml(productDescription || "").replace(/\n/g, "<br>") : productDescription],
     ["{{PRODUCT_SPECIFICATIONS}}", specsHtml],
     ["{{MM_VARIANTS_SECTION}}", product.template === "mm" ? (mmVariantsHtml ? `<div class="mm-variants" style="padding:16px;margin:16px 0"><h4 style="margin-bottom:12px">Personalize sua compra</h4>${mmVariantsHtml}</div>` : "") : ""],
     ["{{MM_OLD_PRICE_BLOCK}}", product.template === "mm" && originalPrice && discountPercent
