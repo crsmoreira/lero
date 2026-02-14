@@ -134,8 +134,9 @@ html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="att
 html = html.replace(/(<div[^>]*data-testid="product-detail-description"[^>]*>)[\s\S]*?(<\/div>)/, '$1{{PRODUCT_DESCRIPTION}}$2');
 html = html.replace(/<div[^>]*data-testid="review-stats-container"[\s\S]*?data-testid="review-listing-container">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>(?=\s*<div class="flex flex-col gap-xlg)/, '{{PRODUCT_REVIEWS}}');
 
-// 11c. Perguntas Frequentes (FAQ) - abaixo das avaliações (após lazyload-container, como faq.html)
-html = html.replace(/(Ver todas as avaliações<\/a><\/div><\/div><div data-testid="lazyload-container"><\/div>)(<\/section>)/, '$1{{PRODUCT_FAQ}}$2');
+// 11c. Perguntas Frequentes (FAQ) - row SEPARADA das avaliações (igual à caixa de frete)
+// Fecha a row de reviews, remove lazyload vazio, injeta FAQ como nova row (sibling)
+html = html.replace(/(Ver todas as avaliações<\/a><\/div><\/div>)(<div data-testid="lazyload-container"><\/div>)(<\/section>)/, '$1</div>{{PRODUCT_FAQ}}$3');
 
 // 12. FAQ accordion - expand/collapse ao clicar
 const faqAccordionScript = `<script>
