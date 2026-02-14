@@ -122,12 +122,11 @@ html = html.replace(
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
 html = html.replace('<div class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">', '<div id="magalu-thumbnails" class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">');
 if (!html.includes("magalu-galeria-mobile-css")) {
-  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important}</style>\n</head>');
+  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important;padding-bottom:24px!important;margin-bottom:24px!important}</style>\n</head>');
 }
 
-// 11. Remover Armazenamento Interno e Cor (ficha técnica + seletor de atributos na parte superior)
-html = html.replace(/<tr class="text-on-surface-3 even:bg-surface-container-lower"><td[^>]*data-testid="table-factsheet-key"[^>]*>Armazenamento Interno<\/td><td[^>]*>[\s\S]*?<\/td><\/tr>/, "");
-html = html.replace(/<tr class="text-on-surface-3 even:bg-surface-container-lower"><td[^>]*data-testid="table-factsheet-key"[^>]*>Cor<\/td><td[^>]*>[\s\S]*?<\/td><\/tr>/, "");
+// 11. Ficha técnica: substituir tabela original pelas especificações do admin ({{PRODUCT_SPECIFICATIONS}})
+html = html.replace(/(<table class="w-full list-none" data-testid="table-factsheet"><tbody>)[\s\S]*?(<\/tbody><\/table>)/, '$1{{PRODUCT_SPECIFICATIONS}}$2');
 html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="attribute-label">Armazenamento interno[\s\S]*?<\/div><\/div><\/div>/, "");
 html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="attribute-label">Cor[\s\S]*?<\/div><\/div><\/div>/, "");
 
