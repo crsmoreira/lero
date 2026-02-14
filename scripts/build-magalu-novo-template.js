@@ -114,6 +114,12 @@ if (html.includes("magalu-freight-box")) {
 const shippingBox = '<div class="flex flex flex-col mt-md mb-md bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><div class="pt-md pb-xsm px-md" data-testid="product-shipping"><div class="mb-xsm md:mb-sm"><div class="bg-surface-container-lower py-sm pl-sm pr-xsm flex items-center rounded-lg cursor-pointer" data-testid="shipping-btn-container"><i class="icon icon-location-filled mr-sm text-on-brand-default-inverted font-lg-regular flex-grow-0"></i><span class="text-on-surface-3 font-xsm-regular flex-grow"> <strong class="font-xsm-bold">Calcular frete e prazo</strong></span></div></div></div></div></div>';
 if (!html.includes('data-testid="product-shipping"')) {
   html = html.replace(/(data-testid="chevron-icon"><\/i><\/div><\/div>)(<div class="transition delay-150[^"]*" data-testid="installments-sidebar")/, '$1' + shippingBox + '$2');
+} else {
+  // 9c. Se o original JÁ tem product-shipping, garantir que a row tenha mt-md mb-md (caixa separada do preço, como no Print 2 / Magalu)
+  html = html.replace(
+    /<div class="flex flex flex-col bg-surface-container-lowest md:rounded-lg" data-testid="row">\s*<div data-testid="lazyload-container">\s*<div class="pt-md pb-xsm px-md" data-testid="product-shipping"/,
+    '<div class="flex flex flex-col mt-md mb-md bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><div class="pt-md pb-xsm px-md" data-testid="product-shipping"'
+  );
 }
 
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)

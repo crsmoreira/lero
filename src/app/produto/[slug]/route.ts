@@ -477,6 +477,14 @@ export async function GET(
     );
   }
 
+  // Magalu: garantir que a row do frete tenha mt-md mb-md (caixa separada do preço, como no site oficial)
+  if (product.template === "magalu-novo" && html.includes('data-testid="product-shipping"')) {
+    html = html.replace(
+      /<div class="flex flex flex-col bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><div class="pt-md pb-xsm px-md" data-testid="product-shipping"/,
+      '<div class="flex flex flex-col mt-md mb-md bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><div class="pt-md pb-xsm px-md" data-testid="product-shipping"'
+    );
+  }
+
   if (templateFile === "produto-template.html") {
     html = html.replace(/href="\/login"/g, 'href="javascript:void(0)"');
     // Caixa "Leroy Merlin garante": clique não faz nada
