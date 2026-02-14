@@ -17,7 +17,6 @@
     "build:kalonga": "node scripts/build-kalonga-template.js",
     "build:mm": "node scripts/build-mm-template.js",
     "build:paguemenos": "node scripts/build-paguemenos-static.js",
-    "build:magalu": "node scripts/build-magalu-template.js",
     "build:magalu": "node scripts/build-magalu-template.js"
   },
   "prisma": {
