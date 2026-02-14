@@ -157,27 +157,5 @@ const galeriaScript = `<script>
 </script>`;
 html = html.replace("</body>", galeriaScript + "\n</body>");
 
-// 13. Calcular frete e prazo - adicionar seção após parcelamento (usa CHECKOUT_URL no handler)
-const freteBlock = '<div class="mb-md" data-testid="magalu-frete"><div class="flex gap-xsm"><input type="text" placeholder="Digite seu CEP" maxlength="9" class="flex-1 px-md py-sm rounded-lg border border-on-surface-8 font-xsm-regular" id="magalu-cep-input" aria-label="CEP"/><button type="button" class="btn btn-md btn-primary px-md" id="magalu-frete-btn">Calcular</button></div><p class="text-on-surface-3 font-2xsm-regular mt-xsm" id="magalu-frete-result"></p></div>';
-const freteScript = `<script>
-(function(){
-  var btn=document.getElementById("magalu-frete-btn");
-  var inp=document.getElementById("magalu-cep-input");
-  var res=document.getElementById("magalu-frete-result");
-  if(btn&&inp&&res){
-    btn.addEventListener("click",function(){
-      var cep=(inp.value||"").replace(/\\D/g,"");
-      if(cep.length!==8){res.textContent="Digite um CEP válido (8 dígitos)";return;}
-      var c=document.querySelector("[data-checkout-url]")?.getAttribute("data-checkout-url")||"{{CHECKOUT_URL}}";
-      if(c&&c!=="#"&&c!=="{{CHECKOUT_URL}}"){window.location.href=c+(c.indexOf("?")>=0?"&":"?")+"cep="+cep;}else{res.textContent="Frete calculado no checkout. CEP: "+cep.replace(/(\\d{5})(\\d{3})/,"$1-$2");}
-    });
-  }
-})();
-</script>`;
-if (!html.includes("magalu-frete")) {
-  html = html.replace(/(<span[^>]*data-testid="price-installment"[^>]*>[\s\S]*?<\/span>)/, "$1" + freteBlock);
-}
-html = html.replace("</body>", freteScript + "\n</body>");
-
 fs.writeFileSync(dest, html);
 console.log("Template gerado:", dest);
