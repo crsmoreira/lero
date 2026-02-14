@@ -435,6 +435,19 @@ export async function GET(
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
+    ["{{PRODUCT_FAQ}}", (() => {
+      if (product.template !== "magalu-novo") return "";
+      const qs = (product.questions ?? []) as { question: string; answer: string | null }[];
+      const items = qs
+        .filter((q) => q.answer)
+        .map(
+          (q) =>
+            `<div class="box-border flex w-full flex-wrap items-center no-underline cursor-pointer flex" data-testid="item-question"><div class="box-border flex w-full no-underline items-center justify-between gap-sm py-sm !px-[0px]" data-testid="item"><h3 data-testid="heading" class="text-on-surface-2 font-md-bold">${escapeHtml(q.question)}</h3><i class="icon icon-chevron-right font-lg-bold text-on-surface-4" data-testid="item-icon"></i></div><div class="basis-full text-justify overflow-hidden grid transition-[grid-template-rows,max-height] duration-[0.3s] ease-out text-on-surface-3 font-xsm-regular max-h-[0px]" data-testid="item-content">${escapeHtml(q.answer ?? "")}</div></div>`
+        )
+        .join("");
+      if (!items) return "";
+      return `<div class="flex mt-xsm py-md flex flex-col bg-surface-container-lowest md:rounded-lg" data-testid="row"><div class="px-md"><h2 data-testid="faq-title" class="mb-md font-md-bold">Perguntas Frequentes</h2><div id="magalu-faq-container">${items}</div></div></div>`;
+    })()],
     ["{{META_TITLE}}", product.metaTitle ?? `${(product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)} | Loja`],
     ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_PRICE_VALID_UNTIL}}", new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)],

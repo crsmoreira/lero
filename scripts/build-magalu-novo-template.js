@@ -122,7 +122,7 @@ html = html.replace(
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
 html = html.replace('<div class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">', '<div id="magalu-thumbnails" class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">');
 if (!html.includes("magalu-galeria-mobile-css")) {
-  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important;padding-bottom:24px!important;margin-bottom:24px!important}</style>\n</head>');
+  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important;padding-bottom:24px!important;margin-bottom:24px!important}[data-testid=lazyload-container]:empty{min-height:0!important;height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}section[style*="aftercontent"] .my-lg{margin-top:8px!important;margin-bottom:0!important}</style>\n</head>');
 }
 
 // 11. Ficha técnica: substituir tabela original pelas especificações do admin ({{PRODUCT_SPECIFICATIONS}})
@@ -134,7 +134,29 @@ html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="att
 html = html.replace(/(<div[^>]*data-testid="product-detail-description"[^>]*>)[\s\S]*?(<\/div>)/, '$1{{PRODUCT_DESCRIPTION}}$2');
 html = html.replace(/<div[^>]*data-testid="review-stats-container"[\s\S]*?data-testid="review-listing-container">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>(?=\s*<div class="flex flex-col gap-xlg)/, '{{PRODUCT_REVIEWS}}');
 
-// 12. Benefit cards (Entrega Full, Magalu garante, Devolução): clicar abre bottom-sheet original
+// 11c. Perguntas Frequentes (FAQ) - abaixo das avaliações. {{PRODUCT_FAQ}} = row completa ou vazio
+html = html.replace(/(Ver todas as avaliações<\/a><\/div><\/div>)(<div data-testid="lazyload-container"><\/div><\/section>)/, '$1{{PRODUCT_FAQ}}$2');
+
+// 12. FAQ accordion - expand/collapse ao clicar
+const faqAccordionScript = `<script>
+(function(){
+  function init(){
+    var items=document.querySelectorAll("#magalu-faq-container [data-testid=item-question]");
+    items.forEach(function(el){
+      el.addEventListener("click",function(){
+        var content=el.querySelector("[data-testid=item-content]");
+        var icon=el.querySelector("[data-testid=item-icon]");
+        var isOpen=el.classList.contains("magalu-faq-open");
+        document.querySelectorAll("#magalu-faq-container [data-testid=item-question]").forEach(function(i){i.classList.remove("magalu-faq-open");var c=i.querySelector("[data-testid=item-content]");if(c)c.style.maxHeight="0";var ic=i.querySelector("[data-testid=item-icon]");if(ic){ic.classList.remove("rotate-90");ic.style.transform="";}});
+        if(!isOpen&&content){el.classList.add("magalu-faq-open");content.style.maxHeight=content.scrollHeight+"px";if(icon){icon.classList.add("rotate-90");icon.style.transform="rotate(90deg)";}}
+      });
+    });
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>`;
+
+// 13. Benefit cards (Entrega Full, Magalu garante, Devolução): clicar abre bottom-sheet original
 const benefitScript = `<script>
 (function(){
   function init(){
@@ -152,9 +174,9 @@ const benefitScript = `<script>
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
 </script>`;
-html = html.replace("</body>", benefitScript + "\n</body>");
+html = html.replace("</body>", faqAccordionScript + "\n" + benefitScript + "\n</body>");
 
-// 13. CSS mínimo - só esconder cookie/consent (não altera layout)
+// 14. CSS mínimo - só esconder cookie/consent (não altera layout)
 const magaluHide = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}</style>';
 if (!html.includes("magalu-hide")) html = html.replace("</head>", magaluHide + "\n</head>");
 

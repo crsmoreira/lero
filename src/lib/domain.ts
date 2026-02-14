@@ -147,6 +147,7 @@ export async function resolveProductByDomainAndSlug(domainId: string, slug: stri
         brand: true,
         category: true,
         reviews: { where: { approved: true }, orderBy: { createdAt: "desc" } },
+        questions: { where: { status: "answered" }, orderBy: { createdAt: "asc" } },
       },
     });
 
@@ -174,6 +175,7 @@ export async function resolveProductBySlugOnly(slug: string) {
       brand: true,
       category: true,
       reviews: { where: { approved: true }, orderBy: { createdAt: "desc" } },
+      questions: { where: { status: "answered" }, orderBy: { createdAt: "asc" } },
     },
   });
 }
