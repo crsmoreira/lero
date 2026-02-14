@@ -79,26 +79,26 @@ html = html.replace(/em <!-- -->\d+<!-- -->x de<!-- --> <!-- -->R\$\s*[\d.,]+<!-
 html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => m.includes(",") ? "{{PRODUCT_PRICE}}" : m);
 
 // 7. Checkout - botões Comprar/Adicionar redirecionam para o link do admin
+html = html.replace(/(<button[^>]*data-testid="bagButton"[^>]*)(>)/, '$1 data-magalu-checkout="{{CHECKOUT_URL}}"$2');
+html = html.replace(/(<button[^>]*data-testid="buyButton"[^>]*)(>)/, '$1 data-magalu-checkout="{{CHECKOUT_URL}}"$2');
 if (!html.includes("magalu-checkout-redirect")) {
   html = html.replace("</body>", `<script id="magalu-checkout-redirect">(function(){
-var getUrl=function(){
+var getUrl=function(el){
+  var u=(el&&el.getAttribute&&el.getAttribute("data-magalu-checkout"))||"";
+  if(u&&u!=="#")return u;
   var a=document.querySelector("[data-magalu-sticky-buy]");
   if(a&&a.href&&a.href!=="#")return a.href;
-  return "";
+  return "{{CHECKOUT_URL}}";
 };
 document.addEventListener("click",function(e){
-  var t=e.target.closest("a, button");
+  var t=e.target.closest("a, button, [data-testid=bagButton], [data-testid=buyButton]");
   if(!t)return;
+  var tid=t.getAttribute("data-testid")||"";
   var txt=(t.textContent||"").trim();
-  var isBuy=txt.indexOf("Comprar")>=0||txt.indexOf("Adicionar")>=0||
-    (t.getAttribute("data-testid")||"").indexOf("buy")>=0||
-    (t.getAttribute("aria-label")||"").toLowerCase().indexOf("comprar")>=0;
+  var isBuy=tid==="bagButton"||tid==="buyButton"||txt.indexOf("Comprar")>=0||txt.indexOf("Adicionar")>=0||tid.indexOf("buy")>=0||(t.getAttribute("aria-label")||"").toLowerCase().indexOf("comprar")>=0;
   if(isBuy){
-    var c=getUrl()||"{{CHECKOUT_URL}}";
-    if(c&&c!=="#"&&c!=="{{CHECKOUT_URL}}"){
-      e.preventDefault();
-      window.location.href=c;
-    }
+    var c=getUrl(t);
+    if(c&&c!=="#"){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();window.location.href=c;}
   }
 },true);
 })();</script></body>`);
