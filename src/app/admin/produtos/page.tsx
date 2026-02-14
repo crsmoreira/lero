@@ -35,6 +35,19 @@ export default async function AdminProductsPage() {
 
   const productList = products ?? [];
 
+  const templateLabels: Record<string, string> = {
+    leroy: "Leroy Merlin",
+    drogasil: "Drogasil",
+    decolar: "Decolar",
+    carrefour: "Carrefour",
+    mercadolivre: "Mercado Livre",
+    vakinha: "Vaquinha",
+    havan: "Havan",
+    kalonga: "Kalonga",
+    mm: "Madeira Madeira",
+    "magalu-novo": "Magalu Novo",
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -51,7 +64,7 @@ export default async function AdminProductsPage() {
               <TableHead className="w-16">Imagem</TableHead>
               <TableHead>Nome</TableHead>
               <TableHead>Preço</TableHead>
-              <TableHead>Link</TableHead>
+              <TableHead className="whitespace-nowrap">Modelo</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -90,13 +103,9 @@ export default async function AdminProductsPage() {
                   })()}
                 </TableCell>
                 <TableCell>
-                  {product.checkoutUrl ? (
-                    <a href={product.checkoutUrl} target="_blank" rel="noopener" className="text-primary hover:underline text-sm truncate max-w-[120px] block">
-                      Link
-                    </a>
-                  ) : (
-                    "-"
-                  )}
+                  <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+                    {templateLabels[(product as { template?: string }).template ?? "leroy"] ?? "Leroy Merlin"}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Badge variant={product.status === "active" ? "default" : "secondary"}>
