@@ -438,12 +438,12 @@ export async function GET(
     ["{{PRODUCT_FAQ}}", (() => {
       if (product.template !== "magalu-novo") return "";
       const faqItems: { question: string; answer: string }[] = [
-        { question: "Qual o prazo de entrega?", answer: "O prazo varia conforme sua região. Informe seu CEP na página do produto para consultar prazos e valores. Em geral, entregas em capitais levam de 3 a 10 dias úteis." },
-        { question: "A compra é segura?", answer: "Sim! Utilizamos ambiente seguro e criptografado. Seus dados são protegidos e não compartilhamos informações com terceiros." },
-        { question: "Como funciona a devolução?", answer: "Você tem até 7 dias para solicitar a devolução, conforme o Código de Defesa do Consumidor. Entre em contato conosco e orientaremos todo o processo." },
-        { question: "Quais as formas de pagamento?", answer: "Aceitamos cartão de crédito em até 12x, PIX com desconto, e boleto bancário. Parcelas e condições podem variar conforme o produto." },
-        { question: "O produto tem garantia?", answer: "Sim. Todos os produtos possuem garantia de fábrica. O prazo varia conforme o fabricante e está indicado na ficha técnica do produto." },
-        { question: "Posso parcelar a compra?", answer: "Sim! Oferecemos parcelamento no cartão de crédito em até 12x, com parcelas fixas. O PIX também pode ter desconto à vista." },
+        { question: "Qual o prazo de entrega?", answer: "O prazo varia conforme sua região. Informe seu CEP na página do produto para consultar prazos e valores. Em geral, entregas em capitais levam de 3 a 10 dias úteis. Todas as entregas são realizadas e garantidas pela Magazine Luiza." },
+        { question: "A compra é segura?", answer: "Sim. Todas as compras são entregues e garantidas pela Magazine Luiza. Utilizamos ambiente 100% seguro e criptografado, com proteção dos seus dados. Você compra com total tranquilidade e o apoio da maior rede varejista do Brasil." },
+        { question: "Como funciona a devolução?", answer: "Você tem até 7 dias para solicitar a devolução ou troca, conforme o Código de Defesa do Consumidor. A Magazine Luiza garante todo o suporte no processo. Entre em contato e nossa equipe irá orientá-lo em cada etapa." },
+        { question: "O produto tem garantia?", answer: "Sim. Todos os produtos possuem garantia de fábrica. O prazo varia conforme o fabricante e está indicado na ficha técnica. Em caso de defeito, a Magazine Luiza oferece suporte completo para resolução." },
+        { question: "Recebo código de rastreio da entrega?", answer: "Sim. Após a postagem, você recebe o código de rastreio por e-mail e SMS. Assim você acompanha cada etapa da entrega em tempo real, com total transparência do pedido." },
+        { question: "É emitida nota fiscal?", answer: "Sim. Todos os pedidos possuem Nota Fiscal Eletrônica (NF-e), enviada automaticamente por e-mail. O documento é válido para garantia, trocas e declaração de imposto de renda. Você compra com total regularidade fiscal." },
       ];
       const customQs = (product.questions ?? []) as { question: string; answer: string | null }[];
       const customAnswered = customQs.filter((q) => q.answer);
