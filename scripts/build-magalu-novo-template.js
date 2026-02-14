@@ -122,7 +122,7 @@ html = html.replace(
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
 html = html.replace('<div class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">', '<div id="magalu-thumbnails" class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">');
 if (!html.includes("magalu-galeria-mobile-css")) {
-  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important;padding-bottom:24px!important;margin-bottom:24px!important}[data-testid=lazyload-container]:empty{min-height:0!important;height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}section[style*="aftercontent"] .my-lg{margin-top:8px!important;margin-bottom:0!important}</style>\n</head>');
+  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">#magalu-faq-row{margin-top:16px!important;display:block!important}@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important;padding-bottom:24px!important;margin-bottom:24px!important}[data-testid=lazyload-container]:empty{min-height:0!important;height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}section[style*="aftercontent"] .my-lg{margin-top:8px!important;margin-bottom:0!important}}</style>\n</head>');
 }
 
 // 11. Ficha técnica: substituir tabela original pelas especificações do admin ({{PRODUCT_SPECIFICATIONS}})
@@ -134,9 +134,9 @@ html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="att
 html = html.replace(/(<div[^>]*data-testid="product-detail-description"[^>]*>)[\s\S]*?(<\/div>)/, '$1{{PRODUCT_DESCRIPTION}}$2');
 html = html.replace(/<div[^>]*data-testid="review-stats-container"[\s\S]*?data-testid="review-listing-container">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>(?=\s*<div class="flex flex-col gap-xlg)/, '{{PRODUCT_REVIEWS}}');
 
-// 11c. Perguntas Frequentes (FAQ) - row SEPARADA das avaliações (igual à caixa de frete)
-// Fecha a row de reviews, remove lazyload vazio, injeta FAQ como nova row (sibling)
-html = html.replace(/(Ver todas as avaliações<\/a><\/div><\/div>)(<div data-testid="lazyload-container"><\/div>)(<\/section>)/, '$1</div>{{PRODUCT_FAQ}}$3');
+// 11c. Perguntas Frequentes (FAQ) - row SEPARADA das avaliações (caixa própria, igual frete)
+// Fecha tab-product-detail-view-container E a row de reviews, remove lazyload, FAQ fica fora
+html = html.replace(/(Ver todas as avaliações<\/a><\/div><\/div>)(<div data-testid="lazyload-container"><\/div>)(<\/section>)/, '$1</div></div>{{PRODUCT_FAQ}}$3');
 
 // 12. FAQ accordion - expand/collapse ao clicar
 const faqAccordionScript = `<script>

@@ -457,7 +457,7 @@ export async function GET(
         )
         .join("");
       if (!items) return "";
-      return `<div class="flex mt-md py-md flex flex-col bg-surface-container-lowest md:rounded-lg" data-testid="row"><div class="px-md"><h2 data-testid="faq-title" class="mb-md font-md-bold">Perguntas Frequentes</h2><div id="magalu-faq-container">${items}</div></div></div>`;
+      return `<div class="flex mt-md mb-0 py-md flex flex-col bg-surface-container-lowest md:rounded-lg border-t-0" data-testid="row" id="magalu-faq-row"><div class="px-md"><h2 data-testid="faq-title" class="mb-md font-md-bold">Perguntas Frequentes</h2><div id="magalu-faq-container">${items}</div></div></div>`;
     })()],
     ["{{META_TITLE}}", product.metaTitle ?? `${(product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)} | Loja`],
     ["{{META_DESCRIPTION}}", product.metaDescription ?? product.shortDescription ?? (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
