@@ -109,6 +109,13 @@ if (html.includes("magalu-freight-box")) {
   html = html.replace(/<div id="magalu-freight-box"[^>]*>[\s\S]*?<\/div>\s*<\/div>/, "");
 }
 
+// 9b. Garantir caixa "Calcular frete e prazo" no sidebar (abaixo de Ver opções de pagamento)
+// Se o magalu-novo não tiver (lazy-loaded), injetamos; se já tiver, não duplica
+const shippingBox = '<div class="flex flex flex-col bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><div class="pt-md pb-xsm px-md" data-testid="product-shipping"><div class="mb-xsm md:mb-sm"><div class="bg-surface-container-lower py-sm pl-sm pr-xsm flex items-center rounded-lg cursor-pointer" data-testid="shipping-btn-container"><i class="icon icon-location-filled mr-sm text-on-brand-default-inverted font-lg-regular flex-grow-0"></i><span class="text-on-surface-3 font-xsm-regular flex-grow"> <strong class="font-xsm-bold">Calcular frete e prazo</strong></span></div></div></div></div></div>';
+if (!html.includes('data-testid="product-shipping"')) {
+  html = html.replace(/(data-testid="chevron-icon"><\/i><\/div><\/div>)(<div class="transition delay-150[^"]*" data-testid="installments-sidebar")/, '$1' + shippingBox + '$2');
+}
+
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
 html = html.replace('<div class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">', '<div id="magalu-thumbnails" class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">');
 if (!html.includes("magalu-galeria-mobile-css")) {
@@ -151,13 +158,13 @@ if (!html.includes("magalu-hide")) html = html.replace("</head>", magaluHide + "
 
 // 10. Barra fixa inferior: preço + Adicionar à sacola
 const stickyBar = `
-<div id="magalu-sticky-bar" style="position:fixed;bottom:0;left:0;right:0;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:12px 16px 16px;padding-bottom:max(16px,env(safe-area-inset-bottom));background:#2d2d2d;box-shadow:0 -2px 10px rgba(0,0,0,.15);gap:16px;">
+<div id="magalu-sticky-bar" style="position:fixed;bottom:0;left:0;right:0;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:12px 16px 16px;padding-bottom:max(16px,env(safe-area-inset-bottom));background:#fff;box-shadow:0 -2px 10px rgba(0,0,0,.1);gap:16px;">
   <div style="flex:1;min-width:0;">
     <div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
-      <span style="font-size:22px;font-weight:700;color:#fff;">{{PRODUCT_PRICE}}</span>
-      <span style="font-size:13px;color:#aaa;font-weight:500;">no Pix</span>
+      <span style="font-size:22px;font-weight:700;color:#1a1a1a;">{{PRODUCT_PRICE}}</span>
+      <span style="font-size:13px;color:#666;font-weight:500;">no Pix</span>
     </div>
-    <div style="font-size:12px;color:#999;margin-top:2px;">ou {{PRODUCT_INSTALLMENT_COUNT}}x de {{PRODUCT_INSTALLMENT_PARCEL}}</div>
+    <div style="font-size:12px;color:#666;margin-top:2px;">ou {{PRODUCT_INSTALLMENT_COUNT}}x de {{PRODUCT_INSTALLMENT_PARCEL}}</div>
   </div>
   <a href="{{CHECKOUT_URL}}" data-magalu-sticky-buy style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;background:#00a650;color:#fff;font-size:16px;font-weight:700;border-radius:8px;text-decoration:none;white-space:nowrap;flex-shrink:0;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
