@@ -86,7 +86,10 @@ if (!html.includes("CHECKOUT_URL")) {
   html = html.replace("</body>", `<script>(function(){var c="{{CHECKOUT_URL}}";if(c&&c!=="#"&&c!=="{{CHECKOUT_URL}}"){document.addEventListener("click",function(e){var t=e.target.closest("a, button");if(t&&(t.textContent.includes("Comprar")||t.textContent.includes("Adicionar")||t.getAttribute("data-testid")?.includes("buy")||t.getAttribute("aria-label")?.includes("comprar"))){e.preventDefault();window.location.href=c;}},true);}})();</script></body>`);
 }
 
-// 8. Avaliações
+// 8. Avaliações - link "Ver todas" desabilitado (não redireciona para Magalu)
+html = html.replace(/href="\/review\/[^"]*"/g, 'href="javascript:void(0)"');
+
+// 8b. Avaliações - substituir conteúdo por placeholder editável
 const gridOpen = '<div class="flex grid grid-cols-1 gap-lg md:grid-cols-[3fr_7fr] md:items-start" data-testid="row">';
 const idxAv = html.indexOf("Avaliações dos clientes");
 const idxGrid = html.indexOf(gridOpen, idxAv > 0 ? idxAv - 500 : 0);
@@ -103,6 +106,9 @@ if (idxAv >= 0 && idxGrid >= 0) {
   if (depth === 0) html = html.substring(0, afterOpen) + "{{PRODUCT_REVIEWS}}" + html.substring(pos - 6);
 }
 if (!html.includes("{{PRODUCT_REVIEWS}}")) html = html.replace("</body>", '<div id="magalu-reviews-placeholder">{{PRODUCT_REVIEWS}}</div>\n</body>');
+
+// Link "Ver todas as avaliações" -> javascript:void(0) (não navega para Magalu)
+html = html.replace(/href="\/review\/[^"]*"([^>]*data-testid="button-container")/g, 'href="javascript:void(0)"$1');
 
 // 9. Preço HTML - o preço principal está em spans separados (R$ | 1.008 | , | 00)
 html = html.replace(/(data-testid="price-value-integer">)[\d.]+(<\/span>)/g, "$1{{PRODUCT_PRICE_INTEGER}}$2");
