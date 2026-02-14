@@ -109,18 +109,15 @@ if (html.includes("magalu-freight-box")) {
   html = html.replace(/<div id="magalu-freight-box"[^>]*>[\s\S]*?<\/div>\s*<\/div>/, "");
 }
 
-// 9b. Garantir caixa "Calcular frete e prazo" no sidebar (abaixo de Ver opções de pagamento)
-// Se o magalu-novo não tiver (lazy-loaded), injetamos; se já tiver, não duplica
+// 9b. Caixa "Calcular frete e prazo" como row SEPARADA (caixa única, igual ao Print 2 / Magalu)
+// O magalu-novo tem uma row vazia (lazyload-container vazio) entre preço e botões - SUBSTITUÍMOS por nosso shipping.
+// NÃO injetar após chevron (ficaria dentro da row do preço = mesma caixa visual).
 const shippingBox = '<div class="flex flex flex-col mt-md mb-md bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><div class="pt-md pb-xsm px-md" data-testid="product-shipping"><div class="mb-xsm md:mb-sm"><div class="bg-surface-container-lower py-sm pl-sm pr-xsm flex items-center rounded-lg cursor-pointer" data-testid="shipping-btn-container"><i class="icon icon-location-filled mr-sm text-on-brand-default-inverted font-lg-regular flex-grow-0"></i><span class="text-on-surface-3 font-xsm-regular flex-grow"> <strong class="font-xsm-bold">Calcular frete e prazo</strong></span></div></div></div></div></div>';
-if (!html.includes('data-testid="product-shipping"')) {
-  html = html.replace(/(data-testid="chevron-icon"><\/i><\/div><\/div>)(<div class="transition delay-150[^"]*" data-testid="installments-sidebar")/, '$1' + shippingBox + '$2');
-} else {
-  // 9c. Se o original JÁ tem product-shipping, garantir que a row tenha mt-md mb-md (caixa separada do preço, como no Print 2 / Magalu)
-  html = html.replace(
-    /<div class="flex flex flex-col bg-surface-container-lowest md:rounded-lg" data-testid="row">\s*<div data-testid="lazyload-container">\s*<div class="pt-md pb-xsm px-md" data-testid="product-shipping"/,
-    '<div class="flex flex flex-col mt-md mb-md bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><div class="pt-md pb-xsm px-md" data-testid="product-shipping"'
-  );
-}
+// Substituir a row vazia (lazyload-container vazio) pela caixa de frete - assim fica em sua própria row, separada do preço
+html = html.replace(
+  /<div class="flex flex flex-col bg-surface-container-lowest md:rounded-lg" data-testid="row"><div data-testid="lazyload-container"><\/div><\/div>/,
+  shippingBox
+);
 
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
 html = html.replace('<div class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">', '<div id="magalu-thumbnails" class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">');
