@@ -70,9 +70,12 @@ html = html.replace(/"listPrice"\s*:\s*[0-9.]+/g, '"listPrice":{{PRODUCT_PRICE_M
 html = html.replace(/"paymentMethodId":"pix","totalAmount"\s*:\s*[0-9.]+/g, '"paymentMethodId":"pix","totalAmount":"{{PRODUCT_PRICE_META}}"');
 
 // 6. Preço HTML visível
+// Preço riscado (price-original) = {{PRODUCT_OLD_PRICE_MAGALU}} = product.price do admin (antes do generic R$)
+html = html.replace(/(data-testid="price-original">)R\$\s*[\d.,]+/g, '$1{{PRODUCT_OLD_PRICE_MAGALU}}');
 html = html.replace(/(data-testid="price-value-integer">)[\d.]+(<\/span>)/g, "$1{{PRODUCT_PRICE_INTEGER}}$2");
 html = html.replace(/data-testid="price-value-split-cents-decimal">,<\/span><span[^>]*data-testid="price-value-split-cents-fraction">\d+<\/span>/g, 'data-testid="price-value-split-cents-decimal">{{PRODUCT_PRICE_DECIMAL}}</span>');
 html = html.replace(/em <!-- -->\d+<!-- -->x de<!-- --> <!-- -->R\$\s*[\d.,]+<!-- -->/g, 'em <!-- -->{{PRODUCT_INSTALLMENT_COUNT}}<!-- -->x de<!-- --> <!-- -->{{PRODUCT_INSTALLMENT_PARCEL}}<!-- -->');
+// R$ genérico: só substituir onde NÃO for price-original (já tratado acima)
 html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => m.includes(",") ? "{{PRODUCT_PRICE}}" : m);
 
 // 7. Checkout - botões Comprar/Adicionar redirecionam para o link do admin
@@ -122,7 +125,7 @@ html = html.replace(
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
 html = html.replace('<div class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">', '<div id="magalu-thumbnails" class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">');
 if (!html.includes("magalu-galeria-mobile-css")) {
-  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">#magalu-faq-row{margin-top:16px!important;display:block!important}@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important;padding-bottom:24px!important;margin-bottom:24px!important}[data-testid=lazyload-container]:empty{min-height:0!important;height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}section[style*="aftercontent"] .my-lg{margin-top:8px!important;margin-bottom:0!important}}</style>\n</head>');
+  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">#magalu-faq-row{margin-top:16px!important;display:block!important}[data-testid="price-original"]:empty{display:none!important}@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important;padding-bottom:24px!important;margin-bottom:24px!important}[data-testid=lazyload-container]:empty{min-height:0!important;height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}section[style*="aftercontent"] .my-lg{margin-top:8px!important;margin-bottom:0!important}}</style>\n</head>');
 }
 
 // 11. Ficha técnica: substituir tabela original pelas especificações do admin ({{PRODUCT_SPECIFICATIONS}})

@@ -379,7 +379,10 @@ export async function GET(
           const magaluInstallmentCount = 8;
           const magaluParcelValue = Number(priceAvista) / magaluInstallmentCount;
           const magaluParcelStr = `R$ ${magaluParcelValue.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+          // Preço riscado = product.price (admin), nunca o valor com desconto
+          const magaluOldPrice = originalPrice ? `R$ ${Number(originalPrice).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}` : "";
           return [
+            ["{{PRODUCT_OLD_PRICE_MAGALU}}", magaluOldPrice],
             ["{{PRODUCT_PRICE_INTEGER}}", intPart],
             ["{{PRODUCT_PRICE_DECIMAL}}", "," + decPart],
             ["{{PRODUCT_INSTALLMENT_COUNT}}", String(magaluInstallmentCount)],
