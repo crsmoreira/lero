@@ -95,7 +95,9 @@ export async function GET(
                 ? "produto-template-kalonga.html"
                 : product.template === "mm"
                   ? "produto-template-mm.html"
-                  : "produto-template.html";
+                  : product.template === "magalu"
+                    ? "produto-template-magalu.html"
+                    : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
   const toAbsoluteUrl = (url: string) => {
@@ -279,7 +281,9 @@ export async function GET(
         ? `<tr class="text-zinc-medium text-sm ${i % 2 === 0 ? "bg-background-gray" : ""}"><td class="p-2 w-1/3">${escapeHtml(s.key)}</td><td class="p-2 w-2/3">${escapeHtml(s.value)}</td></tr>`
         : product.template === "mm"
           ? `<tr style="border-bottom:1px solid #eee"><td style="padding:8px 12px;font-weight:600">${escapeHtml(s.key)}</td><td style="padding:8px 12px">${escapeHtml(s.value)}</td></tr>`
-          : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
+          : product.template === "magalu"
+            ? `<tr class="text-on-surface-3 even:bg-surface-container-lower"><td class="px-md py-sm font-xsm-bold align-top table-cell w-1/2" data-testid="table-factsheet-key">${escapeHtml(s.key)}</td><td class="px-md py-sm font-xsm-regular list-item w-full align-top">${escapeHtml(s.value)}</td></tr>`
+            : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
   );
   const specsHtml =
     specsRows.length > 0
