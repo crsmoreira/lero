@@ -75,21 +75,38 @@ html = html.replace(/data-testid="price-value-split-cents-decimal">,<\/span><spa
 html = html.replace(/em <!-- -->\d+<!-- -->x de<!-- --> <!-- -->R\$\s*[\d.,]+<!-- -->/g, 'em <!-- -->{{PRODUCT_INSTALLMENT_COUNT}}<!-- -->x de<!-- --> <!-- -->{{PRODUCT_INSTALLMENT_PARCEL}}<!-- -->');
 html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => m.includes(",") ? "{{PRODUCT_PRICE}}" : m);
 
-// 7. Checkout - botões Comprar/Adicionar redirecionam
-if (!html.includes("CHECKOUT_URL")) {
-  html = html.replace("</body>", `<script>(function(){var c="{{CHECKOUT_URL}}";if(c&&c!=="#"&&c!=="{{CHECKOUT_URL}}"){document.addEventListener("click",function(e){var t=e.target.closest("a, button");if(t&&(t.textContent.includes("Comprar")||t.textContent.includes("Adicionar")||t.getAttribute("data-testid")?.includes("buy")||t.getAttribute("aria-label")?.includes("comprar"))){e.preventDefault();window.location.href=c;}},true);}})();</script></body>`);
+// 7. Checkout - botões Comprar/Adicionar redirecionam para o link do admin
+if (!html.includes("magalu-checkout-redirect")) {
+  html = html.replace("</body>", `<script id="magalu-checkout-redirect">(function(){
+var getUrl=function(){
+  var a=document.querySelector("[data-magalu-sticky-buy]");
+  if(a&&a.href&&a.href!=="#")return a.href;
+  return "";
+};
+document.addEventListener("click",function(e){
+  var t=e.target.closest("a, button");
+  if(!t)return;
+  var txt=(t.textContent||"").trim();
+  var isBuy=txt.indexOf("Comprar")>=0||txt.indexOf("Adicionar")>=0||
+    (t.getAttribute("data-testid")||"").indexOf("buy")>=0||
+    (t.getAttribute("aria-label")||"").toLowerCase().indexOf("comprar")>=0;
+  if(isBuy){
+    var c=getUrl()||"{{CHECKOUT_URL}}";
+    if(c&&c!=="#"&&c!=="{{CHECKOUT_URL}}"){
+      e.preventDefault();
+      window.location.href=c;
+    }
+  }
+},true);
+})();</script></body>`);
 }
 
 // 8. Desabilitar scripts React/Next da Magalu (evita "Oops! ALGUMA COISA DEU ERRADO")
 html = html.replace(/<script([^>]*)\ssrc="https:\/\/m\.magazineluiza\.com\.br\/mixer-web\/[^"]*"([^>]*)>/gi, '<script$1 src="data:text/javascript,void 0" data-magalu-disabled$2>');
 
-// 9. Caixa CEP "Calcular frete e prazo" - estrutura original React/Magalu (icon-place, classes Magalu), apenas visual
-const freightBox = '<div id="magalu-freight-box" class="mt-2xsm px-md" style="pointer-events:none;cursor:default"><a href="javascript:void(0)" class="flex items-center gap-2xsm text-interaction-default font-2xsm-medium mb-2xsm" style="text-decoration:none"><span>Ver opções de pagamento</span><i class="icon icon-chevron-right text-interaction-default font-xlg-regular flex justify-center"></i></a><div class="flex font-2xsm-regular gap-2xsm items-center w-full rounded-md px-md py-sm bg-surface-container-low" data-testid="magalu-shipping-cep" style="border:1px solid #e5e5e5"><i class="icon icon-place text-interaction-default font-xlg-regular flex shrink-0"></i><span class="block text-left font-2xsm-regular flex-1 text-on-surface-2">Calcular frete e prazo</span><i class="icon icon-chevron-down text-on-surface-3 font-xlg-regular self-center"></i></div></div>';
-if (!html.includes("magalu-freight-box")) {
-  html = html.replace(
-    /(data-testid="chevron-icon"><\/i><\/div><\/div>)(<div class="transition delay-150)/,
-    "$1" + freightBox + "$2"
-  );
+// 9. Remover nossa caixa CEP/Ver opções (duplicada) - o original já tem na página
+if (html.includes("magalu-freight-box")) {
+  html = html.replace(/<div id="magalu-freight-box"[^>]*>[\s\S]*?<\/div>\s*<\/div>/, "");
 }
 
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
@@ -98,9 +115,15 @@ if (!html.includes("magalu-galeria-mobile-css")) {
   html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}</style>\n</head>');
 }
 
-// 11. Remover Armazenamento Interno e Cor da ficha técnica
+// 11. Remover Armazenamento Interno e Cor (ficha técnica + seletor de atributos na parte superior)
 html = html.replace(/<tr class="text-on-surface-3 even:bg-surface-container-lower"><td[^>]*data-testid="table-factsheet-key"[^>]*>Armazenamento Interno<\/td><td[^>]*>[\s\S]*?<\/td><\/tr>/, "");
 html = html.replace(/<tr class="text-on-surface-3 even:bg-surface-container-lower"><td[^>]*data-testid="table-factsheet-key"[^>]*>Cor<\/td><td[^>]*>[\s\S]*?<\/td><\/tr>/, "");
+html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="attribute-label">Armazenamento interno[\s\S]*?<\/div><\/div><\/div>/, "");
+html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="attribute-label">Cor[\s\S]*?<\/div><\/div><\/div>/, "");
+
+// 11b. Descrição e avaliações: usar conteúdo do admin (placeholders para o route substituir)
+html = html.replace(/(O \{\{PRODUCT_TITLE\}\} oferece|A tela imersiva)[\s\S]*?seus acessórios\./, "{{PRODUCT_DESCRIPTION}}");
+html = html.replace(/<div[^>]*data-testid="review-stats-container"[\s\S]*?data-testid="review-listing-container">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>(?=\s*<div class="flex flex-col gap-xlg)/, '{{PRODUCT_REVIEWS}}');
 
 // 12. Benefit cards (Entrega Full, Magalu garante, Devolução): clicar abre bottom-sheet original
 const benefitScript = `<script>
@@ -147,18 +170,23 @@ if (!html.includes("magalu-sticky-bar")) {
   html = html.replace("</body>", stickyBar + "\n</body>");
 }
 
-// 11. Galeria - script para miniaturas funcionarem (React desabilitado)
+// 11. Galeria - miniaturas, dots, swipe no mobile
 if (!html.includes("magalu-main-image")) {
   html = html.replace(/<img([^>]*class="[^"]*max-h-\\[344px\\][^"]*")([^>]*data-testid="image")/, '<img id="magalu-main-image"$1$2');
 }
+html = html.replace(/touch-pan-y/g, "touch-pan-x");
 const galeriaScript = `<script>
 (function(){
   function init(){
     var content=document.querySelector("[data-testid=carousel-content]");
     var thumbs=document.querySelectorAll("[data-testid=thumbnail-item]");
     var indicators=document.querySelectorAll("[data-testid=carousel-indicator]");
-    if(!content||!thumbs.length)return;
+    var container=content&&content.closest("[id=carousel]")||content&&content.parentElement;
+    if(!content)return;
+    var count=content.querySelectorAll("[data-testid=carousel-item]").length||4;
+    var maxIdx=Math.max(0,count-1);
     function goTo(idx){
+      if(idx<0)idx=0;if(idx>maxIdx)idx=maxIdx;
       content.style.transition="transform 0.3s ease";
       content.style.transform="translateX(-"+(idx*25)+"%)";
       content.setAttribute("data-active-item",String(idx));
@@ -172,8 +200,21 @@ const galeriaScript = `<script>
         btn.classList.toggle("bg-surface-container-mid",i!==idx);
       });
     }
-    thumbs.forEach(function(el,i){el.addEventListener("click",function(){goTo(i);});});
+    if(thumbs.length)thumbs.forEach(function(el,i){el.addEventListener("click",function(){goTo(i);});});
     if(indicators.length)indicators.forEach(function(btn,i){btn.addEventListener("click",function(){goTo(i);});});
+    if(container){
+      var startX=0,startY=0;
+      container.addEventListener("touchstart",function(e){
+        startX=e.touches[0].clientX;startY=e.touches[0].clientY;
+      },{passive:true});
+      container.addEventListener("touchend",function(e){
+        var dx=e.changedTouches[0].clientX-startX;
+        var dy=e.changedTouches[0].clientY-startY;
+        if(Math.abs(dx)<40||Math.abs(dx)<Math.abs(dy))return;
+        var idx=parseInt(content.getAttribute("data-active-item")||"0",10);
+        if(dx<-40)goTo(idx+1);else if(dx>40)goTo(idx-1);
+      },{passive:true});
+    }
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();

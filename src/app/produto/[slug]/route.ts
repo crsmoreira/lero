@@ -3,7 +3,7 @@ import {
   resolveProductByDomainAndSlug,
   resolveProductBySlugOnly,
 } from "@/lib/domain";
-import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMercadoLivre } from "./reviewsHtml";
+import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMagalu, buildReviewsHtmlMercadoLivre } from "./reviewsHtml";
 import { loadTemplate } from "@/lib/loadTemplate";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -347,7 +347,9 @@ export async function GET(
         )
       : product.template === "mercadolivre"
         ? buildReviewsHtmlMercadoLivre(reviewInputs, escapeHtml)
-        : buildReviewsHtml(reviewInputs, escapeHtml);
+        : product.template === "magalu-novo"
+          ? buildReviewsHtmlMagalu(reviewInputs, escapeHtml)
+          : buildReviewsHtml(reviewInputs, escapeHtml);
 
   const isMobile = product.template === "mercadolivre" && isMobileRequest(req);
   const mlIsMobile = isMobile ? "true" : "false";
