@@ -112,7 +112,7 @@ if (html.includes("magalu-freight-box")) {
 // 10. Mobile: só dots na galeria (esconder miniaturas, dots menores)
 html = html.replace('<div class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">', '<div id="magalu-thumbnails" class="gap-xsm p-md md:gap-sm grid grid-flow-col overflow-hidden overflow-x-auto md:auto-cols-min">');
 if (!html.includes("magalu-galeria-mobile-css")) {
-  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}</style>\n</head>');
+  html = html.replace("</head>", '<style id="magalu-galeria-mobile-css">@media(max-width:743px){#magalu-thumbnails{display:none!important}[data-testid=carousel-indicator]{width:8px!important;height:8px!important;min-width:8px!important;min-height:8px!important}[data-testid=tab-product-detail-view-container]{max-height:none!important;overflow:visible!important}[data-testid=tab-product-detail]{overflow:visible!important}[data-testid=tab-product-detail]::after{display:none!important}[data-testid=product-detail-description]{-webkit-line-clamp:unset!important;line-clamp:unset!important;overflow:visible!important;display:block!important;max-height:none!important}</style>\n</head>');
 }
 
 // 11. Remover Armazenamento Interno e Cor (ficha técnica + seletor de atributos na parte superior)
@@ -122,7 +122,7 @@ html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="att
 html = html.replace(/<div data-testid="attribute-type"><div[^>]*data-testid="attribute-label">Cor[\s\S]*?<\/div><\/div><\/div>/, "");
 
 // 11b. Descrição e avaliações: usar conteúdo do admin (placeholders para o route substituir)
-html = html.replace(/(O \{\{PRODUCT_TITLE\}\} oferece|A tela imersiva)[\s\S]*?seus acessórios\./, "{{PRODUCT_DESCRIPTION}}");
+html = html.replace(/(<div[^>]*data-testid="product-detail-description"[^>]*>)[\s\S]*?(<\/div>)/, '$1{{PRODUCT_DESCRIPTION}}$2');
 html = html.replace(/<div[^>]*data-testid="review-stats-container"[\s\S]*?data-testid="review-listing-container">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>(?=\s*<div class="flex flex-col gap-xlg)/, '{{PRODUCT_REVIEWS}}');
 
 // 12. Benefit cards (Entrega Full, Magalu garante, Devolução): clicar abre bottom-sheet original
