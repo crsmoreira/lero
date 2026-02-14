@@ -106,7 +106,11 @@ if (!html.includes("{{PRODUCT_REVIEWS}}")) html = html.replace("</body>", '<div 
 // 9. Preço HTML
 html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => m.includes(",") ? "{{PRODUCT_PRICE}}" : m);
 
-// 10. CSS hide
+// 10. Desabilitar scripts React/Next da Magalu - evitam a tela "Oops! ALGUMA COISA DEU ERRADO"
+// Esses scripts fazem hidratação e sobrescrevem o HTML; ao rodar fora do domínio Magalu ou com dados modificados, mostram erro
+html = html.replace(/<script([^>]*)\ssrc="https:\/\/m\.magazineluiza\.com\.br\/mixer-web\/[^"]*"([^>]*)>/gi, '<script$1 src="data:text/javascript,void 0" data-magalu-disabled$2>');
+
+// 11. CSS hide
 const magaluHide = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}[data-testid="attribute-selector-container"],[data-testid="attribute-selector"]{display:none!important}</style>';
 if (!html.includes("magalu-hide")) html = html.replace("</head>", magaluHide + "\n</head>");
 
