@@ -1,5 +1,5 @@
 /**
- * Gera produto-template-magalu.html a partir de magalu.html.
+ * Gera produto-template-magalu.html a partir de magalu.html (baseado em maga2).
  * Placeholders: título, imagem, preço, descrição, avaliações, checkout (editáveis via admin).
  */
 const fs = require("fs");
@@ -67,84 +67,68 @@ html = html.replace(
   '<link rel="canonical" href="{{PRODUCT_URL}}">'
 );
 
-// 4. Imagens - URLs Magalu (mlcdn, magazineluiza)
-const imgPatterns = [
-  /https:\/\/a-static\.mlcdn\.com\.br\/[^"'\s]+/g,
-  /https:\/\/m\.magazineluiza\.com\.br\/a-static\/[^"'\s]+/g,
-  /https:\/\/i\.mlcdn\.com\.br\/[^"'\s]*240466500[^"'\s]*/g,
-];
-imgPatterns.forEach((re, i) => {
-  html = html.replace(re, (match) => {
-    if (match.includes("136cee204094a8b1f0fb8344884ef31b") || match.includes("240466500")) {
-      return "{{PRODUCT_IMAGE_1}}";
-    }
-    return match;
-  });
-});
+// 4. Imagens - substituir por placeholder (ordem: específico primeiro, depois genérico)
 html = html.replace(
-  /https:\/\/[^"'\s]*(?:mlcdn|magazineluiza)[^"'\s]*240466500[^"'\s]*/g,
+  /https:\/\/[^"'\s]*08a2e6fda9d98d5d07c04450e5cd8fb7[^"'\s]*/g,
   "{{PRODUCT_IMAGE_1}}"
 );
 html = html.replace(
-  /https:\/\/[^"'\s]*136cee204094a8b1f0fb8344884ef31b[^"'\s]*/g,
+  /https:\/\/[^"'\s]*42443264033b329a8028b99a73f2b0fa[^"'\s]*/g,
+  "{{PRODUCT_IMAGE_2}}"
+);
+html = html.replace(
+  /https:\/\/[^"'\s]*9ad98c65e448753e49d60013bf53fe9d[^"'\s]*/g,
+  "{{PRODUCT_IMAGE_3}}"
+);
+html = html.replace(
+  /https:\/\/[^"'\s]*f7122fbb4f9db57e0af1e443f6ad4114[^"'\s]*/g,
+  "{{PRODUCT_IMAGE_4}}"
+);
+html = html.replace(
+  /https:\/\/[^"'\s]*(?:mlcdn|magazineluiza)[^"'\s]*240612300[^"'\s]*/g,
   "{{PRODUCT_IMAGE_1}}"
 );
 
-// 5. Descrição do produto - um único bloco (evitar duplicação)
-const descricaoParagrafo1 = "Mergulhe em seus conteúdos na ampla tela de 6.7 polegadas, que oferece uma visualização imersiva para vídeos e jogos. Feito para o dia a dia, o Galaxy A07 ainda conta com certificação IP54, oferecendo resistência contra poeira e respingos d'água para sua tranquilidade. É a combinação ideal de estilo, potência e autonomia.";
-const descricaoParagrafo2 = "Viva com mais liberdade e menos preocupação com a tomada. Com uma poderosa bateria de 5000mAh, o Galaxy A07 tem energia de sobra para um dia inteiro de uso intenso, seja para maratonar séries, jogar ou navegar nas redes sociais. E quando precisar recarregar, o Carregamento Rápido de 25W garante que você volte à ação em pouco tempo.";
-const descricaoParagrafo3 = "Desempenho ágil para todas as suas tarefas. O processador Octa-Core, combinado com a tecnologia RAM Plus que otimiza a memória RAM, garante uma experiência fluida ao alternar entre aplicativos. E com 128GB de armazenamento interno, você terá espaço de sobra para guardar todas as suas fotos, vídeos e apps favoritos sem se preocupar.";
-const descricaoParagrafo4 = "Capture o mundo com detalhes impressionantes. A câmera traseira dupla, com um sensor principal de 50MP, permite tirar fotos nítidas e ricas em cores. Seja um retrato, uma paisagem ou um momento especial, seus registros terão qualidade surpreendente. A câmera frontal de 8MP garante selfies perfeitas para compartilhar.";
-[descricaoParagrafo1, descricaoParagrafo2, descricaoParagrafo3, descricaoParagrafo4].forEach((p) => {
-  html = html.split(p).join("{{PRODUCT_DESCRIPTION}}");
-});
-// Colapsar múltiplos {{PRODUCT_DESCRIPTION}} consecutivos em um só (evitar duplicação)
-html = html.replace(/({{PRODUCT_DESCRIPTION}}\s*)+/g, "{{PRODUCT_DESCRIPTION}}");
-// Descrição completa no __NEXT_DATA__ (JSON com \n)
-const descricaoCompletaJson = "O Samsung Galaxy A07 é a escolha perfeita para quem busca performance, uma bateria incrível e câmeras de alta qualidade. Desenhado para o seu dia a dia, ele combina um design moderno com todos os recursos que você precisa para se conectar, criar e se divertir.\\nViva com mais liberdade e menos preocupação com a tomada. Com uma poderosa bateria de 5000mAh, o Galaxy A07 tem energia de sobra para um dia inteiro de uso intenso, seja para maratonar séries, jogar ou navegar nas redes sociais. E quando precisar recarregar, o Carregamento Rápido de 25W garante que você volte à ação em pouco tempo.\\nCapture o mundo com detalhes impressionantes. A câmera traseira dupla, com um sensor principal de 50MP, permite tirar fotos nítidas e ricas em cores. Seja um retrato, uma paisagem ou um momento especial, seus registros terão qualidade surpreendente. A câmera frontal de 8MP garante selfies perfeitas para compartilhar.\\nDesempenho ágil para todas as suas tarefas. O processador Octa-Core, combinado com a tecnologia RAM Plus que otimiza a memória RAM, garante uma experiência fluida ao alternar entre aplicativos. E com 128GB de armazenamento interno, você terá espaço de sobra para guardar todas as suas fotos, vídeos e apps favoritos sem se preocupar.\\nMergulhe em seus conteúdos na ampla tela de 6.7 polegadas, que oferece uma visualização imersiva para vídeos e jogos. Feito para o dia a dia, o Galaxy A07 ainda conta com certificação IP54, oferecendo resistência contra poeira e respingos d'água para sua tranquilidade. É a combinação ideal de estilo, potência e autonomia.";
+// 5. Descrição do produto - maga2 tem um parágrafo visível
+const descricaoMag2 = "É equipado com sistema operacional Android 15, oferecendo os recursos mais recentes de segurança e usabilidade. Mantenha-se sempre conectado com Wi-Fi e Bluetooth para todos os seus acessórios.";
+html = html.split(descricaoMag2).join("{{PRODUCT_DESCRIPTION}}");
+// Descrição completa no __NEXT_DATA__ (JSON)
+const descricaoCompletaJson = 'O Tablet Samsung Galaxy Tab A11 oferece a combinação entre design e potência. Projetado para quem busca versatilidade, é ideal para estudos, trabalho e entretenimento, combinando especificações robustas em um corpo compacto e elegante.\\nA tela imersiva de 8,7" oferece uma experiência visual vibrante, perfeita para streaming, leitura ou videochamadas, mantendo a portabilidade para uso em qualquer lugar.\\nÉ impulsionado pelo processador Helio G99, que, aliado aos 4GB de Memória RAM, garante uma performance fluida e ágil, mesmo em multitarefa. Com 64GB de armazenamento interno, você tem espaço de sobra para seus aplicativos essenciais, fotos e documentos.\\nÉ equipado com sistema operacional Android 15, oferecendo os recursos mais recentes de segurança e usabilidade. Mantenha-se sempre conectado com Wi-Fi e Bluetooth para todos os seus acessórios.';
 html = html.split(descricaoCompletaJson).join("{{PRODUCT_DESCRIPTION}}");
-// Intro da descrição (pode aparecer separado)
-html = html.replace(/O Samsung Galaxy A07 é a escolha perfeita para quem busca performance[^"]*Desenhado para o seu dia a dia[^"]*se divertir\./g, "{{PRODUCT_DESCRIPTION}}");
-// Galaxy A07 em breadcrumb, title, name
-html = html.replace(/Celulares e Smartphones > Galaxy A07/g, "{{PRODUCT_BRAND}} > {{PRODUCT_TITLE}}");
-html = html.replace(/"name":"Galaxy A07"/g, '"name":"{{PRODUCT_TITLE}}"');
-html = html.replace(/title="Galaxy A07"/g, 'title="{{PRODUCT_TITLE}}"');
+// Colapsar múltiplos {{PRODUCT_DESCRIPTION}}
+html = html.replace(/({{PRODUCT_DESCRIPTION}}\s*)+/g, "{{PRODUCT_DESCRIPTION}}");
 
-// 6. Ficha Técnica - substituir tbody da tabela por placeholder e remover hidden (mostrar em mobile)
-const factsheetTableMatch = html.match(/<table[^>]*data-testid="table-factsheet"[^>]*>[\s\S]*?<tbody>([\s\S]*?)<\/tbody>\s*<\/table>/);
-if (factsheetTableMatch) {
+// 6. Título e breadcrumb - Tablet Samsung Galaxy Tab A11
+const tituloTabA11 = 'Tablet Samsung Galaxy Tab A11 4GB RAM 64GB 8,7" Android 15 Helio G99 Wi-Fi';
+const tituloTabA11Quot = tituloTabA11.replace(/"/g, '&quot;');
+const tituloTabA11Esc = tituloTabA11.replace(/"/g, '\\"');
+html = html.split(tituloTabA11).join("{{PRODUCT_TITLE}}");
+html = html.split(tituloTabA11Quot).join("{{PRODUCT_TITLE}}");
+html = html.split(tituloTabA11Esc).join("{{PRODUCT_TITLE}}");
+html = html.replace(/> Tablets</g, "> {{PRODUCT_BRAND}}<");
+html = html.replace(/title="Tablets"/g, 'title="{{PRODUCT_BRAND}}"');
+html = html.replace(/"name":"Tablet Samsung Galaxy Tab A11[^"]*"/g, '"name":"{{PRODUCT_TITLE}}"');
+// Imagem alt/title
+html = html.replace(/alt="Tablet Samsung Galaxy Tab A11[^"]*"/g, 'alt="{{PRODUCT_TITLE}}"');
+html = html.replace(/title="Tablet Samsung Galaxy Tab A11[^"]*"/g, 'title="{{PRODUCT_TITLE}}"');
+
+// 7. Ficha Técnica - substituir tbody da tabela por placeholder e remover hidden
+if (html.includes('data-testid="table-factsheet"')) {
   html = html.replace(
     /<table[^>]*data-testid="table-factsheet"[^>]*>[\s\S]*?<tbody>[\s\S]*?<\/tbody>\s*<\/table>/,
     '<table class="w-full list-none" data-testid="table-factsheet"><tbody>{{PRODUCT_SPECIFICATIONS}}</tbody></table>'
   );
 }
-// Mostrar ficha técnica em mobile (remover "hidden" do wrapper)
 html = html.replace(
   /<div([^>]*data-testid="tab-product-factsheet"[^>]*)>/,
   (m) => m.replace(/\bhidden\s+/g, '').replace(/\s+hidden\b/g, '')
 );
 
-// 7. Título do produto - todas as variações (HTML, JSON com \", &quot;)
-// Ordem: "Imagem de" primeiro, depois o título genérico
-html = html.replace(/Imagem de Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7&quot; Câm\. Dupla \+ Selfie 8MP/g, "Imagem de {{PRODUCT_TITLE}}");
-html = html.replace(/Imagem de Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7\\" Câm\. Dupla \+ Selfie 8MP/g, "Imagem de {{PRODUCT_TITLE}}");
-html = html.replace(/Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7" Câm\. Dupla \+ Selfie 8MP/g, "{{PRODUCT_TITLE}}");
-html = html.replace(/Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7&quot; Câm\. Dupla \+ Selfie 8MP/g, "{{PRODUCT_TITLE}}");
-html = html.replace(/Smartphone Samsung A07 128GB Preto 4GB RAM Tela 6,7\\" Câm\. Dupla \+ Selfie 8MP/g, "{{PRODUCT_TITLE}}");
-html = html.replace(/> Galaxy A07</g, "> {{PRODUCT_TITLE}}<");
-html = html.replace(/Smartphone Samsung A07 128GB(?![^<]*Preto)/g, "{{PRODUCT_TITLE}}");
-html = html.replace(/>Smartphone Samsung</g, ">{{PRODUCT_TITLE}}");
-html = html.replace(/"Smartphone Samsung"/g, '"{{PRODUCT_TITLE}}"');
-html = html.replace(/"Smartphone Samsung A07 128GB"/g, '"{{PRODUCT_TITLE}}"');
-html = html.replace(/"Smartphone A07 128GB"/g, '"{{PRODUCT_TITLE}}"');
-html = html.replace(/"Smartphone A07"/g, '"{{PRODUCT_TITLE}}"');
-
 // 8. Preço em Schema/JSON-LD e __NEXT_DATA__ (incluindo Pix/bestPrice)
-html = html.replace(/"price"\s*:\s*"[0-9.]+"/g, '"price" : "{{PRODUCT_PRICE_META}}"');
+html = html.replace(/"price"\s*:\s*[0-9.]+/g, '"price":{{PRODUCT_PRICE_META}}');
 html = html.replace(/"lowPrice"\s*:\s*[0-9.]+/g, '"lowPrice":{{PRODUCT_PRICE_META}}');
 html = html.replace(/"highPrice"\s*:\s*[0-9.]+/g, '"highPrice":{{PRODUCT_PRICE_META}}');
 html = html.replace(/"listPrice"\s*:\s*[0-9.]+/g, '"listPrice":{{PRODUCT_PRICE_META}}');
-// Preço no Pix (bestPrice.totalAmount) - usado pelo Magalu para exibir "R$ X no Pix"
 html = html.replace(/"paymentMethodId":"pix","totalAmount"\s*:\s*[0-9.]+/g, '"paymentMethodId":"pix","totalAmount":"{{PRODUCT_PRICE_META}}"');
 
 // 9. Botões Comprar / Adicionar - injetar script que redireciona para checkout
@@ -168,7 +152,7 @@ if (!html.includes("CHECKOUT_URL")) {
   html = html.replace("</body>", checkoutScript + "</body>");
 }
 
-// 10. Área de avaliações - substituir conteúdo Magalu pelo do admin
+// 10. Área de avaliações - substituir conteúdo pelo do admin
 const reviewsMarker = "{{PRODUCT_REVIEWS}}";
 const gridOpen = '<div class="flex grid grid-cols-1 gap-lg md:grid-cols-[3fr_7fr] md:items-start" data-testid="row">';
 const idxAv = html.indexOf("Avaliações dos clientes");
@@ -197,24 +181,17 @@ if (!html.includes("{{PRODUCT_REVIEWS}}")) {
   html = html.replace("</body>", '<div id="magalu-reviews-placeholder">{{PRODUCT_REVIEWS}}</div>\n</body>');
 }
 
-// 11. Preço no HTML - padrões comuns R$ X.XXX,XX
+// 11. Preço no HTML - R$ X.XXX,XX
 html = html.replace(/\bR\$\s*[\d.,]+\b/g, (m) => {
   if (m.includes(",")) return "{{PRODUCT_PRICE}}";
   return m;
 });
 
-// 12. Esconder cookie/consent e seções indesejadas
+// 12. Esconder cookie/consent e variantes
 const magaluHideCss = `<style id="magalu-hide">
 [id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}
 [data-testid="attribute-selector-container"],[data-testid="attribute-selector"]{display:none!important}
-</style>
-<script>
-(function(){
-  var h=['Explore e aproveite','Principais características','Feito pra durar','Feito para durar'];
-  function hide(){ document.querySelectorAll('[data-testid="row"]').forEach(function(r){ var t=r.textContent||''; if(h.some(function(x){return t.indexOf(x)>=0})) r.style.display='none'; }); }
-  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',hide):hide();
-})();
-</script>`;
+</style>`;
 if (!html.includes("magalu-hide")) {
   html = html.replace("</head>", magaluHideCss + "\n</head>");
 }
