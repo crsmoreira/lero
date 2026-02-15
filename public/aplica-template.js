@@ -24,7 +24,16 @@
           afterTitle.parentNode.insertBefore(container, afterTitle.nextSibling);
         }
         var titleLabel = sizes.title || 'Tamanhos';
-        var html = '<div class="iokarsten-custom-apps-0-x-containerSizes"><div class="iokarsten-custom-apps-0-x-variationContainerSize iokarsten-custom-apps-0-x-sizesContainerSize">' +
+        var pillCss = '<style id="product-sizes-pill-style">' +
+          '#product-sizes-mount .iokarsten-custom-apps-0-x-listSize{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:8px 0 0;}' +
+          '#product-sizes-mount .iokarsten-custom-apps-0-x-listItemSize{list-style:none;margin:0;}' +
+          '#product-sizes-mount .iokarsten-custom-apps-0-x-listItemLinkSize{display:inline-block;padding:10px 20px;border-radius:120px;border:1px solid #e3e4e6;background:#fff;color:#878787;text-decoration:none;font-size:14px;font-family:Alexandria,sans-serif;transition:border-color .15s,color .15s;}' +
+          '#product-sizes-mount .iokarsten-custom-apps-0-x-listItemLinkSize:hover{border-color:#c2c3c5;color:#4f4f4f;}' +
+          '#product-sizes-mount .iokarsten-custom-apps-0-x-listItemLinkSize--active{border-color:#4f4f4f;color:#3f3f40;font-weight:500;}' +
+          '#product-sizes-mount .iokarsten-custom-apps-0-x-titleSize{margin:0 0 4px;font-size:16px;font-weight:400;color:#878787;font-family:Alexandria,sans-serif;}' +
+          '#product-sizes-mount .iokarsten-custom-apps-0-x-containerSizes{margin-top:12px;}' +
+          '</style>';
+        var html = pillCss + '<div class="iokarsten-custom-apps-0-x-containerSizes"><div class="iokarsten-custom-apps-0-x-variationContainerSize iokarsten-custom-apps-0-x-sizesContainerSize">' +
           '<h4 class="iokarsten-custom-apps-0-x-titleSize">' + escapeHtml(titleLabel) + '</h4>' +
           '<ul class="iokarsten-custom-apps-0-x-listSize">';
         sizes.items.forEach(function (item) {
