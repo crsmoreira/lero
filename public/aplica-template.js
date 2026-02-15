@@ -25,6 +25,7 @@
         }
         var titleLabel = sizes.title || 'Tamanhos';
         var pillCss = '<style id="product-sizes-pill-style">' +
+          '#product-sizes-mount{flex-basis:100%;width:100%;min-width:0;order:99;}' +
           '#product-sizes-mount .iokarsten-custom-apps-0-x-listSize{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:8px 0 0;}' +
           '#product-sizes-mount .iokarsten-custom-apps-0-x-listItemSize{list-style:none;margin:0;}' +
           '#product-sizes-mount .iokarsten-custom-apps-0-x-listItemLinkSize{display:inline-block;padding:10px 20px;border-radius:120px;border:1px solid #e3e4e6;background:#fff;color:#878787;text-decoration:none;font-size:14px;font-family:Alexandria,sans-serif;transition:border-color .15s,color .15s;}' +
