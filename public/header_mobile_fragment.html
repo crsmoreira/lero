@@ -13,7 +13,9 @@
 @media (max-width:1025px){.vtex-sticky-layout-0-x-wrapper--container__header-desktop{display:none!important}}
 /* Remover seção Produtos relacionados e skeleton */
 .vtex-flex-layout-0-x-flexRow--container__releated-pdp{display:none!important}
-.vtex-flex-layout-0-x-flexRow--container__releated-pdp [class*="skeleton"],.vtex-flex-layout-0-x-flexRow--container__releated-pdp [class*="Skeleton"]{display:none!important}
+[class*="skeleton"],[class*="Skeleton"]{display:none!important}
+/* Remover bloco skeleton 760px (slide gradient) */
+div:has(> div > .vtex-render-runtime-8-x-slide){display:none!important}
 </style>
 <div id="injected-mobile-header" class="header-mobile-injected">
 <!-- Barra de aviso FRETE GRÁTIS em cima do novo header (fininha igual ao print) -->
