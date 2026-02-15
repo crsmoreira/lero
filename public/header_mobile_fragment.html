@@ -16,6 +16,8 @@
 [class*="skeleton"],[class*="Skeleton"]{display:none!important}
 /* Remover bloco skeleton 760px (slide gradient) */
 div:has(> div > .vtex-render-runtime-8-x-slide){display:none!important}
+/* Remover espaçamento vazio entre conteúdo e rodapé */
+.vtex-store-footer-2-x-footerLayoutSpacer{display:none!important}
 </style>
 <div id="injected-mobile-header" class="header-mobile-injected">
 <!-- Barra de aviso FRETE GRÁTIS em cima do novo header (fininha igual ao print) -->
@@ -119,4 +121,16 @@ div:has(> div > .vtex-render-runtime-8-x-slide){display:none!important}
  if (overlay) overlay.addEventListener('click', closeMenu);
  if (close) close.addEventListener('click', closeMenu);
 })();
+function noActionHeaderFooter(){
+ var h = document.getElementById('injected-mobile-header');
+ if (h) h.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); }, true);
+ var footer = document.querySelector('[data-hydration-id="store.product/$after_footer"]') || document.querySelector('.vtex-store-footer-2-x-footerLayout');
+ if (footer) {
+   footer.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); }, true);
+   var f = footer.querySelector('form');
+   if (f) f.addEventListener('submit', function(e){ e.preventDefault(); }, true);
+ }
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', noActionHeaderFooter);
+else noActionHeaderFooter();
 </script>
