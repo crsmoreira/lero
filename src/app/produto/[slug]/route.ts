@@ -485,7 +485,7 @@ export async function GET(
           ["{{IS_MOBILE}}", mlIsMobile],
           ["{{DEVICE_TYPE}}", mlDeviceType],
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
-          ["{{VPP_CSS_HREF}}", `${baseUrl.replace(/\/$/, "")}/ml-pdp/css/vpp-np.desktop.7087e1ba.css`],
+          ["{{VPP_CSS_HREF}}", `${baseUrl.replace(/\/$/, "")}/ml-pdp/css/${isMobile ? "vpp-np.mobile.2f6bb321.css" : "vpp-np.desktop.7087e1ba.css"}`],
           ["{{VPP_RENDER_SCRIPT}}", isMobile
             ? "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-render-index.mobile.4c101a87.js"
             : "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-render-index.b5adb461.js"],
