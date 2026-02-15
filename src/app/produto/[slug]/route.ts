@@ -486,6 +486,9 @@ export async function GET(
           ["{{DEVICE_TYPE}}", mlDeviceType],
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
           ["{{VPP_CSS_HREF}}", "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-np.desktop.64f99b77.css"],
+          ["{{VPP_RENDER_SCRIPT}}", isMobile
+            ? "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-render-index.mobile.4c101a87.js"
+            : "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-render-index.b5adb461.js"],
         ] as [string | RegExp, string][])
       : []),
     [
