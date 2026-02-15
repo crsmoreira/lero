@@ -144,9 +144,9 @@ if (compreJuntoStart >= 0 && compreJuntoScript > compreJuntoStart) {
   }
 }
 
-// 11b. Banner Volta às Aulas: clicar não faz nada
+// 11b. Banner Volta às Aulas: clicar não faz nada (URL absoluta ou relativa)
 html = html.replace(
-  /href="https:\/\/www\.kalunga\.com\.br\/hotsite\/volta-as-aulas"/,
+  /href="(https:\/\/www\.kalunga\.com\.br\/hotsite\/volta-as-aulas|\/hotsite\/volta-as-aulas)"/,
   'href="javascript:void(0)" onclick="event.preventDefault();return false"'
 );
 
