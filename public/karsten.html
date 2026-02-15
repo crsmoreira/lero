@@ -77,9 +77,9 @@
   }
   // Aplica fallback de CSS logo no carregamento para evitar tela branca se o bundle falhar
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() { setTimeout(handleCSSFallback, 800); });
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(handleCSSFallback, 400); });
   } else {
-    setTimeout(handleCSSFallback, 800);
+    setTimeout(handleCSSFallback, 400);
   }
 </script>
 
@@ -90,93 +90,7 @@
 <script >!function(e,t,n,a,c,f,o){f=e.vtexaf=e.vtexaf||function(){(f.q=f.q||[]).push(arguments)},f.l=+new Date,o=t.createElement(n),o.async=!0,o.src=a,c=t.getElementsByTagName(n)[0],c.parentNode.insertBefore(o,c)}(window,document,"script","https://activity-flow.vtex.com/af/af.js")</script>
 
 <!--pixel:end:vtex.request-capture-->
-<!--pixel:start:vtexventures.livestreaming-free-->
-<script >
-  ;(async () => {
-    const SCRIPT_ID = 'nz-runtime-script'
-    const SRC_ATTR = 'data-src'
-    const LS_KEY = 'nizza:runtime-script:url'
-
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-    const err = (msg) => new Error(`[ls-pixel] ${msg}`)
-    const log = (level = 'log', ...args) =>
-      (console[level] || console.log).apply(console, ['[ls-pixel]', ...args])
-
-    const waitForRuntime = async (timeout = 60000, interval = 50) => {
-      const end = Date.now() + timeout
-      while (Date.now() < end) {
-        const rt = window.__RUNTIME__
-        if (
-          rt &&
-          rt.account &&
-          rt.workspace &&
-          typeof rt.production === 'boolean'
-        ) {
-          return rt
-        }
-        await sleep(interval)
-      }
-      throw err('Timeout waiting for __RUNTIME__')
-    }
-
-    const getLocalUrl = () => {
-      try {
-        return localStorage.getItem(LS_KEY)
-      } catch {
-        return null
-      }
-    }
-
-    const buildUrl = (rt) => {
-      const override = getLocalUrl()
-      if (override) return override
-      const { account, workspace, production: isProd } = rt
-      const map = {
-        'livestreamingdemo.qadev': 'dev',
-        'livestreamingdemo.qaprod': 'staging',
-      }
-      const env =
-        map[`${account}.${workspace}`] || (isProd ? 'prod' : 'main-dev')
-      return `https://cdn.nizza.com/runtime-script/${env}/nz-rs-index.js`
-    }
-
-    const isLoaded = (src) => {
-      const el = document.getElementById(SCRIPT_ID)
-      return !!el && (el.getAttribute(SRC_ATTR) || '') === src
-    }
-
-    const loadInline = async (src, ms = 15000) => {
-      const hasAbort = typeof AbortController !== 'undefined'
-      const ctrl = hasAbort ? new AbortController() : null
-      const timer = hasAbort ? setTimeout(() => ctrl.abort(), ms) : null
-      const opts = hasAbort
-        ? { signal: ctrl.signal, mode: 'cors', credentials: 'omit' }
-        : { mode: 'cors', credentials: 'omit' }
-      const res = await fetch(src, opts)
-      if (timer) clearTimeout(timer)
-      if (!res.ok) throw err(`Failed to fetch: ${res.status}`)
-      const code = await res.text()
-      const existing = document.getElementById(SCRIPT_ID)
-      if (existing) existing.remove()
-      const s = document.createElement('script')
-      s.id = SCRIPT_ID
-      s.setAttribute(SRC_ATTR, src)
-      s.textContent = code
-      document.head.appendChild(s)
-    }
-
-    try {
-      const rt = await waitForRuntime()
-      const url = buildUrl(rt)
-      if (isLoaded(url)) return log('Script already loaded:', url)
-      await loadInline(url)
-      log('Script loaded:', url)
-    } catch (err) {
-      log('error', err)
-    }
-  })()
-</script>
-
+<!--pixel:start:vtexventures.livestreaming-free (desativado em página estática para evitar tela branca)-->
 <!--pixel:end:vtexventures.livestreaming-free-->
 <!--pixel:start:vtex.facebook-fbe-->
 <script src="https://capi-automation.s3.us-east-2.amazonaws.com/public/client_js/capiParamBuilder/clientParamBuilder.bundle.js"></script>
