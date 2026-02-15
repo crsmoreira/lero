@@ -310,10 +310,15 @@ export function buildReviewsHtmlMagalu(
       .slice(0, 6)
       .map(
         (url) =>
-          `<a aria-disabled="false" class="btn btn-sm btn-invisible justify-center border-none p-[0px]" data-testid="display-card" href="${escapeHtml(url)}" target="_blank" rel="noopener" aria-label="card de review com mídia"><div class="flex items-center justify-center overflow-hidden w-[90px] h-[90px] bg-on-surface-6 relative rounded-md p-[0px]" data-testid="media-card"><img alt="Foto da avaliação" class="h-full w-full object-cover" data-testid="image" decoding="auto" loading="lazy" src="${escapeHtml(url)}" width="90" height="90"/></div></a>`
+          `<a href="javascript:void(0)" role="button" aria-label="Ver foto em tela cheia" class="btn btn-sm btn-invisible justify-center border-none p-[0px]" data-testid="display-card" data-review-img="${escapeHtml(url)}"><div class="flex items-center justify-center overflow-hidden w-[90px] h-[90px] bg-on-surface-6 relative rounded-md p-[0px]" data-testid="media-card"><img alt="Foto da avaliação" class="h-full w-full object-cover cursor-pointer" data-testid="image" decoding="auto" loading="lazy" src="${escapeHtml(url)}" width="90" height="90"/></div></a>`
       )
       .join("")}</div>`;
   };
+
+  const hasAnyReviewImages = reviews.some((r) => (r.images?.length ?? 0) > 0);
+  const reviewImageLightboxHtml = hasAnyReviewImages
+    ? `<div id="review-image-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.9);align-items:center;justify-content:center;cursor:pointer" aria-hidden="true"><img id="review-image-overlay-img" src="" alt="Foto da avaliação em tela cheia" style="max-width:100%;max-height:100%;object-fit:contain;pointer-events:none"/></div><script>(function(){var o=document.getElementById('review-image-overlay'),i=document.getElementById('review-image-overlay-img');function close(){o.style.display='none';document.body.style.overflow='';}function open(el){var u=el.getAttribute('data-review-img');if(u){i.src=u;o.style.display='flex';document.body.style.overflow='hidden';}}document.querySelectorAll('[data-review-img]').forEach(function(el){el.addEventListener('click',function(e){e.preventDefault();open(el);});});o.addEventListener('click',close);document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});})();</script>`
+    : "";
 
   const reviewCardHtml = (r: ReviewInput) => {
     const pills = extractMagaluPills(r);
@@ -343,7 +348,7 @@ export function buildReviewsHtmlMagalu(
 
   const listingContainerHtml = `<div class="flex grid grid-cols-1" data-testid="row"><div data-testid="inview-container"><div class="gap-md flex flex-col order-3 md:order-2" data-testid="review-listing-container">${reviewsListingHtml}</div></div></div>`;
 
-  return statsContainerHtml + listingContainerHtml;
+  return statsContainerHtml + listingContainerHtml + reviewImageLightboxHtml;
 }
 
 /** Gera HTML de avaliações no estilo Mercado Livre (classes ui-review-*) */
