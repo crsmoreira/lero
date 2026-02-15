@@ -304,6 +304,17 @@ export function buildReviewsHtmlMagalu(
       .join("");
   };
 
+  const reviewImagesBlockHtml = (imgs: string[]) => {
+    if (!imgs.length) return "";
+    return `<div class="mt-sm gap-sm flex flex-row flex-wrap">${imgs
+      .slice(0, 6)
+      .map(
+        (url) =>
+          `<a aria-disabled="false" class="btn btn-sm btn-invisible justify-center border-none p-[0px]" data-testid="display-card" href="${escapeHtml(url)}" target="_blank" rel="noopener" aria-label="card de review com mídia"><div class="flex items-center justify-center overflow-hidden w-[90px] h-[90px] bg-on-surface-6 relative rounded-md p-[0px]" data-testid="media-card"><img alt="Foto da avaliação" class="h-full w-full object-cover" data-testid="image" decoding="auto" loading="lazy" src="${escapeHtml(url)}" width="90" height="90"/></div></a>`
+      )
+      .join("")}</div>`;
+  };
+
   const reviewCardHtml = (r: ReviewInput) => {
     const pills = extractMagaluPills(r);
     const pillsBlock =
@@ -316,7 +327,8 @@ export function buildReviewsHtmlMagalu(
             .join("")}</div>`
         : "";
     const comment = (r.comment ?? "").trim() || (r.title ?? "").trim() || " ";
-    return `<div data-testid="review-listing-opinion"><div class="pb-xsm flex w-full items-center"><i class="icon icon-account-circle text-interaction-default font-lg-regular" data-testid="avatar"></i><p class="p-xsm text-on-surface-2 font-xsm-regular truncate">${escapeHtml(r.userName)}</p><div class="mt-sm"><div class="mb-md flex items-center"><ol class="no-hover relative rating rating-md" data-testid="rating-list">${ratingListHtml(r.rating)}</ol></div></div></div>${pillsBlock}<div class="pb-xsm text-on-surface-2 font-xsm-regular break-words" data-testid="review-description">${escapeHtml(comment)}<!-- --> </div><div class="text-on-surface-3 font-2xsm-regular" data-testid="review-date">${formatRelativeDate(new Date(r.createdAt))}</div></div>`;
+    const imagesBlock = reviewImagesBlockHtml(r.images ?? []);
+    return `<div data-testid="review-listing-opinion"><div class="pb-xsm flex w-full items-center"><i class="icon icon-account-circle text-interaction-default font-lg-regular" data-testid="avatar"></i><p class="p-xsm text-on-surface-2 font-xsm-regular truncate">${escapeHtml(r.userName)}</p><div class="mt-sm"><div class="mb-md flex items-center"><ol class="no-hover relative rating rating-md" data-testid="rating-list">${ratingListHtml(r.rating)}</ol></div></div></div>${pillsBlock}<div class="pb-xsm text-on-surface-2 font-xsm-regular break-words" data-testid="review-description">${escapeHtml(comment)}<!-- --> </div><div class="text-on-surface-3 font-2xsm-regular" data-testid="review-date">${formatRelativeDate(new Date(r.createdAt))}</div>${imagesBlock}</div>`;
   };
 
   const statsContainerHtml = `<div class="bg-interaction-darker-inverted md:top-2xhg md:gap-lg flex md:sticky md:flex-col md:overflow-y-auto" data-testid="review-stats-container"><div class="gap-xsm flex w-full flex-col"><div class="gap-3xsm flex"><span class="h-2xlg text-on-surface-2 font-3xlg-bold" data-testid="review-totalizers-rating">${total > 0 ? avgRounded : "-"}</span><i class="icon icon-star text-warning-lighter font-3xlg-regular"></i></div><p class="mr-sm text-on-surface-3 font-xsm-regular" data-testid="review-totalizers-count"><b>${total}</b> <!-- -->avaliações</p><p class="text-on-surface-3 font-xsm-regular" data-testid="review-comment-count"><b>${commentCount}</b> <!-- -->comentários</p></div><ul class="gap-2xsm flex flex-col" data-testid="rating-line-container">${ratingLinesHtml}</ul></div>`;
