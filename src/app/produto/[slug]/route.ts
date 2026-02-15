@@ -25,8 +25,9 @@ function formatPriceDrogasil(value: number): string {
 function isMobileRequest(req: NextRequest): boolean {
   const cookie = req.cookies.get("device_force_view")?.value;
   if (cookie === "mobile") return true;
+  if (cookie === "desktop") return false;
   const ua = req.headers.get("user-agent") ?? "";
-  return /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  return /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini|Silk|UCBrowser|SamsungBrowser|MiuiBrowser|FxiOS|CriOS|EdgiOS|Tablet/i.test(ua);
 }
 
 function escapeHtml(text: string): string {
@@ -484,6 +485,7 @@ export async function GET(
           ["{{IS_MOBILE}}", mlIsMobile],
           ["{{DEVICE_TYPE}}", mlDeviceType],
           ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
+          ["{{VPP_CSS_HREF}}", "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-np.desktop.64f99b77.css"],
         ] as [string | RegExp, string][])
       : []),
     [

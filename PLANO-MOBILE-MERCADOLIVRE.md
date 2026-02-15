@@ -77,9 +77,10 @@ function isMobileRequest(req: NextRequest): boolean {
 
 1. [x] Adicionar placeholders no template:
    - `{{IS_MOBILE}}`, `{{DEVICE_TYPE}}`, `{{DEVICE_PLATFORM}}`
-2. [ ] Implementar `isMobileRequest()` em `route.ts`.
-3. [ ] Adicionar substituições desses placeholders para template `mercadolivre`.
-4. [ ] Testar em viewport móvel e em device mobile real.
+2. [x] Implementar `isMobileRequest()` em `route.ts`.
+3. [x] Adicionar substituições desses placeholders para template `mercadolivre`.
+4. [x] Template: `{{VPP_CSS_HREF}}`, `data-device="{{DEVICE_TYPE}}"` no `<body>`, CSS fallback para `body[data-device="mobile"]`.
+5. [ ] Testar em viewport móvel e em device mobile real.
 
 ### Fase 2 — CSS (opcional)
 
