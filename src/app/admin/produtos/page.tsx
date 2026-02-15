@@ -40,12 +40,12 @@ export default async function AdminProductsPage() {
     drogasil: "Drogasil",
     decolar: "Decolar",
     carrefour: "Carrefour",
-    mercadolivre: "Mercado Livre",
     vakinha: "Vaquinha",
     havan: "Havan",
     kalonga: "Kalonga",
     mm: "Madeira Madeira",
     "magalu-novo": "Magalu Novo",
+    amazon: "Amazon",
   };
 
   return (

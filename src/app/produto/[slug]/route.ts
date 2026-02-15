@@ -3,7 +3,7 @@ import {
   resolveProductByDomainAndSlug,
   resolveProductBySlugOnly,
 } from "@/lib/domain";
-import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMagalu, buildReviewsHtmlMercadoLivre } from "./reviewsHtml";
+import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMagalu } from "./reviewsHtml";
 import { loadTemplate } from "@/lib/loadTemplate";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -20,14 +20,6 @@ function formatPriceDecolar(value: number): string {
 
 function formatPriceDrogasil(value: number): string {
   return `R$\u00A0${formatPrice(value)}`;
-}
-
-function isMobileRequest(req: NextRequest): boolean {
-  const cookie = req.cookies.get("device_force_view")?.value;
-  if (cookie === "mobile") return true;
-  if (cookie === "desktop") return false;
-  const ua = req.headers.get("user-agent") ?? "";
-  return /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini|Silk|UCBrowser|SamsungBrowser|MiuiBrowser|FxiOS|CriOS|EdgiOS|Tablet/i.test(ua);
 }
 
 function escapeHtml(text: string): string {
@@ -88,9 +80,7 @@ export async function GET(
         ? "produto-template-decolar.html"
         : product.template === "carrefour"
           ? "produto-template-carrefour.html"
-          : product.template === "mercadolivre"
-            ? "produto-template-mercadolivre.html"
-            : product.template === "havan"
+          : product.template === "havan"
               ? "produto-template-havan.html"
               : product.template === "kalonga"
                 ? "produto-template-kalonga.html"
@@ -98,7 +88,9 @@ export async function GET(
                   ? "produto-template-mm.html"
                   : product.template === "magalu-novo"
                     ? "produto-template-magalu-novo.html"
-                    : "produto-template.html";
+                    : product.template === "amazon"
+                      ? "produto-template-amazon.html"
+                      : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
   const toAbsoluteUrl = (url: string) => {
@@ -283,7 +275,9 @@ export async function GET(
           ? `<tr style="border-bottom:1px solid #eee"><td style="padding:8px 12px;font-weight:600">${escapeHtml(s.key)}</td><td style="padding:8px 12px">${escapeHtml(s.value)}</td></tr>`
           : product.template === "magalu-novo"
             ? `<tr class="text-on-surface-3 even:bg-surface-container-lower"><td class="px-md py-sm font-xsm-bold align-top table-cell w-1/2" data-testid="table-factsheet-key">${escapeHtml(s.key)}</td><td class="px-md py-sm font-xsm-regular list-item w-full align-top">${escapeHtml(s.value)}</td></tr>`
-            : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
+            : product.template === "amazon"
+              ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
+              : `<tr class="text-gray-700 [&:nth-child(odd)]:bg-gray-100"><th class="w-1/3 p-2.5 text-start"><strong>${escapeHtml(s.key)}</strong></th><td class="p-2.5">${escapeHtml(s.value)}</td></tr>`
   );
   const specsHtml =
     specsRows.length > 0
@@ -348,16 +342,9 @@ export async function GET(
           mainImage,
           escapeHtml
         )
-      : product.template === "mercadolivre"
-        ? buildReviewsHtmlMercadoLivre(reviewInputs, escapeHtml)
-        : product.template === "magalu-novo"
+      : product.template === "magalu-novo"
           ? buildReviewsHtmlMagalu(reviewInputs, escapeHtml)
           : buildReviewsHtml(reviewInputs, escapeHtml);
-
-  const isMobile = product.template === "mercadolivre" && isMobileRequest(req);
-  const mlIsMobile = isMobile ? "true" : "false";
-  const mlDeviceType = isMobile ? "mobile" : "desktop";
-  const mlDevicePlatform = isMobile ? "/web/mobile" : "/web/desktop";
 
   const replacements: [string | RegExp, string][] = [
     ["{{PRODUCT_IMAGE_1}}", mainImage],
@@ -372,6 +359,12 @@ export async function GET(
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
     ["{{PRODUCT_TITLE}}", (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_BRAND}}", brandName],
+    ["{{AMAZON_BRAND_BYLINE}}", product.template === "amazon" && brandName ? `<div class="amz-byline"><a href="javascript:void(0)">Marca: ${escapeHtml(brandName)}</a></div>` : ""],
+    ["{{AMAZON_OLD_PRICE_BLOCK}}", product.template === "amazon" && originalPrice && discountPercent ? `<span class="amz-old-price">R$ ${formatPrice(Number(originalPrice))}</span><span class="amz-savings">${discountPercent}</span><br/>` : ""],
+    ["{{AMAZON_PRICE_WHOLE}}", product.template === "amazon" ? (() => { const [whole] = Number(priceAvista).toFixed(2).split("."); return Number(whole).toLocaleString("pt-BR", { maximumFractionDigits: 0 }); })() : ""],
+    ["{{AMAZON_PRICE_FRACTION}}", product.template === "amazon" ? (() => { const [, frac] = Number(priceAvista).toFixed(2).split("."); return frac || "00"; })() : ""],
+    ["{{AMAZON_SAVINGS_BLOCK}}", product.template === "amazon" && discountPercent ? `<span class="amz-savings">${discountPercent}</span>` : ""],
+    ["{{AMAZON_SPECS_SECTION}}", product.template === "amazon" && specsRows.length > 0 ? `<div class="amz-section"><h2>Especificações do produto</h2><div class="amz-specs"><table><tbody>${specsRows.join("")}</tbody></table></div></div>` : ""],
     ["{{PRODUCT_PRICE}}", product.template === "drogasil" ? formatPriceDrogasil(Number(priceAvista)) : product.template === "decolar" ? formatPriceDecolar(Number(priceAvista)) : product.template === "havan" ? `R$ ${formatPrice(Number(priceAvista))}` : product.template === "magalu-novo" ? `R$ ${Number(priceAvista).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}` : `R$ ${formatPrice(Number(priceAvista))}`],
     ...(product.template === "magalu-novo"
       ? (() => {
@@ -480,17 +473,6 @@ export async function GET(
     ["{{PACKAGE_INCLUSIONS}}", packageInclusions],
     ["{{LOYALTY_POINTS}}", loyaltyPoints],
     ["{{PRICE_TOTAL_LABEL}}", priceTotalLabel],
-    ...(product.template === "mercadolivre"
-      ? ([
-          ["{{IS_MOBILE}}", mlIsMobile],
-          ["{{DEVICE_TYPE}}", mlDeviceType],
-          ["{{DEVICE_PLATFORM}}", mlDevicePlatform],
-          ["{{VPP_CSS_HREF}}", `${baseUrl.replace(/\/$/, "")}/ml-pdp/css/${isMobile ? "vpp-np.mobile.2f6bb321.css" : "vpp-np.desktop.7087e1ba.css"}`],
-          ["{{VPP_RENDER_SCRIPT}}", isMobile
-            ? "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-render-index.mobile.4c101a87.js"
-            : "https://http2.mlstatic.com/frontend-assets/vpp-frontend/vpp-render-index.b5adb461.js"],
-        ] as [string | RegExp, string][])
-      : []),
     [
       "{{CARREFOUR_CUSTOM_STYLES}}",
       product.template === "carrefour"

@@ -35,7 +35,7 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
-  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "mercadolivre", "vakinha", "havan", "kalonga", "mm", "magalu-novo"]).optional(),
+  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "vakinha", "havan", "kalonga", "mm", "magalu-novo", "amazon"]).optional(),
   tags: z.string().optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
@@ -90,7 +90,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
           gtin: product.gtin ?? "",
           stock: product.stock,
           status: product.status as "draft" | "active",
-          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "mercadolivre" ? "mercadolivre" : (product as { template?: string }).template === "vakinha" ? "vakinha" : (product as { template?: string }).template === "kalonga" ? "kalonga" : (product as { template?: string }).template === "havan" ? "havan" : (product as { template?: string }).template === "mm" ? "mm" : (product as { template?: string }).template === "magalu-novo" ? "magalu-novo" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "mercadolivre" | "vakinha" | "kalonga" | "havan" | "mm" | "magalu-novo",
+          template: ((product as { template?: string }).template === "drogasil" ? "drogasil" : (product as { template?: string }).template === "decolar" ? "decolar" : (product as { template?: string }).template === "carrefour" ? "carrefour" : (product as { template?: string }).template === "vakinha" ? "vakinha" : (product as { template?: string }).template === "kalonga" ? "kalonga" : (product as { template?: string }).template === "havan" ? "havan" : (product as { template?: string }).template === "mm" ? "mm" : (product as { template?: string }).template === "magalu-novo" ? "magalu-novo" : (product as { template?: string }).template === "amazon" ? "amazon" : "leroy") as "leroy" | "drogasil" | "decolar" | "carrefour" | "vakinha" | "kalonga" | "havan" | "mm" | "magalu-novo" | "amazon",
           tags: product.tags.join(", "),
           metaTitle: product.metaTitle ?? "",
           metaDescription: product.metaDescription ?? "",
@@ -465,12 +465,12 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       <SelectItem value="drogasil">Drogasil</SelectItem>
                       <SelectItem value="decolar">Decolar (Pacotes)</SelectItem>
                       <SelectItem value="carrefour">Carrefour</SelectItem>
-                      <SelectItem value="mercadolivre">Mercado Livre</SelectItem>
                       <SelectItem value="vakinha">Vakinha (Vaquinha)</SelectItem>
                       <SelectItem value="havan">Havan</SelectItem>
                       <SelectItem value="kalonga">Kalunga</SelectItem>
                       <SelectItem value="mm">Madeira Madeira</SelectItem>
                       <SelectItem value="magalu-novo">Magalu Novo</SelectItem>
+                      <SelectItem value="amazon">Amazon</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
