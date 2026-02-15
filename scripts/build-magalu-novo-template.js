@@ -16,7 +16,7 @@ if (!fs.existsSync(src)) {
 
 let html = fs.readFileSync(src, "utf8");
 
-// 1. Anti-React (evita erro ao rodar fora do domínio Magalu)
+// 1. Anti-React (evita erro ao rodar fora do domínio Magalu) - otimizado: 100ms em vez de 20ms, 2s em vez de 8s
 const antiReactScript = `
 <script>
 (function(){
@@ -27,8 +27,8 @@ const antiReactScript = `
       if(r){window.ReactDOM.render=function(v,n,c){if(c)c();};}
       clearInterval(i);
     }
-  },20);
-  setTimeout(function(){clearInterval(i);},8e3);
+  },100);
+  setTimeout(function(){clearInterval(i);},2e3);
 })();
 </script>
 `;
@@ -179,6 +179,10 @@ const benefitScript = `<script>
 })();
 </script>`;
 html = html.replace("</body>", faqAccordionScript + "\n" + benefitScript + "\n</body>");
+
+// 13b. Performance: evita carregar Datadoghq RUM (analytics Magalu) e cookie-consent - reduz requests
+html = html.replace(/https:\/\/www\.datadoghq-browser-agent\.com\/us5\/v6\/datadog-rum\.js/g, 'data:text/javascript,window.DD_RUM=window.DD_RUM||{onReady:function(f){if(f)f()},init:function(){}}');
+html = html.replace(/<link[^>]*href="https:\/\/cdn-prod\.securiti\.ai\/consent\/cookie-consent\.css"[^>]*>/gi, '');
 
 // 14. CSS mínimo - só esconder cookie/consent (não altera layout)
 const magaluHide = '<style id="magalu-hide">[id*="securiti"],[id*="onetrust"],[class*="cookie-consent"],[class*="cookie-banner"]{display:none!important}</style>';
