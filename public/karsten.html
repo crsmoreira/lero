@@ -223,6 +223,8 @@
 div:has(> div > .vtex-render-runtime-8-x-slide){display:none!important}
 /* Remover espaçamento vazio entre conteúdo e rodapé */
 .vtex-store-footer-2-x-footerLayoutSpacer{display:none!important}
+.vtex-product-context-provider>.flex.flex-column.min-vh-100{min-height:0!important}
+.vtex-product-context-provider>.flex.flex-column.min-vh-100>.flex-grow-1,.vtex-product-context-provider .flex-grow-1{flex-grow:0!important}
 </style>
 <div id="injected-mobile-header" class="header-mobile-injected">
 <div class="vtex-flex-layout-0-x-flexRow vtex-flex-layout-0-x-flexRow--countdown-top-bar" style="overflow:hidden;background-color:#dedbd4;padding:6px 16px">
@@ -334,6 +336,8 @@ function noActionHeaderFooter(){
    var f = footer.querySelector('form');
    if (f) f.addEventListener('submit', function(e){ e.preventDefault(); }, true);
  }
+ var breadcrumb = document.querySelector('.vtex-breadcrumb-1-x-container') || document.querySelector('[class*="breadcrumb"]');
+ if (breadcrumb) breadcrumb.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); }, true);
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', noActionHeaderFooter);
 else noActionHeaderFooter();
