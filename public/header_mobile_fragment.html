@@ -1,0 +1,103 @@
+<style>
+.header-mobile-injected{display:none}
+@media (max-width:1025px){.header-mobile-injected{display:block!important}}
+@media (min-width:1026px){.header-mobile-injected{display:none!important}}
+/* Drawer overlay e painel */
+.iokarsten-avanti-menu-0-x-mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+.iokarsten-avanti-menu-0-x-mobile-overlay[aria-hidden="false"]{opacity:1;visibility:visible}
+.iokarsten-avanti-menu-0-x-mobile-container{position:fixed;top:0;left:0;bottom:0;width:min(320px,85vw);background:#fff;z-index:9999;transform:translateX(-100%);transition:transform .25s;overflow:auto;box-shadow:2px 0 8px rgba(0,0,0,.15)}
+.iokarsten-avanti-menu-0-x-mobile-container--open{transform:translateX(0)}
+/* Produtos patrocinados: ocultar no autocomplete/search */
+[class*="sponsored"],[class*="Sponsor"],[id*="sponsored"],.vtex-search-2-x-sponsored{display:none!important}
+</style>
+<div id="injected-mobile-header" class="header-mobile-injected">
+<div class="vtex-sticky-layout-0-x-wrapper vtex-sticky-layout-0-x-wrapper--container__header-mobile" style="position:relative;height:120px">
+<div class="vtex-sticky-layout-0-x-container vtex-sticky-layout-0-x-container--container__header-mobile z-999 relative left-0 right-0" style="top:0;background:#fff">
+<div class="vtex-flex-layout-0-x-flexRow vtex-flex-layout-0-x-flexRow--container__content-header-row" aria-label="Linha de sessão">
+<div class="flex mt0 mb0 pt0 pb0 justify-start vtex-flex-layout-0-x-flexRowContent vtex-flex-layout-0-x-flexRowContent--container__content-header-row items-stretch w-100">
+<div class="pr0 items-stretch vtex-flex-layout-0-x-stretchChildrenWidth flex" style="width:100%">
+<div class="vtex-flex-layout-0-x-flexCol vtex-flex-layout-0-x-flexCol--container__content-header-col ml0 mr0 pl0 pr0 flex flex-column h-100 w-100">
+<div class="vtex-flex-layout-0-x-flexColChild vtex-flex-layout-0-x-flexColChild--container__content-header-col pb0" style="height:auto">
+<div class="vtex-flex-layout-0-x-flexRow vtex-flex-layout-0-x-flexRow--main-header-mobile" aria-label="Linha de sessão">
+<div class="flex mt0 mb0 pt0 pb0 justify-start vtex-flex-layout-0-x-flexRowContent vtex-flex-layout-0-x-flexRowContent--main-header-mobile items-stretch w-100">
+<div class="pr0 items-stretch flex" style="width:auto">
+<div class="vtex-flex-layout-0-x-flexCol vtex-flex-layout-0-x-flexCol--container__menu-and-logo-col ml0 mr0 pl0 pr0 flex flex-column h-100 w-100">
+<div class="vtex-flex-layout-0-x-flexColChild vtex-flex-layout-0-x-flexColChild--container__menu-and-logo-col pb0" style="height:auto">
+<div class="iokarsten-avanti-menu-0-x-theme3">
+<button type="button" class="iokarsten-avanti-menu-0-x-mobile-hamburguer" aria-label="Menu" id="mobile-hamburger-btn">
+<img width="32" height="24" alt="Icone do Menu" class="iokarsten-avanti-menu-0-x-mobile-hamburguerImage" src="https://iokarsten.vtexassets.com/assets/vtex.file-manager-graphql/images/37c4f2b1-f513-44f1-b3bd-a9c3ce526e58___61fee636843863219d3e18c676199385.svg" crossorigin="anonymous">
+</button>
+<div class="iokarsten-avanti-menu-0-x-mobile-overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
+<div class="iokarsten-avanti-menu-0-x-mobile-container" id="mobile-menu-drawer">
+<div class="iokarsten-avanti-menu-0-x-mobile-content">
+<div class="iokarsten-avanti-menu-0-x-mobile-headerContainer">
+<div class="iokarsten-avanti-menu-0-x-mobile-titleContainer">
+<div class="iokarsten-avanti-menu-0-x-mobile-titleContent"><span class="iokarsten-avanti-menu-0-x-mobile-title">Menu</span></div>
+<div class="iokarsten-avanti-menu-0-x-mobile-buttonsContainer">
+<button type="button" class="iokarsten-avanti-menu-0-x-mobile-closeButton" aria-label="Fechar" id="mobile-menu-close"><img height="12" width="12" alt="Close" src="https://iokarsten.vtexassets.com/assets/vtex.file-manager-graphql/images/47d63bb0-9411-43f7-88f8-80757950a4b4___ad17045caf6caaedf04e4be0d3bf772f.svg"></button>
+</div></div></div>
+<div class="iokarsten-avanti-menu-0-x-mobile-menuContainer">
+<div class="iokarsten-avanti-menu-0-x-mobile-menuItemsWrapper">
+<ul class="iokarsten-avanti-menu-0-x-mobile-menuItems">
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/cama" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Cama</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/banho" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Banho</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/mesa" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Mesa</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/travesseiros" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Travesseiros</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/infantil" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Infantil</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/casa-e-decoracao" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Casa e Decoração</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/fragrancias" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Fragrâncias</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/mais-vendidos" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Mais Vendidos</span></a></li>
+<li class="iokarsten-avanti-menu-0-x-mobile-menuItem"><a href="/promocoes" class="iokarsten-avanti-menu-0-x-mobile-menuItemLink"><span class="iokarsten-avanti-menu-0-x-mobile-menuItemLinkText">Promoções</span></a></li>
+</ul></div></div></div></div></div></div>
+<div class="vtex-flex-layout-0-x-flexColChild vtex-flex-layout-0-x-flexColChild--container__menu-and-logo-col pb0" style="height:auto">
+<a href="/" class="vtex-store-components-3-x-logoLink">
+<span class="store-logo vtex-store-components-3-x-logoContainer vtex-store-components-3-x-sizeDesktop pv4 ph6">
+<img width="123" height="24" alt="Logo Karsten" class="vtex-store-components-3-x-logoImage" src="https://iokarsten.vtexassets.com/assets/vtex.file-manager-graphql/images/8a9c3424-5ae8-4a2c-a388-cf734efa1110___dde76c5ecb05dbbddb471d7d1a028fc5.svg" crossorigin="anonymous">
+</span></a>
+</div></div></div>
+<div class="pr0 items-stretch flex" style="width:auto">
+<div class="vtex-flex-layout-0-x-flexCol vtex-flex-layout-0-x-flexCol--container__menu-and-logo-col ml0 mr0 pl0 pr0 flex flex-column h-100 w-100">
+<div class="vtex-flex-layout-0-x-flexColChild vtex-flex-layout-0-x-flexColChild--container__menu-and-logo-col pb0" style="height:auto">
+<a href="/account#/wishlist" title="Favoritos" class="iokarsten-custom-apps-0-x-imageElementLink iokarsten-custom-apps-0-x-imageElementLink--container-icon-wishlist vtex-store-components-3-x-imageElementLink">
+<img height="24" width="24" alt="Favoritos" class="iokarsten-custom-apps-0-x-imageElement iokarsten-custom-apps-0-x-imageElement--container-icon-wishlist vtex-store-components-3-x-imageElement" src="https://iokarsten.vtexassets.com/assets/vtex.file-manager-graphql/images/b932684e-818c-44a1-99a4-a52c02f344a3___5e6af085246413eb43dd888a856c9760.svg">
+</a></div>
+<div class="vtex-flex-layout-0-x-flexColChild vtex-flex-layout-0-x-flexColChild--container__menu-and-logo-col pb0" style="height:auto">
+<aside class="vtex-minicart-2-x-minicartWrapperContainer relative fr flex items-center">
+<div class="vtex-minicart-2-x-minicartContainer flex flex-column">
+<div role="presentation" aria-hidden="true" class="pa4 pointer vtex-minicart-2-x-openIconContainer">
+<button tabindex="0" class="vtex-button bw1 ba fw5 v-mid relative pa0 lh-solid br2 min-h-regular t-action icon-button dib bg-transparent b--transparent c-action-primary pointer" type="button" style="font-size:0">
+<div class="vtex-button__label flex items-center justify-center h-100 ph4"><span class="vtex-minicart-2-x-minicartIconContainer gray relative"><svg fill="none" width="16" height="16" viewBox="0 0 16 16" class="vtex-minicart-2-x-cartIcon" xmlns="http://www.w3.org/2000/svg"><use href="#hpa-cart" xlink:href="#hpa-cart"></use></svg></span></div></button></div></div></aside>
+</div></div></div></div></div></div>
+<div class="vtex-flex-layout-0-x-flexColChild vtex-flex-layout-0-x-flexColChild--container__content-header-col pb0" style="height:auto">
+<div class="vtex-flex-layout-0-x-flexRow vtex-flex-layout-0-x-flexRow--container__search-mobile" aria-label="Linha de sessão">
+<div class="flex-none flex-ns mt0 mb0 pt0 pb0 justify-start vtex-flex-layout-0-x-flexRowContent vtex-flex-layout-0-x-flexRowContent--container__search-mobile items-stretch w-100">
+<div class="pr0-ns pb0 pb0-ns items-stretch vtex-flex-layout-0-x-stretchChildrenWidth flex" style="width:100%">
+<div class="w-100 mw7 pv4 vtex-store-components-3-x-searchBarContainer">
+<div class="relative-m w-100 vtex-store-components-3-x-searchBarInnerContainer" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="injected-search-label">
+<label for="injected-search-input" id="injected-search-label" class="vtex-store-components-3-x-visuallyHidden">O que você procura?</label>
+<div class="vtex-store-components-3-x-autoCompleteOuterContainer">
+<div class="w-100 flex">
+<label class="vtex-input w-100">
+<div class="vtex-input-prefix__group flex flex-row items-stretch overflow-hidden br2 bw1 b--solid b--muted-4 hover-b--muted-3 h-large">
+<input class="vtex-styleguide-9-x-input ma0 border-box vtex-styleguide-9-x-hideDecorators vtex-styleguide-9-x-noAppearance br2 br-0 br--left w-100 bn outline-0 bg-base c-on-base b--muted-4 hover-b--muted-3 t-body pl5" autocomplete="off" placeholder="O que você procura?" type="text" id="injected-search-input" value="">
+<span class="c-muted-2 fw5 flex items-center t-body bg-base vtex-input__suffix br2 bl-0 br--right pr5 pl4">
+<div class="vtex-store-components-3-x-suffixWrapper flex h-100">
+<button type="button" class="vtex-store-components-3-x-searchBarIcon vtex-store-components-3-x-searchBarIcon--search flex items-center pointer bn bg-transparent outline-0 pv0 pl0 pr3" aria-label="Buscar produtos"><svg fill="none" width="16" height="16" viewBox="0 0 16 16" class="vtex-store-components-3-x-searchIcon" xmlns="http://www.w3.org/2000/svg"><use href="#hpa-search" xlink:href="#hpa-search"></use></svg></button>
+</div></span></div></label></div></div></div></div></div></div></div></div>
+</div></div></div></div></div></div></div>
+
+<script>
+(function(){
+ var w = document.getElementById('injected-mobile-header');
+ if (!w) return;
+ var btn = document.getElementById('mobile-hamburger-btn');
+ var overlay = document.getElementById('mobile-menu-overlay');
+ var drawer = document.getElementById('mobile-menu-drawer');
+ var close = document.getElementById('mobile-menu-close');
+ function openMenu(){ if (overlay) overlay.setAttribute('aria-hidden','false'); if (drawer) drawer.classList.add('iokarsten-avanti-menu-0-x-mobile-container--open'); document.body.style.overflow = 'hidden'; }
+ function closeMenu(){ if (overlay) overlay.setAttribute('aria-hidden','true'); if (drawer) drawer.classList.remove('iokarsten-avanti-menu-0-x-mobile-container--open'); document.body.style.overflow = ''; }
+ if (btn) btn.addEventListener('click', openMenu);
+ if (overlay) overlay.addEventListener('click', closeMenu);
+ if (close) close.addEventListener('click', closeMenu);
+})();
+</script>
