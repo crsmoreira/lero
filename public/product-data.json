@@ -1,0 +1,25 @@
+{
+  "title": "Jogo de Cama Queen 100% Algodão 200 Fios Ariel",
+  "images": [
+    "https://karsten.vtexassets.com/arquivos/ids/229027/3125434_01.jpg?v=639062606653870000"
+  ],
+  "price": {
+    "installments": "7x R$ 55,99",
+    "installmentsLabel": "sem juros",
+    "listPrice": "R$ 559,98",
+    "spotPrice": "391,99",
+    "currency": "BRL"
+  },
+  "shortDescription": "Com linda estampa floral, garante o toque macio do puro algodão e sua propriedade hipoalergênica. Compra já!",
+  "longDescription": "<p>Sinta o conforto do puro algodão com o Toque Soft 200 Karsten. Feito em percal 200 fios com algodão de fio penteado, esse tecido combina suavidade com um toque encorpado e agradável. Naturalmente fresco e respirável, proporciona conforto em todas as estações.</p><p>O algodão também se destaca pela durabilidade e resistência, mantendo o caimento e a aparência bonita por mais tempo. Hipoalergênico, é uma escolha segura e confortável para toda a família, garantindo noites de descanso mais tranquilas.</p>",
+  "checkoutLink": "https://www.karsten.com.br/checkout",
+  "sizes": {
+    "title": "Tamanhos",
+    "items": [
+      { "name": "Solteiro", "link": "https://www.karsten.com.br/jogo-de-cama-solteiro-100-algodao-200-fios-ariel/p", "active": false },
+      { "name": "Casal", "link": "https://www.karsten.com.br/jogo-de-cama-casal-100-algodao-200-fios-ariel/p", "active": false },
+      { "name": "Queen", "link": "https://www.karsten.com.br/jogo-de-cama-queen-100-algodao-200-fios-ariel-3125434/p", "active": true },
+      { "name": "King", "link": "https://www.karsten.com.br/jogo-de-cama-king-100-algodao-200-fios-ariel/p", "active": false }
+    ]
+  }
+}

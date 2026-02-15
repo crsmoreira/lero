@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin – Template Karsten (dados do produto)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 24px; max-width: 900px; margin-left: auto; margin-right: auto; }
+    h1 { margin-top: 0; color: #005870; }
+    h2 { margin-top: 28px; margin-bottom: 12px; font-size: 1.1rem; color: #333; }
+    label { display: block; margin-bottom: 4px; font-weight: 500; color: #444; }
+    input[type="text"], input[type="url"], input[type="number"], textarea { width: 100%; padding: 10px 12px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    textarea { min-height: 80px; resize: vertical; }
+    textarea.long { min-height: 160px; }
+    .row { display: flex; gap: 12px; align-items: flex-start; }
+    .row > * { flex: 1; }
+    button { padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; }
+    .btn-primary { background: #005870; color: #fff; }
+    .btn-primary:hover { background: #004558; }
+    .btn-secondary { background: #e0e0e0; color: #333; margin-left: 8px; }
+    .btn-secondary:hover { background: #d0d0d0; }
+    .sizes-list { list-style: none; padding: 0; margin: 0; }
+    .sizes-list li { padding: 12px; margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
+    .sizes-list .row { margin-bottom: 8px; }
+    .sizes-list label { margin-bottom: 2px; }
+    .sizes-list input { margin-bottom: 8px; }
+    .sizes-list .active-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .sizes-list .active-wrap input { width: auto; margin: 0; }
+    .add-size { margin-top: 12px; }
+    .remove-size { background: #c00; color: #fff; padding: 6px 12px; font-size: 12px; border-radius: 4px; }
+    .remove-size:hover { background: #a00; }
+    .msg { padding: 12px; border-radius: 6px; margin-bottom: 16px; }
+    .msg.success { background: #d4edda; color: #155724; }
+    .msg.error { background: #f8d7da; color: #721c24; }
+    .images-list input { margin-bottom: 8px; }
+    .images-list .add-img { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Admin – Dados do template Karsten</h1>
+  <p>Edite os campos abaixo e use <strong>Salvar e baixar JSON</strong> para gerar o <code>product-data.json</code>. Substitua o arquivo <code>public/product-data.json</code> no projeto para atualizar a página do produto.</p>
+
+  <div id="msg" class="msg" style="display: none;"></div>
+
+  <form id="form">
+    <h2>Produto</h2>
+    <label>Título do produto</label>
+    <input type="text" id="title" name="title" required>
+
+    <h2>Imagens (URLs)</h2>
+    <div class="images-list" id="imagesContainer"></div>
+    <button type="button" class="btn-secondary add-img" id="addImage">+ Adicionar imagem</button>
+
+    <h2>Preço</h2>
+    <div class="row">
+      <div>
+        <label>Parcelas (ex: 7x R$ 55,99)</label>
+        <input type="text" id="installments" name="installments">
+      </div>
+      <div>
+        <label>Rótulo parcelas (ex: sem juros)</label>
+        <input type="text" id="installmentsLabel" name="installmentsLabel">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Preço de (list price)</label>
+        <input type="text" id="listPrice" name="listPrice">
+      </div>
+      <div>
+        <label>Preço à vista (spot)</label>
+        <input type="text" id="spotPrice" name="spotPrice">
+      </div>
+    </div>
+
+    <h2>Descrição</h2>
+    <label>Descrição curta (resumo / meta)</label>
+    <textarea id="shortDescription" name="shortDescription"></textarea>
+    <label>Descrição longa (HTML)</label>
+    <textarea id="longDescription" name="longDescription" class="long"></textarea>
+
+    <h2>Checkout</h2>
+    <label>Link do botão Adicionar / Checkout</label>
+    <input type="url" id="checkoutLink" name="checkoutLink">
+
+    <h2>Tamanhos (variantes)</h2>
+    <label>Título do bloco (ex: Tamanhos)</label>
+    <input type="text" id="sizesTitle" name="sizesTitle" value="Tamanhos">
+    <ul class="sizes-list" id="sizesList"></ul>
+    <button type="button" class="btn-secondary add-size" id="addSize">+ Adicionar tamanho</button>
+
+    <p style="margin-top: 24px;">
+      <button type="submit" class="btn-primary">Salvar e baixar JSON</button>
+      <button type="button" class="btn-secondary" id="loadJson">Carregar product-data.json</button>
+    </p>
+  </form>
+
+  <script>
+    (function () {
+      var CONFIG_URL = 'product-data.json';
+
+      function showMsg(text, isError) {
+        var el = document.getElementById('msg');
+        el.textContent = text;
+        el.className = 'msg ' + (isError ? 'error' : 'success');
+        el.style.display = 'block';
+        setTimeout(function () { el.style.display = 'none'; }, 5000);
+      }
+
+      function getData() {
+        return {
+          title: document.getElementById('title').value.trim(),
+          images: getImages(),
+          price: {
+            installments: document.getElementById('installments').value.trim(),
+            installmentsLabel: document.getElementById('installmentsLabel').value.trim(),
+            listPrice: document.getElementById('listPrice').value.trim(),
+            spotPrice: document.getElementById('spotPrice').value.trim(),
+            currency: 'BRL'
+          },
+          shortDescription: document.getElementById('shortDescription').value.trim(),
+          longDescription: document.getElementById('longDescription').value.trim(),
+          checkoutLink: document.getElementById('checkoutLink').value.trim(),
+          sizes: {
+            title: document.getElementById('sizesTitle').value.trim() || 'Tamanhos',
+            items: getSizes()
+          }
+        };
+      }
+
+      function getImages() {
+        var inputs = document.querySelectorAll('#imagesContainer input[type="url"]');
+        var arr = [];
+        for (var i = 0; i < inputs.length; i++) {
+          var v = inputs[i].value.trim();
+          if (v) arr.push(v);
+        }
+        return arr.length ? arr : [''];
+      }
+
+      function getSizes() {
+        var items = [];
+        document.querySelectorAll('#sizesList li[data-index]').forEach(function (li) {
+          var name = li.querySelector('.size-name').value.trim();
+          var link = li.querySelector('.size-link').value.trim();
+          var active = !!li.querySelector('.size-active').checked;
+          items.push({ name: name, link: link, active: active });
+        });
+        return items;
+      }
+
+      function setData(data) {
+        document.getElementById('title').value = data.title || '';
+        document.getElementById('installments').value = (data.price && data.price.installments) || '';
+        document.getElementById('installmentsLabel').value = (data.price && data.price.installmentsLabel) || '';
+        document.getElementById('listPrice').value = (data.price && data.price.listPrice) || '';
+        document.getElementById('spotPrice').value = (data.price && data.price.spotPrice) || '';
+        document.getElementById('shortDescription').value = data.shortDescription || '';
+        document.getElementById('longDescription').value = data.longDescription || '';
+        document.getElementById('checkoutLink').value = data.checkoutLink || '';
+        document.getElementById('sizesTitle').value = (data.sizes && data.sizes.title) ? data.sizes.title : 'Tamanhos';
+
+        var imgs = (data.images && data.images.length) ? data.images : [''];
+        var container = document.getElementById('imagesContainer');
+        container.innerHTML = '';
+        imgs.forEach(function (url) {
+          addImageInput(container, url);
+        });
+
+        var list = document.getElementById('sizesList');
+        list.innerHTML = '';
+        var items = (data.sizes && data.sizes.items && data.sizes.items.length) ? data.sizes.items : [{ name: '', link: '', active: false }];
+        items.forEach(function (item) {
+          addSizeRow(list, item);
+        });
+      }
+
+      function addImageInput(container, value) {
+        value = value || '';
+        var wrap = document.createElement('div');
+        wrap.className = 'image-row';
+        wrap.innerHTML = '<input type="url" placeholder="https://..." value="' + escapeAttr(value) + '"> <button type="button" class="remove-size remove-img">Remover</button>';
+        wrap.querySelector('button').addEventListener('click', function () {
+          wrap.remove();
+        });
+        container.appendChild(wrap);
+      }
+
+      function escapeAttr(s) {
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML.replace(/"/g, '&quot;');
+      }
+
+      function addSizeRow(list, item) {
+        item = item || { name: '', link: '', active: false };
+        var li = document.createElement('li');
+        li.setAttribute('data-index', list.children.length);
+        li.innerHTML =
+          '<div class="row"><label>Nome</label><input type="text" class="size-name" placeholder="Ex: Queen" value="' + escapeAttr(item.name) + '"></div>' +
+          '<div class="row"><label>Link</label><input type="url" class="size-link" placeholder="https://..." value="' + escapeAttr(item.link) + '"></div>' +
+          '<div class="active-wrap"><input type="checkbox" class="size-active" ' + (item.active ? 'checked' : '') + '> <label style="margin:0">Ativo (destacar este tamanho)</label></div>' +
+          '<button type="button" class="remove-size">Remover tamanho</button>';
+        li.querySelector('button').addEventListener('click', function () {
+          li.remove();
+        });
+        list.appendChild(li);
+      }
+
+      document.getElementById('addImage').addEventListener('click', function () {
+        addImageInput(document.getElementById('imagesContainer'), '');
+      });
+
+      document.getElementById('addSize').addEventListener('click', function () {
+        addSizeRow(document.getElementById('sizesList'), { name: '', link: '', active: false });
+      });
+
+      document.getElementById('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var data = getData();
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'product-data.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        showMsg('JSON baixado. Substitua public/product-data.json no projeto.');
+      });
+
+      document.getElementById('loadJson').addEventListener('click', function () {
+        fetch(CONFIG_URL)
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.statusText);
+            return r.json();
+          })
+          .then(function (data) {
+            setData(data);
+            showMsg('Dados carregados de product-data.json.');
+          })
+          .catch(function (err) {
+            showMsg('Erro ao carregar: ' + err.message, true);
+          });
+      });
+
+      // Carregar ao abrir a página
+      fetch(CONFIG_URL)
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (data) setData(data);
+          else setData({});
+        })
+        .catch(function () { setData({}); });
+    })();
+  </script>
+</body>
+</html>
