@@ -501,7 +501,7 @@ function ctsu(u){return p ? p.createScriptURL(u) : u;}
             new CategoriesWidget({
               bus: freya,
               endpoint: '//www.mercadolivre.com.br/menu/departments?zipcode=41181900',
-              isMobile: false
+              isMobile: {{IS_MOBILE}}
             });
           }
         })(window, window.freya);
