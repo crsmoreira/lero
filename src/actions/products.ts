@@ -300,7 +300,7 @@ export async function duplicateProduct(id: string) {
     gtin: product.gtin ?? undefined,
     stock: product.stock,
     status: "draft",
-    template: (product as { template?: string }).template ?? "leroy",
+    template: ((product as { template?: string }).template ?? "leroy") as z.infer<typeof productSchema>["template"],
     tags: (product as { tags?: string[] }).tags ?? [],
     metaTitle: product.metaTitle ?? undefined,
     metaDescription: product.metaDescription ?? undefined,
