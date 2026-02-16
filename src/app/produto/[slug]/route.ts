@@ -523,10 +523,10 @@ export async function GET(
         installments: installmentPrice > 0 ? `${installmentCount}x R$ ${formatPrice(installmentPrice)}` : "",
         installmentsLabel: "sem juros",
         listPrice: originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : "",
-        spotPrice: priceAvista ? formatPrice(Number(priceAvista)) : "",
+        spotPrice: priceAvista ? `R$ ${formatPrice(Number(priceAvista))}` : "",
       },
       shortDescription: product.shortDescription || product.name,
-      longDescription: product.description || product.shortDescription || "",
+      longDescription: product.description || product.shortDescription || product.name || "",
       checkoutLink: product.checkoutUrl || "#",
       sizes: {
         title: "Tamanhos",
@@ -537,8 +537,18 @@ export async function GET(
         })) : [],
       },
     };
-    const karstenScript = `<script>window.PRODUCT_DATA = ${JSON.stringify(karstenData)};</script>`;
-    html = html.replace(/<script src="aplica-template.js"><\/script>/, karstenScript + '\n  <script src="aplica-template.js"></script>');
+    const karstenScript = `<script>
+      window.PRODUCT_DATA = ${JSON.stringify(karstenData)};
+      console.log('[Next.js] Dados injetados para Karsten:', window.PRODUCT_DATA);
+    </script>`;
+    // Substituir o script aplica-template.js, permitindo variações no caminho
+    const scriptPattern = /<script\s+src=["']\/?aplica-template\.js["']><\/script>/i;
+    if (scriptPattern.test(html)) {
+      html = html.replace(scriptPattern, karstenScript + '\n  <script src="/aplica-template.js"></script>');
+    } else {
+      // Se não encontrar, adicionar antes do </body>
+      html = html.replace('</body>', karstenScript + '\n  <script src="/aplica-template.js"></script>\n</body>');
+    }
   }
 
   return new NextResponse(html, {
