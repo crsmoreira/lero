@@ -46,6 +46,7 @@ export default async function AdminProductsPage() {
     mm: "Madeira Madeira",
     "magalu-novo": "Magalu Novo",
     amazon: "Amazon",
+    karsten: "Karsten",
   };
 
   return (
