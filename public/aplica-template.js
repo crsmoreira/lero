@@ -82,36 +82,48 @@
       
       if (instEl && data.price.installments) {
         console.log('[aplica-template] Parcelas encontradas, atualizando:', data.price.installments);
+        
+        // Encontrar o container pai que pode conter elementos duplicados
+        var container = instEl.closest('[class*="installment"]') || instEl.parentElement;
+        if (container) {
+          // Limpar todos os elementos filhos que possam conter parcelas antigas
+          var allChildren = Array.from(container.querySelectorAll('*'));
+          allChildren.forEach(function(child) {
+            var text = child.textContent || '';
+            // Se contém padrão "Xx" mas não é o elemento que vamos atualizar
+            if (child !== instEl && text.match(/\d+x/i)) {
+              // Limpar apenas se não for um elemento importante
+              if (!child.querySelector('*')) {
+                child.textContent = '';
+              }
+            }
+          });
+          
+          // Limpar nós de texto que possam conter "7x" ou "sem juros" duplicados
+          var walker = document.createTreeWalker(
+            container,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+          );
+          var textNode;
+          while (textNode = walker.nextNode()) {
+            var text = textNode.textContent || '';
+            // Se contém "7x" ou "sem juros" e não está dentro do elemento que vamos atualizar
+            if ((text.match(/^\s*\d+x\s*$/i) || text.match(/sem\s+juros/i)) && 
+                !instEl.contains(textNode.parentElement)) {
+              textNode.textContent = '';
+            }
+          }
+        }
+        
         // Substituir completamente o conteúdo do elemento
         var fullText = data.price.installments;
         if (data.price.installmentsLabel) {
           fullText += ' ' + data.price.installmentsLabel;
         }
         instEl.textContent = fullText;
-        instEl.innerHTML = fullText; // Garantir que HTML também seja atualizado
-        
-        // Verificar elemento pai e limpar duplicações
-        var parent = instEl.parentElement;
-        if (parent) {
-          var parentText = parent.textContent || '';
-          // Se o parent tem texto duplicado (ex: "7x 6x"), limpar
-          if (parentText.match(/\d+x\s+\d+x/)) {
-            // Encontrar e remover o primeiro "Xx" duplicado
-            parentText = parentText.replace(/\d+x\s+/g, function(match, offset) {
-              // Manter apenas a última ocorrência
-              return offset === parentText.lastIndexOf(match) ? match : '';
-            });
-            // Se ainda houver duplicação, usar apenas o texto do elemento filho
-            if (parentText.match(/\d+x\s+\d+x/)) {
-              var children = Array.from(parent.children);
-              children.forEach(function(child) {
-                if (child !== instEl && child.textContent && child.textContent.match(/\d+x/)) {
-                  child.textContent = '';
-                }
-              });
-            }
-          }
-        }
+        instEl.innerHTML = fullText;
       } else {
         console.warn('[aplica-template] Parcelas não encontradas. Dados:', data.price.installments);
       }
@@ -176,6 +188,40 @@
         }
       }
     }
+
+    // Remover valor no Pix - buscar elementos que contenham "no Pix"
+    function removePixElements() {
+      // Buscar por texto que contenha "no Pix" ou padrão similar
+      var allElements = document.querySelectorAll('p, div, span, li, td');
+      allElements.forEach(function(el) {
+        var text = el.textContent || '';
+        // Se contém "no Pix" com valor monetário
+        if (text.match(/R\$\s*\d+[\.,]\d+\s*no\s+Pix/i) || text.match(/no\s+Pix/i)) {
+          // Se é um elemento simples (sem filhos interativos), ocultar completamente
+          if (!el.querySelector('a, button, input, select') && el.children.length === 0) {
+            el.style.display = 'none';
+          } else {
+            // Se tem filhos, remover apenas o texto do Pix dos nós de texto
+            var walker = document.createTreeWalker(
+              el,
+              NodeFilter.SHOW_TEXT,
+              null,
+              false
+            );
+            var textNode;
+            while (textNode = walker.nextNode()) {
+              var nodeText = textNode.textContent || '';
+              if (nodeText.match(/R\$\s*\d+[\.,]\d+\s*no\s+Pix/i)) {
+                textNode.textContent = nodeText.replace(/R\$\s*\d+[\.,]\d+\s*no\s+Pix/gi, '').trim();
+              } else if (nodeText.match(/no\s+Pix/i) && nodeText.match(/R\$\s*\d+[\.,]\d+/)) {
+                textNode.textContent = nodeText.replace(/R\$\s*\d+[\.,]\d+[\s\S]*?no\s+Pix/gi, '').trim();
+              }
+            }
+          }
+        }
+      });
+    }
+    removePixElements();
 
     // Imagens (principal e carrossel)
     if (data.images && data.images.length > 0) {
