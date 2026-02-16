@@ -15,34 +15,39 @@
   function applyData(data) {
     if (!data) return;
 
-    // Título
-    var titleEl = document.querySelector('[data-editable="title"]');
-    if (titleEl && data.title) {
-      titleEl.textContent = data.title;
-      if (titleEl.tagName === 'TITLE') {
-        document.title = data.title;
-      }
+    // Título (atualiza todos os elementos com data-editable="title")
+    if (data.title) {
+      document.querySelectorAll('[data-editable="title"]').forEach(function (el) {
+        if (el.tagName === 'TITLE') {
+          document.title = data.title;
+        } else {
+          el.textContent = data.title;
+        }
+      });
     }
 
     // Meta description
-    var metaDesc = document.querySelector('meta[name="description"][data-editable="shortDescription"]');
-    if (metaDesc && data.shortDescription) {
-      metaDesc.setAttribute('content', data.shortDescription);
+    if (data.shortDescription) {
+      document.querySelectorAll('meta[name="description"][data-editable="shortDescription"]').forEach(function (el) {
+        el.setAttribute('content', data.shortDescription);
+      });
     }
 
     // Imagem principal
-    var mainImg = document.querySelector('[data-editable="mainImage"]');
-    if (mainImg && data.images && data.images[0]) {
-      mainImg.src = data.images[0];
-      mainImg.alt = data.title || 'Produto';
+    if (data.images && data.images[0]) {
+      document.querySelectorAll('[data-editable="mainImage"]').forEach(function (img) {
+        img.src = data.images[0];
+        img.alt = data.title || 'Produto';
+      });
     }
 
     // Tamanhos
     var sizes = data.sizes;
     if (sizes) {
-      var sizesTitleEl = document.querySelector('[data-editable="sizesTitle"]');
-      if (sizesTitleEl && sizes.title) {
-        sizesTitleEl.textContent = sizes.title;
+      if (sizes.title) {
+        document.querySelectorAll('[data-editable="sizesTitle"]').forEach(function (el) {
+          el.textContent = sizes.title;
+        });
       }
 
       var sizesList = document.getElementById('product-sizes-list');
@@ -63,49 +68,60 @@
 
     // Preço
     if (data.price) {
-      var instEl = document.querySelector('[data-editable="priceInstallments"]');
-      if (instEl && data.price.installments) {
+      if (data.price.installments) {
         var label = data.price.installmentsLabel ? ' ' + data.price.installmentsLabel : '';
-        instEl.textContent = data.price.installments + label;
+        document.querySelectorAll('[data-editable="priceInstallments"]').forEach(function (el) {
+          el.textContent = data.price.installments + label;
+        });
       }
 
-      var listEl = document.querySelector('[data-editable="priceList"]');
-      if (listEl && data.price.listPrice) {
-        listEl.textContent = data.price.listPrice;
+      if (data.price.listPrice) {
+        document.querySelectorAll('[data-editable="priceList"]').forEach(function (el) {
+          el.textContent = data.price.listPrice;
+        });
       }
 
-      var spotEl = document.querySelector('[data-editable="priceSpot"]');
-      if (spotEl && data.price.spotPrice) {
+      if (data.price.spotPrice) {
         var spotText = 'R$ ' + data.price.spotPrice + ' à vista';
         if (data.price.pixPrice) {
           spotText += ' ou R$ ' + data.price.pixPrice + ' no Pix';
         }
-        spotEl.textContent = spotText;
+        document.querySelectorAll('[data-editable="priceSpot"]').forEach(function (el) {
+          el.textContent = spotText;
+        });
       }
     }
 
     // Descrição longa
-    var descEl = document.querySelector('[data-editable="longDescription"]');
-    if (descEl && data.longDescription) {
-      descEl.innerHTML = data.longDescription;
+    if (data.longDescription) {
+      document.querySelectorAll('[data-editable="longDescription"]').forEach(function (el) {
+        el.innerHTML = data.longDescription;
+      });
     }
 
     // Link checkout
-    var checkoutEl = document.querySelector('[data-editable="checkoutLink"]');
-    if (checkoutEl && data.checkoutLink) {
-      checkoutEl.href = data.checkoutLink;
+    if (data.checkoutLink) {
+      document.querySelectorAll('[data-editable="checkoutLink"]').forEach(function (el) {
+        el.href = data.checkoutLink;
+      });
     }
   }
 
   function run() {
+    console.log('Carregando dados de:', CONFIG_URL);
     fetch(CONFIG_URL)
       .then(function (r) {
-        if (!r.ok) throw new Error('Não foi possível carregar ' + CONFIG_URL);
+        if (!r.ok) throw new Error('Não foi possível carregar ' + CONFIG_URL + ' (status: ' + r.status + ')');
         return r.json();
       })
-      .then(applyData)
+      .then(function (data) {
+        console.log('Dados carregados:', data);
+        applyData(data);
+        console.log('Dados aplicados com sucesso');
+      })
       .catch(function (err) {
-        console.warn('Erro ao carregar dados do produto:', err);
+        console.error('Erro ao carregar dados do produto:', err);
+        console.error('Certifique-se de que product-data.json está na mesma pasta que template-karsten.html');
       });
   }
 
