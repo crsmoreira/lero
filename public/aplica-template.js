@@ -12,16 +12,22 @@
     var titleEl = document.querySelector('.vtex-store-components-3-x-productNameContainer') || document.querySelector('[data-product-title]');
     if (titleEl && data.title) titleEl.textContent = data.title;
 
-    // Bloco Tamanhos (abaixo do título)
+    // Bloco Tamanhos (abaixo do título, não ao lado)
     var sizes = data.sizes;
     if (sizes && sizes.items && sizes.items.length) {
-      var afterTitle = document.querySelector('.vtex-store-components-3-x-productNameContainer') || document.querySelector('[data-product-title]');
-      if (afterTitle) {
+      var titleEl = document.querySelector('.vtex-store-components-3-x-productNameContainer') || document.querySelector('[data-product-title]');
+      if (titleEl) {
         var container = document.querySelector('#product-sizes-mount');
         if (!container) {
           container = document.createElement('div');
           container.id = 'product-sizes-mount';
-          afterTitle.parentNode.insertBefore(container, afterTitle.nextSibling);
+          // Inserir depois da linha inteira (flex row) que contém o título, para ficar abaixo e não ao lado
+          var productNameRow = titleEl.closest('[class*="flexRow--container__product-name-and-actions"]') || titleEl.closest('[class*="container__product-name-and-actions"]');
+          if (productNameRow && productNameRow.parentNode) {
+            productNameRow.parentNode.insertBefore(container, productNameRow.nextSibling);
+          } else {
+            titleEl.parentNode.insertBefore(container, titleEl.nextSibling);
+          }
         }
         var titleLabel = sizes.title || 'Tamanhos';
         var pillCss = '<style id="product-sizes-pill-style">' +
