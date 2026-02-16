@@ -42,10 +42,11 @@ export default async function AdminProductsPage() {
     carrefour: "Carrefour",
     vakinha: "Vaquinha",
     havan: "Havan",
-    kalonga: "Kalonga",
+    kalonga: "Kalunga",
     mm: "Madeira Madeira",
     "magalu-novo": "Magalu Novo",
     amazon: "Amazon",
+    karsten: "Karsten",
   };
 
   return (

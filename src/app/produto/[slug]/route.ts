@@ -90,7 +90,9 @@ export async function GET(
                     ? "produto-template-magalu-novo.html"
                     : product.template === "amazon"
                       ? "produto-template-amazon.html"
-                      : "produto-template.html";
+                      : product.template === "karsten"
+                        ? "template-karsten.html"
+                        : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
   const toAbsoluteUrl = (url: string) => {
@@ -505,6 +507,34 @@ export async function GET(
     html = html.replace(/href="\/login"/g, 'href="javascript:void(0)"');
     // Caixa "Leroy Merlin garante": clique não faz nada
     html = html.replace(/href="https:\/\/www\.leroymerlin\.com\.br\/leroy-merlin-garante"/g, 'href="javascript:void(0)"');
+  }
+
+  // Karsten: injetar dados do produto via script inline antes do loader
+  if (product.template === "karsten") {
+    const karstenData = {
+      title: product.name,
+      images: images.length > 0 ? images : [mainImage],
+      price: {
+        installments: installmentCount && installmentPrice ? `${installmentCount}x R$ ${formatPrice(Number(installmentPrice))}` : "",
+        installmentsLabel: "sem juros",
+        listPrice: originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : "",
+        spotPrice: priceAvista ? formatPrice(Number(priceAvista)) : "",
+        pixPrice: priceAvista ? formatPrice(Number(priceAvista) * 0.95) : "",
+      },
+      shortDescription: product.shortDescription || product.name,
+      longDescription: product.description || product.shortDescription || "",
+      checkoutLink: product.checkoutUrl || "#",
+      sizes: {
+        title: "Tamanhos",
+        items: variantGroups && variantGroups.length > 0 ? variantGroups[0].variants.map((v: any, i: number) => ({
+          name: v.name || `Opção ${i + 1}`,
+          link: product.checkoutUrl || "#",
+          active: i === 0,
+        })) : [],
+      },
+    };
+    const karstenScript = `<script>window.PRODUCT_DATA = ${JSON.stringify(karstenData)};</script>`;
+    html = html.replace(/<script src="\/template-karsten-loader.js"><\/script>/, karstenScript + '\n  <script src="/template-karsten-loader.js"></script>');
   }
 
   return new NextResponse(html, {

@@ -108,6 +108,15 @@
   }
 
   function run() {
+    // Se os dados já estão disponíveis via window.PRODUCT_DATA (injetado pelo Next.js), use-os
+    if (typeof window !== 'undefined' && window.PRODUCT_DATA) {
+      console.log('Dados carregados de window.PRODUCT_DATA:', window.PRODUCT_DATA);
+      applyData(window.PRODUCT_DATA);
+      console.log('Dados aplicados com sucesso');
+      return;
+    }
+
+    // Caso contrário, tenta carregar do JSON (para uso standalone)
     console.log('Carregando dados de:', CONFIG_URL);
     fetch(CONFIG_URL)
       .then(function (r) {

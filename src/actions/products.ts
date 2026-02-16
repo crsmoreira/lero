@@ -17,7 +17,7 @@ const productSchema = z.object({
   gtin: z.string().optional(),
   stock: z.number().int().min(0),
   status: z.enum(["draft", "active"]),
-  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "vakinha", "havan", "kalonga", "mm", "magalu-novo", "amazon"]).optional().default("leroy"),
+  template: z.enum(["leroy", "drogasil", "decolar", "carrefour", "vakinha", "havan", "kalonga", "mm", "magalu-novo", "amazon", "karsten"]).optional().default("leroy"),
   tags: z.array(z.string()).default([]),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
