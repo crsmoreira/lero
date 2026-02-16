@@ -526,7 +526,7 @@ export async function GET(
       checkoutLink: product.checkoutUrl || "#",
       sizes: {
         title: "Tamanhos",
-        items: variantGroups && variantGroups.length > 0 ? variantGroups[0].variants.map((v: any, i: number) => ({
+        items: variantGroups && variantGroups.length > 0 ? variantGroups[0].variants.map((v: { name: string }, i: number) => ({
           name: v.name || `Opção ${i + 1}`,
           link: product.checkoutUrl || "#",
           active: i === 0,
