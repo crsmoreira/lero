@@ -68,13 +68,50 @@
     // Preço (parcelas, list price, à vista)
     if (data.price) {
       console.log('[aplica-template] Aplicando preços:', data.price);
-      // Parcelas
-      var instEl = document.querySelector('.vtex-product-price-1-x-installmentValue--container__installments') || 
-                   document.querySelector('[class*="installmentValue--container__installments"]') ||
-                   document.querySelector('[class*="installmentValue"]');
+      // Parcelas - substituir completamente o conteúdo para evitar duplicação
+      var instSelectors = [
+        '.vtex-product-price-1-x-installmentValue--container__installments',
+        '[class*="installmentValue--container__installments"]',
+        '[class*="installmentValue"]'
+      ];
+      var instEl = null;
+      for (var i = 0; i < instSelectors.length; i++) {
+        instEl = document.querySelector(instSelectors[i]);
+        if (instEl) break;
+      }
+      
       if (instEl && data.price.installments) {
         console.log('[aplica-template] Parcelas encontradas, atualizando:', data.price.installments);
-        instEl.textContent = data.price.installments;
+        // Substituir completamente o conteúdo do elemento
+        var fullText = data.price.installments;
+        if (data.price.installmentsLabel) {
+          fullText += ' ' + data.price.installmentsLabel;
+        }
+        instEl.textContent = fullText;
+        instEl.innerHTML = fullText; // Garantir que HTML também seja atualizado
+        
+        // Verificar elemento pai e limpar duplicações
+        var parent = instEl.parentElement;
+        if (parent) {
+          var parentText = parent.textContent || '';
+          // Se o parent tem texto duplicado (ex: "7x 6x"), limpar
+          if (parentText.match(/\d+x\s+\d+x/)) {
+            // Encontrar e remover o primeiro "Xx" duplicado
+            parentText = parentText.replace(/\d+x\s+/g, function(match, offset) {
+              // Manter apenas a última ocorrência
+              return offset === parentText.lastIndexOf(match) ? match : '';
+            });
+            // Se ainda houver duplicação, usar apenas o texto do elemento filho
+            if (parentText.match(/\d+x\s+\d+x/)) {
+              var children = Array.from(parent.children);
+              children.forEach(function(child) {
+                if (child !== instEl && child.textContent && child.textContent.match(/\d+x/)) {
+                  child.textContent = '';
+                }
+              });
+            }
+          }
+        }
       } else {
         console.warn('[aplica-template] Parcelas não encontradas. Dados:', data.price.installments);
       }
@@ -140,16 +177,29 @@
       }
     }
 
-    // Imagem principal (primeira do carrossel)
-    if (data.images && data.images[0]) {
+    // Imagens (principal e carrossel)
+    if (data.images && data.images.length > 0) {
       var mainImg = document.querySelector('.vtex-store-components-3-x-productImageTag--main') || 
                     document.querySelector('[class*="productImageTag--main"]') ||
                     document.querySelector('[class*="productImageTag"]') ||
                     document.querySelector('.vtex-store-components-3-x-productImagesContainer img');
       if (mainImg) {
-        console.log('[aplica-template] Imagem encontrada, atualizando:', data.images[0]);
+        console.log('[aplica-template] Imagem principal encontrada, atualizando:', data.images[0]);
         mainImg.src = data.images[0];
         if (mainImg.dataset) mainImg.dataset.src = data.images[0];
+        // Atualizar srcset se existir
+        if (mainImg.srcset) mainImg.srcset = data.images[0];
+        // Atualizar todas as imagens do carrossel
+        var allImgs = document.querySelectorAll('.vtex-store-components-3-x-productImagesContainer img, [class*="productImageTag"]');
+        if (allImgs.length > 0) {
+          allImgs.forEach(function(img, index) {
+            if (data.images[index]) {
+              img.src = data.images[index];
+              if (img.dataset) img.dataset.src = data.images[index];
+              if (img.srcset) img.srcset = data.images[index];
+            }
+          });
+        }
       } else {
         console.warn('[aplica-template] Imagem não encontrada. Dados:', data.images[0]);
       }
