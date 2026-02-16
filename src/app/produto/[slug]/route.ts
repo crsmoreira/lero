@@ -511,11 +511,16 @@ export async function GET(
 
   // Karsten: injetar dados do produto via script inline antes do loader
   if (product.template === "karsten") {
+    // Calcular parcelas: usar 6x como padrão
+    const installmentCount = 6;
+    const totalPrice = Number(priceAPrazo);
+    const installmentPrice = totalPrice > 0 ? totalPrice / installmentCount : 0;
+    
     const karstenData = {
       title: product.name,
       images: images.length > 0 ? images : [mainImage],
       price: {
-        installments: installmentCount && installmentPrice ? `${installmentCount}x R$ ${formatPrice(Number(installmentPrice))}` : "",
+        installments: installmentPrice > 0 ? `${installmentCount}x R$ ${formatPrice(installmentPrice)}` : "",
         installmentsLabel: "sem juros",
         listPrice: originalPrice ? `R$ ${formatPrice(Number(originalPrice))}` : "",
         spotPrice: priceAvista ? formatPrice(Number(priceAvista)) : "",
