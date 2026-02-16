@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { Decimal } from "@prisma/client/runtime/library";
 
@@ -263,4 +264,95 @@ export async function deleteProduct(id: string) {
   revalidatePath("/produtos");
   revalidatePath(`/produto/${product?.slug ?? ""}`);
   return { success: true };
+}
+
+/**
+ * Duplica um produto: copia todos os dados (imagens, especificações, variantes, reviews)
+ * com nome "(cópia)", slug único e status "draft". Redireciona para a página de edição do novo produto.
+ */
+export async function duplicateProduct(id: string) {
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: {
+      images: { orderBy: { order: "asc" } },
+      specifications: { orderBy: { order: "asc" } },
+      variantGroups: { include: { variants: { orderBy: { order: "asc" } } }, orderBy: { order: "asc" } },
+      reviews: { orderBy: { createdAt: "desc" } },
+    },
+  });
+
+  if (!product) {
+    return { error: { _form: ["Produto não encontrado"] } };
+  }
+
+  const baseSlug = `${product.slug}-copia`;
+  const copyName = `${product.name} (cópia)`;
+
+  const payload: z.infer<typeof productSchema> = {
+    name: copyName,
+    slug: baseSlug,
+    shortDescription: product.shortDescription ?? undefined,
+    description: product.description ?? undefined,
+    price: Number(product.price),
+    promotionalPrice: product.promotionalPrice != null ? Number(product.promotionalPrice) : null,
+    installmentPrice: product.installmentPrice != null ? Number(product.installmentPrice) : null,
+    sku: product.sku ? `${product.sku}-copia` : undefined,
+    gtin: product.gtin ?? undefined,
+    stock: product.stock,
+    status: "draft",
+    template: (product as { template?: string }).template ?? "leroy",
+    tags: (product as { tags?: string[] }).tags ?? [],
+    metaTitle: product.metaTitle ?? undefined,
+    metaDescription: product.metaDescription ?? undefined,
+    checkoutUrl: product.checkoutUrl ?? null,
+    breadcrumbBackLabel: product.breadcrumbBackLabel ?? null,
+    breadcrumbBackUrl: product.breadcrumbBackUrl ?? null,
+    brandName: product.brandName ?? null,
+    categoryId: product.categoryId ?? null,
+    brandId: product.brandId ?? null,
+    images: product.images.map((img) => ({
+      url: img.url,
+      key: img.key ?? undefined,
+      alt: img.alt ?? undefined,
+      order: img.order,
+      isMain: img.isMain,
+    })),
+    specifications: product.specifications.map((s) => ({
+      key: s.key,
+      value: s.value,
+      order: s.order,
+    })),
+    reviews: product.reviews.map((r) => ({
+      userName: r.userName,
+      rating: r.rating,
+      title: r.title ?? undefined,
+      comment: r.comment ?? undefined,
+      images: r.images ?? [],
+    })),
+    variantGroups: (product.variantGroups ?? []).map((g, gi) => ({
+      name: g.name,
+      order: g.order ?? gi,
+      variants: (g.variants ?? []).map((v, vi) => ({
+        name: v.name,
+        extraPrice: Number(v.extraPrice ?? 0),
+        stock: v.stock ?? 0,
+        order: v.order ?? vi,
+        imageUrl: (v as { imageUrl?: string | null }).imageUrl ?? undefined,
+      })),
+    })),
+  };
+
+  const result = await createProduct(payload);
+
+  if (result.error) {
+    return result;
+  }
+
+  revalidatePath("/admin/produtos");
+  revalidatePath("/produtos");
+  if (result.data?.id) {
+    redirect(`/admin/produtos/${result.data.id}/editar`);
+  }
+
+  return result;
 }

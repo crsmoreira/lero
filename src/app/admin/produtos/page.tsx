@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { deleteProduct } from "@/actions/products";
+import { deleteProduct, duplicateProduct } from "@/actions/products";
 
 export default async function AdminProductsPage() {
   let products;
@@ -114,7 +114,7 @@ export default async function AdminProductsPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex justify-end gap-2 flex-wrap">
                     <Link href={`/produto/${product.slug}`} target="_blank">
                       <Button variant="outline" size="sm">
                         Visualizar
@@ -125,6 +125,19 @@ export default async function AdminProductsPage() {
                         Editar
                       </Button>
                     </Link>
+                    <form
+                      action={async (formData: FormData) => {
+                        "use server";
+                        const id = formData.get("productId") as string;
+                        if (id) await duplicateProduct(id);
+                      }}
+                      className="inline"
+                    >
+                      <input type="hidden" name="productId" value={product.id} />
+                      <Button type="submit" variant="outline" size="sm">
+                        Duplicar
+                      </Button>
+                    </form>
                     <form
                       action={async () => {
                         "use server";
