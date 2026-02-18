@@ -559,11 +559,34 @@ export async function GET(
     }
   }
 
-  // Amparo: substituir título, meta description e imagem
+  // Amparo: substituir título, meta description, imagem, valores e remover header
   if (product.template === "amparo") {
     const metaTitle = product.metaTitle || product.name;
     const metaDescription = product.metaDescription || product.shortDescription || product.name;
     const ogImage = images.length > 0 ? images[0] : mainImage;
+    
+    // Calcular valores de arrecadação
+    const campaignGoal = Number(product.price ?? 0);
+    const campaignCollected = Number(product.promotionalPrice ?? 0);
+    const percent = campaignGoal > 0 ? Math.min(100, Math.round((campaignCollected / campaignGoal) * 100)) : 0;
+    const formattedGoal = formatPrice(campaignGoal);
+    const formattedCollected = formatPrice(campaignCollected);
+
+    // Remover header (div com framer-nqb29f-container que contém busca, logo e menu)
+    // O HTML está minificado, então vamos buscar pelo padrão específico do header
+    // O header contém: busca (role="search"), logo amparo, botão criar campanha e menu hambúrguer
+    const headerStart = html.indexOf('<div class="framer-nqb29f-container">');
+    if (headerStart !== -1) {
+      // Encontrar o fim do container (próximo </div></div> após framer-wixcr5-container)
+      const nextContainer = html.indexOf('<div class="framer-wixcr5-container">', headerStart);
+      if (nextContainer !== -1) {
+        // Remover tudo desde o início do framer-nqb29f-container até antes do framer-wixcr5-container
+        html = html.substring(0, headerStart) + html.substring(nextContainer);
+      } else {
+        // Fallback: remover usando regex mais ampla (sem flag s, usando [\s\S] para match qualquer caractere)
+        html = html.replace(/<div class="framer-nqb29f-container">[\s\S]*?<div class="framer-wixcr5-container">/, '<div class="framer-wixcr5-container">');
+      }
+    }
 
     // Substituir título
     html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(metaTitle)}</title>`);
@@ -598,6 +621,95 @@ export async function GET(
     // Substituir twitter:description
     html = html.replace(/<meta\s+name=["']twitter:description["']\s+content=["'][^"']*["']\s*\/?>/i,
       `<meta name="twitter:description" content="${escapeHtml(metaDescription)}">`);
+
+    // Substituir título principal (h1 dentro do header)
+    // Buscar pelo padrão específico do título no HTML minificado
+    html = html.replace(/<h1[^>]*style=["'][^"']*margin:0[^"']*font-size:32px[^"']*[^>]*>.*?<\/h1>/gi, 
+      `<h1 style="margin:0;font-size:32px;line-height:1.1;font-weight:900;color:rgb(27, 27, 27)">${escapeHtml(product.name)}</h1>`);
+    // Fallback: substituir qualquer h1 que contenha o texto padrão
+    html = html.replace(/<h1[^>]*>Mimo está sentindo muita dor[^<]*<\/h1>/gi,
+      `<h1 style="margin:0;font-size:32px;line-height:1.1;font-weight:900;color:rgb(27, 27, 27)">${escapeHtml(product.name)}</h1>`);
+
+    // Substituir imagens principais (primeira imagem do carrossel)
+    if (mainImage) {
+      const absoluteImage = toAbsoluteUrl(mainImage);
+      let imageReplaced = false;
+      
+      // Substituir a primeira imagem visível (opacity:1) do carrossel
+      html = html.replace(/<img([^>]*src=["'])https:\/\/framerusercontent\.com\/images\/[^"']*(["'][^>]*opacity:1[^>]*)>/gi, 
+        (match) => {
+          if (!imageReplaced) {
+            imageReplaced = true;
+            return match.replace(/src=["'][^"']*["']/, `src="${escapeHtml(absoluteImage)}"`);
+          }
+          return match;
+        });
+      
+      // Se não encontrou com opacity:1, substituir a primeira imagem do carrossel
+      if (!imageReplaced) {
+        html = html.replace(/<img([^>]*src=["'])https:\/\/framerusercontent\.com\/images\/[^"']*(["'][^>]*alt=["']Imagem da campanha["'][^>]*)>/i,
+          `<img$1${escapeHtml(absoluteImage)}$2>`);
+      }
+    }
+
+    // Substituir valor arrecadado (R$ X arrecadados)
+    // O HTML está minificado, então precisamos buscar padrões mais flexíveis
+    html = html.replace(/R\$&nbsp;0<!--\s*-->?\s*<!--\s*-->?\s*arrecadados/gi, 
+      `R$&nbsp;${formattedCollected}&nbsp;arrecadados`);
+    html = html.replace(/R\$&nbsp;\d+[\.,]?\d*<!--\s*-->?\s*<!--\s*-->?\s*arrecadados/gi,
+      `R$&nbsp;${formattedCollected}&nbsp;arrecadados`);
+    // Também tentar sem os comentários HTML
+    html = html.replace(/R\$&nbsp;\d+[\.,]?\d*\s*arrecadados/gi,
+      `R$&nbsp;${formattedCollected}&nbsp;arrecadados`);
+
+    // Substituir meta (meta R$ X • Y doações)
+    html = html.replace(/meta<!--\s*-->?\s*R\$&nbsp;\d+[\.,]?\d*/gi,
+      `meta R$&nbsp;${formattedGoal}`);
+    html = html.replace(/meta\s*R\$&nbsp;\d+[\.,]?\d*/gi,
+      `meta R$&nbsp;${formattedGoal}`);
+
+    // Substituir percentual (0% ou X%)
+    // Buscar pelo padrão específico dentro do card de arrecadação
+    html = html.replace(/>\s*0\s*<!--\s*-->?\s*%</gi, `>${percent}%<`);
+    html = html.replace(/>\s*\d+\s*<!--\s*-->?\s*%</gi, `>${percent}%<`);
+
+    // Substituir descrição longa (se houver elemento de descrição)
+    if (product.description) {
+      // Procurar por elementos que contenham a descrição padrão e substituir
+      const descPattern = /Por favor, nos ajude[^<]*<\/div>/i;
+      if (descPattern.test(html)) {
+        html = html.replace(descPattern, `${escapeHtml(product.description)}</div>`);
+      }
+      // Também substituir em outros lugares onde a descrição pode aparecer
+      html = html.replace(/Mimo está sentindo muita dor[^<]*<\/div>/i, 
+        `${escapeHtml(product.description)}</div>`);
+    }
+
+    // Substituir link do botão "Doar agora"
+    if (product.checkoutUrl) {
+      html = html.replace(/<button[^>]*>Doar agora<\/button>/i,
+        `<a href="${escapeHtml(product.checkoutUrl)}" style="display:block;width:100%;border:none;border-radius:30px;padding:16px 18px;font-weight:900;cursor:pointer;font-size:15px;background:rgb(185, 243, 108);color:#0c281a;margin-top:18px;text-decoration:none;text-align:center">Doar agora</a>`);
+    }
+
+    // Injetar script para atualizar valores dinamicamente (caso o HTML tenha scripts que buscam dados)
+    const productDataScript = `
+    <script>
+      window.PRODUCT_DATA = {
+        name: ${JSON.stringify(product.name)},
+        description: ${JSON.stringify(product.description || '')},
+        shortDescription: ${JSON.stringify(product.shortDescription || '')},
+        price: ${campaignGoal},
+        promotionalPrice: ${campaignCollected},
+        image: ${JSON.stringify(mainImage ? toAbsoluteUrl(mainImage) : '')},
+        checkoutUrl: ${JSON.stringify(product.checkoutUrl || '')},
+        percent: ${percent},
+        formattedGoal: ${JSON.stringify(formattedGoal)},
+        formattedCollected: ${JSON.stringify(formattedCollected)}
+      };
+    </script>
+    `;
+    // Injetar antes do fechamento do head ou início do body
+    html = html.replace(/<\/head>/i, `${productDataScript}</head>`);
   }
 
   return new NextResponse(html, {
