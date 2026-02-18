@@ -7,3 +7,40 @@
     font-style: normal;
     font-display: block;
 }
+
+/* Sobre o produto: conteúdo estático Detalhes e Ficha técnica */
+#accordion-product-details .product-accordion-content,
+#accordion-technical-sheet .product-accordion-content {
+    padding: 16px 0;
+    font-size: var(--body-md);
+    color: var(--content-primary-dark);
+    line-height: 1.5;
+}
+#accordion-product-details .product-accordion-content p,
+#accordion-technical-sheet .product-accordion-content p {
+    margin: 0 0 1rem;
+}
+#accordion-product-details .product-accordion-content p:last-child,
+#accordion-technical-sheet .product-accordion-content p:last-child {
+    margin-bottom: 0;
+}
+.product-accordion-content .table-technical-sheet {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: calc(var(--body-md) - 1px);
+}
+.product-accordion-content .table-technical-sheet tr:nth-child(odd) {
+    background-color: var(--nav-btn-bg);
+}
+.product-accordion-content .table-technical-sheet tr:nth-child(even) {
+    background-color: var(--content-neutral-lightest);
+}
+.product-accordion-content .table-technical-sheet td {
+    padding: 10px;
+}
+.product-accordion-content .table-technical-sheet td:last-child {
+    text-align: right;
+    color: var(--content-neutral-darkest);
+    font-size: var(--body-sm);
+    font-weight: var(--fw-regular);
+}

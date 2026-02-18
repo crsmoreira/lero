@@ -1301,10 +1301,10 @@ require([
     </div>
     <div class="actions">
         <button type="submit" title="Adicionar ao carrinho"
-                class="action primary tocart" id="product-addtocart-button" disabled>
+                class="action primary tocart icon" id="product-addtocart-button">
+            <i class="h-icon h-cart-add"></i>
             <span class="text">Adicionar ao carrinho</span>
         </button>
-        
     </div>
 <script type="text/x-magento-init">
     {
@@ -1329,10 +1329,9 @@ require([
     }
 </script>
 <div class="havan-buynow-button button-transporta-wrapper actions">
-    <button type="submit"
+    <button type="button"
             title="Comprar agora"
-            class="action secondary redirect-to-cart"
-            data-mage-init='{"Havan_BuyNowButton/js/buy-now-pdp": {}}' disabled>
+            class="action secondary redirect-to-cart">
         <span class="text">Comprar agora</span>
     </button>
 </div>
@@ -1352,45 +1351,54 @@ require([
     <meta itemprop="description" content="Desfrute de versatilidade culinária com o Grill e Sanduicheira Philco Inox 2 em 1 PGR21PI. Com elegante design em aço inoxidável e placas antiaderentes. Venha conferir!               " />
     <meta itemprop="image" content="https://www.havan.com.br/media/catalog/product/g/r/grill-e-sanduicheira-philco-inox-2-em-1-pgr21pi_1236880_1.jpg" />
 
-<div id="accordion-product-details" data-bind="scope: 'productDetails'">
-    <!-- ko template: getTemplate() --><!-- /ko -->
+<div id="accordion-product-details">
+    <div class="container-accordion-product">
+        <div class="header-accordion-product">
+            <span class="text text-prod-details">Detalhes</span>
+        </div>
+        <div class="product-accordion-content">
+            <p>A <strong>Grill e Sanduicheira Philco Inox 2 em 1 PGR21PI</strong> é a escolha ideal para quem busca praticidade e versatilidade no preparo de lanches e grelhados no dia a dia. Com potência de 1000W, aquece rapidamente e garante resultados eficientes, enquanto a chapa com abertura de 180° permite grelhar diferentes tipos de alimentos com mais conforto. As placas com revestimento antiaderente facilitam o preparo e a limpeza, e o coletor de gordura com encaixe tipo gaveta contribui para receitas mais saudáveis. Conta ainda com ajuste de altura das placas, base antiderrapante, luzes indicadoras de funcionamento e aquecimento, além de acabamento em inox que traz um visual moderno e maior durabilidade para a sua cozinha.</p>
+            <p><strong>Características</strong><br>
+            Potência: 1000W.<br>
+            Chapa com abertura de 180°.<br>
+            Acompanha coletor de gordura com encaixe tipo gaveta.<br>
+            Luz indicadora de funcionamento.<br>
+            Luz indicadora de aquecimento.<br>
+            Placas com revestimento antiaderente.<br>
+            Tamanho da Placa: 22 cm x 14 cm.<br>
+            Placas de aquecimento com ajuste de altura.<br>
+            Base antiderrapante.<br>
+            Acabamento em inox.</p>
+            <p><strong>Especificações Técnicas</strong><br>
+            Marca: Philco.<br>
+            Modelo: PGR21PI.<br>
+            Dimensões do Produto (LxAxP): 26,5 cm x 10 cm x 23 cm.<br>
+            Peso Aproximado: 1,3 Kg.</p>
+            <p><strong>Garantia do Fornecedor</strong>: 1 Ano (contra defeitos de fabricação).</p>
+        </div>
+    </div>
 </div>
 
-<script type="text/x-magento-init">
-    {
-        "*": {
-            "Magento_Ui/js/core/app": {
-                "components": {
-                    "productDetails": {
-                        "component": "Magento_Catalog/js/product-details",
-                        "product_full_info": "\u007B\u0022name\u0022\u003A\u0022Grill\u0020e\u0020Sanduicheira\u0020Philco\u0020Inox\u00202\u0020em\u00201\u0020PGR21PI\u0022,\u0022price\u0022\u003A129.9,\u0022initialPrice\u0022\u003A0,\u0022image\u0022\u003A\u0022https\u003A\u005C\u002F\u005C\u002Fwww.havan.com.br\u005C\u002Fmedia\u005C\u002Fcatalog\u005C\u002Fproduct\u005C\u002Fg\u005C\u002Fr\u005C\u002Fgrill\u002De\u002Dsanduicheira\u002Dphilco\u002Dinox\u002D2\u002Dem\u002D1\u002Dpgr21pi_1236880_1.jpg\u0022,\u0022reviews\u0022\u003A\u007B\u0022rating_summary\u0022\u003A0,\u0022review_count\u0022\u003A\u002285\u0022\u007D\u007D",
-                        "attributeValue": "<p>A <strong>Grill e Sanduicheira Philco Inox 2 em 1 PGR21PI<\/strong> &eacute; a escolha ideal para quem busca praticidade e versatilidade no preparo de lanches e grelhados no dia a dia. Com pot&ecirc;ncia de 1000W, aquece rapidamente e garante resultados eficientes, enquanto a chapa com abertura de 180&deg; permite grelhar diferentes tipos de alimentos com mais conforto. As placas com revestimento antiaderente facilitam o preparo e a limpeza, e o coletor de gordura com encaixe tipo gaveta contribui para receitas mais saud&aacute;veis. Conta ainda com ajuste de altura das placas, base antiderrapante, luzes indicadoras de funcionamento e aquecimento, al&eacute;m de acabamento em inox que traz um visual moderno e maior durabilidade para a sua cozinha.<\/p>\r\n\r\n<p><strong>Caracter&iacute;sticas<\/strong>&nbsp;<br \/>\r\nPot&ecirc;ncia: 1000W.<br \/>\r\nChapa com abertura de 180&deg;.<br \/>\r\nAcompanha coletor de gordura com encaixe tipo gaveta.<br \/>\r\nLuz indicadora de funcionamento.&nbsp;<br \/>\r\nLuz indicadora de aquecimento.<br \/>\r\nPlacas com revestimento antiaderente.&nbsp;<br \/>\r\nTamanho da Placa: 22 cm x 14 cm.<br \/>\r\nPlacas de aquecimento com ajuste de altura.<br \/>\r\nBase antiderrapante.&nbsp;<br \/>\r\nAcabamento em inox.&nbsp;<\/p>\r\n\r\n<p><strong>Especifica&ccedil;&otilde;es T&eacute;cnicas<\/strong><br \/>\r\nMarca: Philco.<br \/>\r\nModelo: PGR21PI.<br \/>\r\nDimens&otilde;es do Produto (LxAxP): 26,5 cm x 10 cm x 23 cm.<br \/>\r\nPeso Aproximado: 1,3&nbsp;Kg.<\/p>\r\n\r\n<p><strong>Garantia do Fornecedor<\/strong>: 1 Ano (contra defeitos de fabrica&ccedil;&atilde;o).<\/p>\r\n",
-                        "renderLabel": false,
-                        "attributeLabel": "none"                    }
-                }
-            }
-        }
-    }
-</script>
-
-    <div id="accordion-technical-sheet" data-bind="scope: 'technicalSheet'">
-        <!-- ko template: getTemplate() --><!-- /ko -->
+<div id="accordion-technical-sheet">
+    <div class="container-accordion-product">
+        <div class="header-accordion-product">
+            <span class="text text-technical-sheet">Ficha técnica</span>
+        </div>
+        <div class="product-accordion-content">
+            <table class="table-technical-sheet">
+                <tbody>
+                    <tr><td>Nome do produto</td><td>Grill e Sanduicheira Philco Inox 2 em 1 PGR21PI</td></tr>
+                    <tr><td>SKU</td><td>359933</td></tr>
+                    <tr><td>Marca</td><td>Philco</td></tr>
+                    <tr><td>Garantia de fábrica</td><td>12 meses</td></tr>
+                    <tr><td>Peso líquido</td><td>1.3kg</td></tr>
+                    <tr><td>Dimensões do produto (LxAxP)</td><td>265 x 100 x 230mm</td></tr>
+                    <tr><td>Lembrete</td><td>*Toda a mercadoria deverá ser conferida no ato da entrega e antes de assinar qualquer confirmação de recebimento</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-<script type="text/x-magento-init">
-    {
-        "*": {
-            "Magento_Ui/js/core/app": {
-                "components": {
-                    "technicalSheet": {
-                        "component": "Magento_Catalog/js/technical-sheet",
-                        "product_full_info": "\u007B\u0022name\u0022\u003A\u0022Grill\u0020e\u0020Sanduicheira\u0020Philco\u0020Inox\u00202\u0020em\u00201\u0020PGR21PI\u0022,\u0022price\u0022\u003A129.9,\u0022initialPrice\u0022\u003A0,\u0022image\u0022\u003A\u0022https\u003A\u005C\u002F\u005C\u002Fwww.havan.com.br\u005C\u002Fmedia\u005C\u002Fcatalog\u005C\u002Fproduct\u005C\u002Fg\u005C\u002Fr\u005C\u002Fgrill\u002De\u002Dsanduicheira\u002Dphilco\u002Dinox\u002D2\u002Dem\u002D1\u002Dpgr21pi_1236880_1.jpg\u0022,\u0022reviews\u0022\u003A\u007B\u0022rating_summary\u0022\u003A0,\u0022review_count\u0022\u003A\u002285\u0022\u007D\u007D",
-                        "attributes": [{"code":"name","key":"Nome do produto","value":"Grill e Sanduicheira Philco Inox 2 em 1 PGR21PI"},{"code":"sku","key":"SKU","value":"359933"},{"code":"product_brand","key":"Marca","value":"Philco"},{"code":"product_warranty","key":"Garantia de f\u00e1brica","value":"12 meses"},{"code":"peso_liquido","key":"Peso l\u00edquido","value":"1.3kg"},{"code":"dimensoes","key":"Dimens\u00f5es do produto (LxAxP)","value":"265 x 100 x 230mm"},{"code":"product_remark","key":"Lembrete","value":"*Toda a mercadoria dever\u00e1 ser conferida no ato da entrega e antes de assinar qualquer confirma\u00e7\u00e3o de recebimento"}]                    }
-                }
-            }
-        }
-    }
-</script>
+</div>
 </div></div><div class="review-and-delivery"><div class="review-section" data-bind="scope: 'reviewsSection'">
     <!-- ko template: getTemplate() --><!-- /ko -->
 </div>
