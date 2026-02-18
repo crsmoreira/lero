@@ -141,29 +141,59 @@
     text-decoration: underline;
 }
 
-/* Estrelas no header de avaliações (4.9 e 5 estrelas) */
+/* Layout avaliações estilo print: nota + estrelas em linha, contador abaixo discreto */
+.review-section.havan-reviews-design .header-review .rating-summary {
+    display: flex;
+    align-items: flex-start;
+}
+.review-section.havan-reviews-design .header-review .rating-summary .rating-summary-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+.review-section.havan-reviews-design .header-review .rating-summary .rating-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.review-section.havan-reviews-design .header-review .rating-summary .qtd-reviews {
+    font-size: 1.2rem;
+    color: var(--content-neutral-medium);
+    font-weight: var(--fw-regular);
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Estrelas no header de avaliações (4.9 e 5 estrelas azuis) */
+.review-section.havan-reviews-design .header-review .rating-summary .rating-result,
 .container-review .header-review .rating-summary .rating-result {
     width: 90px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
+.review-section.havan-reviews-design .header-review .rating-summary .rating-result:before,
 .container-review .header-review .rating-summary .rating-result:before {
     color: var(--border-primary-light);
     content: '\e625' '\e625' '\e625' '\e625' '\e625';
     font-family: hvn-icons;
 }
+.review-section.havan-reviews-design .header-review .rating-summary .rating-result span:before,
 .container-review .header-review .rating-summary .rating-result span:before {
     color: var(--content-primary-medium);
     content: '\e605' '\e605' '\e605' '\e605' '\e605';
     font-family: hvn-icons;
     letter-spacing: 2px;
 }
+/* Estrelas azuis nos cards de avaliação */
+.container-review .content-review .review-card .header-content .rating-summary.review-card-stars .rating-result:before,
 .container-review .content-review .review-card .header-content .rating-summary .rating-result:before {
     color: var(--border-primary-light);
     content: '\e625' '\e625' '\e625' '\e625' '\e625';
     font-family: hvn-icons;
 }
+.container-review .content-review .review-card .header-content .rating-summary.review-card-stars .rating-result span:before,
 .container-review .content-review .review-card .header-content .rating-summary .rating-result span:before {
     color: var(--content-primary-medium);
     font-family: hvn-icons;

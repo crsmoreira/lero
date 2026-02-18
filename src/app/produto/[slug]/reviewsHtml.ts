@@ -373,7 +373,7 @@ export function buildReviewsHtmlHavan(
             return `<div class="review-card">
                 <div class="header-content">
                     <div class="title-card"><span class="name">${escapeHtml(r.userName)}</span> <span class="date">${dateStr}</span></div>
-                    <div class="rating-summary"><div class="rating-result"><span style="width:${starWidth}%"></span></div></div>
+                    <div class="rating-summary review-card-stars"><div class="rating-result"><span style="width:${starWidth}%"></span></div></div>
                 </div>
                 <p class="review-text">${escapeHtml(text)}</p>
             </div>`;
@@ -386,16 +386,20 @@ export function buildReviewsHtmlHavan(
       ? `<a href="#tab-label-reviews-title" class="link view-all-reviews">Ver todas as avaliações</a>`
       : "";
 
-  return `<div class="review-section">
+  return `<div class="review-section havan-reviews-design">
     <div class="container-review">
         <div class="header-review" data-trigger="trigger-reviews">
             <span class="heading" style="display:none;">Avaliações</span>
             <div class="rating-summary">
-                <span class="average-rating">${total > 0 ? avgRounded.toFixed(1) : "—"}</span>
-                <div class="rating-result">
-                    <span style="width:${widthPct}%"></span>
+                <div class="rating-summary-inner">
+                    <div class="rating-details">
+                        <span class="average-rating">${total > 0 ? avgRounded.toFixed(1) : "—"}</span>
+                        <div class="rating-result">
+                            <span style="width:${widthPct}%"></span>
+                        </div>
+                    </div>
+                    <p class="qtd-reviews">(${total}) avaliações</p>
                 </div>
-                <p class="qtd-reviews">(${total}) avaliações</p>
             </div>
             <i class="h-icon h-arrow-right"></i>
         </div>
