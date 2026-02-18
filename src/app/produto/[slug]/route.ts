@@ -116,6 +116,16 @@ export async function GET(
           )
           .join("\n")
       : "";
+  const havanGalleryThumbs =
+    product.template === "havan"
+      ? (images.length ? images : [mainImage || ""])
+          .filter(Boolean)
+          .map(
+            (src) =>
+              `<div class="swiper-slide"><img loading="lazy" src="${src.replace(/"/g, "&quot;")}" alt="Thumbnail" /></div>`
+          )
+          .join("\n")
+      : "";
   // À vista (cash) = sempre valor promocional ou preço
   const priceAvista = product.promotionalPrice ?? product.price;
   // Preço riscado = preço original quando há promoção
@@ -283,7 +293,9 @@ export async function GET(
   const productDescription = product.description ?? product.shortDescription ?? ""; // para schema/SEO
 
   const specsRows = specs.map((s, i) =>
-    product.template === "decolar"
+    product.template === "havan"
+      ? `<tr><td>${escapeHtml(s.key)}</td><td>${escapeHtml(s.value)}</td></tr>`
+      : product.template === "decolar"
       ? `<tr><th>${escapeHtml(s.key)}</th><td>${escapeHtml(s.value)}</td></tr>`
       : product.template === "carrefour"
         ? `<tr class="text-zinc-medium text-sm ${i % 2 === 0 ? "bg-background-gray" : ""}"><td class="p-2 w-1/3">${escapeHtml(s.key)}</td><td class="p-2 w-2/3">${escapeHtml(s.value)}</td></tr>`
@@ -374,6 +386,7 @@ export async function GET(
     ["{{PRODUCT_IMAGE_9}}", images[8] ?? mainImage],
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
     ["{{PRODUCT_GALLERY_SLIDES_HAVAN}}", product.template === "havan" ? havanGallerySlides : ""],
+    ["{{PRODUCT_GALLERY_THUMBS_HAVAN}}", product.template === "havan" ? havanGalleryThumbs : ""],
     ["{{PRODUCT_TITLE}}", (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_BRAND}}", brandName],
     ["{{AMAZON_BRAND_BYLINE}}", product.template === "amazon" && brandName ? `<div class="amz-byline"><a href="javascript:void(0)">Marca: ${escapeHtml(brandName)}</a></div>` : ""],
