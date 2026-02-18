@@ -65,5 +65,7 @@ Para o layout e visual ficarem **iguais** ao do site de referência, envie o seg
   - `public/css/styles-l.min.css`
   - (e antes em `havan_base_styles.css`)
 
-Assim, fontes e imagens referenciadas nesses CSS passam a carregar do site da Havan e a página deve aparecer com o visual do tema.  
-Abra a página **por um servidor HTTP** (por exemplo `npx serve public` na pasta do projeto) e acesse `http://localhost:3000/hav.html` (ou a URL que o serve mostrar). Abrir o arquivo direto com `file://` pode bloquear alguns recursos.
+Assim, fontes e imagens referenciadas nesses CSS passam a carregar do site da Havan e a página deve aparecer com o visual do tema.
+
+- Para os **ícones** (lupa, usuário, carrinho, setas, etc.) aparecerem, a fonte **HvnIconFont** precisa carregar. No `hav.html` foi adicionado um **preload** dessa fonte e o **havan_base_styles.css** (que contém o `@font-face` e as classes `.h-icon`) passa a ser carregado no início dos estilos.
+- Abra a página **por um servidor HTTP** (por exemplo `npx serve public` na pasta do projeto) e acesse `http://localhost:3000/hav.html` (ou a URL que o serve mostrar). Abrir o arquivo direto com `file://` pode bloquear fontes e outros recursos do CDN (CORS).
