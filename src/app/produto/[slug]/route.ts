@@ -92,7 +92,9 @@ export async function GET(
                       ? "produto-template-amazon.html"
                       : product.template === "karsten"
                         ? "karsten.html"
-                        : "produto-template.html";
+                        : product.template === "amparo"
+                          ? "33.html"
+                          : "produto-template.html";
   let html = await loadTemplate(templateFile, baseUrl);
 
   const toAbsoluteUrl = (url: string) => {
@@ -555,6 +557,47 @@ export async function GET(
       // Se não encontrar, adicionar antes do </body>
       html = html.replace('</body>', karstenScript + '\n  <script src="/aplica-template.js"></script>\n</body>');
     }
+  }
+
+  // Amparo: substituir título, meta description e imagem
+  if (product.template === "amparo") {
+    const metaTitle = product.metaTitle || product.name;
+    const metaDescription = product.metaDescription || product.shortDescription || product.name;
+    const ogImage = images.length > 0 ? images[0] : mainImage;
+
+    // Substituir título
+    html = html.replace(/<title>.*?<\/title>/i, `<title>${escapeHtml(metaTitle)}</title>`);
+
+    // Substituir meta description
+    html = html.replace(/<meta\s+name=["']description["']\s+content=["'][^"']*["']\s*\/?>/i, 
+      `<meta name="description" content="${escapeHtml(metaDescription)}">`);
+
+    // Substituir og:title
+    html = html.replace(/<meta\s+property=["']og:title["']\s+content=["'][^"']*["']\s*\/?>/i,
+      `<meta property="og:title" content="${escapeHtml(metaTitle)}">`);
+
+    // Substituir og:description
+    html = html.replace(/<meta\s+property=["']og:description["']\s+content=["'][^"']*["']\s*\/?>/i,
+      `<meta property="og:description" content="${escapeHtml(metaDescription)}">`);
+
+    // Substituir og:image (se existir)
+    if (ogImage) {
+      html = html.replace(/<meta\s+property=["']og:image["']\s+content=["'][^"']*["']\s*\/?>/i,
+        `<meta property="og:image" content="${escapeHtml(ogImage)}">`);
+      // Adicionar og:image se não existir
+      if (!html.includes('property="og:image"')) {
+        html = html.replace(/<meta\s+property=["']og:description["']\s+content=["'][^"']*["']\s*\/?>/i,
+          `$&\n    <meta property="og:image" content="${escapeHtml(ogImage)}">`);
+      }
+    }
+
+    // Substituir twitter:title
+    html = html.replace(/<meta\s+name=["']twitter:title["']\s+content=["'][^"']*["']\s*\/?>/i,
+      `<meta name="twitter:title" content="${escapeHtml(metaTitle)}">`);
+
+    // Substituir twitter:description
+    html = html.replace(/<meta\s+name=["']twitter:description["']\s+content=["'][^"']*["']\s*\/?>/i,
+      `<meta name="twitter:description" content="${escapeHtml(metaDescription)}">`);
   }
 
   return new NextResponse(html, {

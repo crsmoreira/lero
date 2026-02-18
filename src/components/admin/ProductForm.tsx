@@ -472,6 +472,7 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
                       <SelectItem value="magalu-novo">Magalu Novo</SelectItem>
                       <SelectItem value="amazon">Amazon</SelectItem>
                       <SelectItem value="karsten">Karsten</SelectItem>
+                      <SelectItem value="amparo">Amparo</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
