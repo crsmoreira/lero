@@ -1,0 +1,9 @@
+/* Fonte de ícones Havan servida localmente para evitar bloqueio CORS ao abrir por file:// ou outro domínio */
+@font-face {
+    font-family: 'hvn-icons';
+    src: url('../fonts/HvnIconFont/HvnIconFont.woff2') format('woff2'),
+         url('../fonts/HvnIconFont/HvnIconFont.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
