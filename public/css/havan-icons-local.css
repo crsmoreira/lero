@@ -8,13 +8,24 @@
     font-display: block;
 }
 
-/* Sobre o produto: conteúdo estático Detalhes e Ficha técnica */
+/* Sobre o produto: Detalhes e Ficha técnica – alinhamento e layout */
 #accordion-product-details .product-accordion-content,
 #accordion-technical-sheet .product-accordion-content {
-    padding: 16px 0;
-    font-size: var(--body-md);
+    padding: 16px;
+    font-size: 1.4rem;
     color: #334156;
     line-height: 1.5;
+    box-sizing: border-box;
+    width: 100%;
+    overflow-wrap: break-word;
+}
+#accordion-product-details .product-accordion-content {
+    padding-top: 0;
+    padding-bottom: 20px;
+}
+#accordion-technical-sheet .product-accordion-content {
+    padding-top: 0;
+    padding-bottom: 20px;
 }
 #accordion-product-details .product-accordion-content p,
 #accordion-technical-sheet .product-accordion-content p {
@@ -24,25 +35,47 @@
 #accordion-technical-sheet .product-accordion-content p:last-child {
     margin-bottom: 0;
 }
+/* Conteúdo rico (editor): alinhar e limitar largura */
+#accordion-product-details .product-accordion-content > *,
+#accordion-product-details .product-accordion-content .prose,
+#accordion-product-details .product-accordion-content [class*="tiptap"] {
+    max-width: 100%;
+    text-align: left;
+}
+/* Ficha técnica: tabela 100% alinhada */
 .product-accordion-content .table-technical-sheet {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
-    font-size: calc(var(--body-md) - 1px);
+    font-size: 1.3rem;
+    margin: 0;
+}
+.product-accordion-content .table-technical-sheet tbody {
+    display: table;
+    width: 100%;
 }
 .product-accordion-content .table-technical-sheet tr:nth-child(odd) {
-    background-color: var(--nav-btn-bg);
+    background-color: #f0f4f8;
 }
 .product-accordion-content .table-technical-sheet tr:nth-child(even) {
-    background-color: var(--content-neutral-lightest);
+    background-color: #f8fafc;
 }
 .product-accordion-content .table-technical-sheet td {
-    padding: 10px;
+    padding: 10px 12px;
+    vertical-align: middle;
+    border: none;
+}
+.product-accordion-content .table-technical-sheet td:first-child {
+    width: 42%;
+    max-width: 220px;
+    font-weight: 500;
+    color: #334156;
 }
 .product-accordion-content .table-technical-sheet td:last-child {
     text-align: right;
-    color: var(--content-neutral-darkest);
-    font-size: var(--body-sm);
-    font-weight: var(--fw-regular);
+    color: #1e293b;
+    font-size: 1.3rem;
+    font-weight: 400;
 }
 
 /* Botão Adicionar ao carrinho: igual print 1 (azul sólido, texto branco, cantos arredondados) */
