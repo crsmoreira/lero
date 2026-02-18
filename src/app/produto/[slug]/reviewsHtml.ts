@@ -342,3 +342,67 @@ export function buildReviewsHtmlMagalu(
 
   return statsContainerHtml + listingContainerHtml + reviewImageLightboxHtml;
 }
+
+/** Formata data no padrão DD/MM/YYYY (Havan) */
+function formatDateHavan(date: Date): string {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+/** Gera HTML de avaliações no estilo Havan (container-review, review-card) – editável pelo admin */
+export function buildReviewsHtmlHavan(
+  reviews: ReviewInput[],
+  escapeHtml: (s: string) => string
+): string {
+  const total = reviews.length;
+  const avg = total > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / total : 0;
+  const avgRounded = Math.round(avg * 10) / 10;
+  const widthPct = total > 0 ? Math.round((avg / 5) * 100) : 0;
+
+  const cardsHtml =
+    total > 0
+      ? reviews
+          .slice(0, 10)
+          .map((r) => {
+            const starWidth = Math.round((r.rating / 5) * 100);
+            const dateStr = formatDateHavan(new Date(r.createdAt));
+            const text = (r.comment ?? r.title ?? "").trim() || "—";
+            return `<div class="review-card">
+                <div class="header-content">
+                    <div class="title-card"><span class="name">${escapeHtml(r.userName)}</span> <span class="date">${dateStr}</span></div>
+                    <div class="rating-summary"><div class="rating-result"><span style="width:${starWidth}%"></span></div></div>
+                </div>
+                <p class="review-text">${escapeHtml(text)}</p>
+            </div>`;
+          })
+          .join("\n            ")
+      : "";
+
+  const viewAllLink =
+    total > 2
+      ? `<a href="#tab-label-reviews-title" class="link view-all-reviews">Ver todas as avaliações</a>`
+      : "";
+
+  return `<div class="review-section">
+    <div class="container-review">
+        <div class="header-review" data-trigger="trigger-reviews">
+            <span class="heading" style="display:none;">Avaliações</span>
+            <div class="rating-summary">
+                <span class="average-rating">${total > 0 ? avgRounded.toFixed(1) : "—"}</span>
+                <div class="rating-result">
+                    <span style="width:${widthPct}%"></span>
+                </div>
+                <p class="qtd-reviews">(${total}) avaliações</p>
+            </div>
+            <i class="h-icon h-arrow-right"></i>
+        </div>
+        <div class="content-review">
+            ${cardsHtml}
+            ${viewAllLink}
+        </div>
+    </div>
+</div>`;
+}

@@ -3,7 +3,7 @@ import {
   resolveProductByDomainAndSlug,
   resolveProductBySlugOnly,
 } from "@/lib/domain";
-import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMagalu } from "./reviewsHtml";
+import { buildReviewsHtml, buildReviewsHtmlDrogasil, buildReviewsHtmlMagalu, buildReviewsHtmlHavan } from "./reviewsHtml";
 import { loadTemplate } from "@/lib/loadTemplate";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -373,6 +373,8 @@ export async function GET(
       : product.template === "magalu-novo"
           ? buildReviewsHtmlMagalu(reviewInputs, escapeHtml)
           : buildReviewsHtml(reviewInputs, escapeHtml);
+  const havanReviewsHtml =
+    product.template === "havan" ? buildReviewsHtmlHavan(reviewInputs, escapeHtml) : "";
 
   const replacements: [string | RegExp, string][] = [
     ["{{PRODUCT_IMAGE_1}}", mainImage],
@@ -462,6 +464,7 @@ export async function GET(
     ["{{CARREFOUR_GALLERY_THUMBNAILS}}", carrefourGalleryThumbnails],
     ["{{CARREFOUR_GALLERY_MAIN}}", carrefourGalleryMain],
     ["{{PRODUCT_REVIEWS}}", reviewsHtml],
+    ["{{PRODUCT_REVIEWS_HAVAN}}", havanReviewsHtml],
     ["{{PRODUCT_FAQ}}", (() => {
       if (product.template !== "magalu-novo") return "";
       const faqItems: { question: string; answer: string }[] = [
