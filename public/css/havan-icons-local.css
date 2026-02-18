@@ -13,7 +13,7 @@
 #accordion-technical-sheet .product-accordion-content {
     padding: 16px 0;
     font-size: var(--body-md);
-    color: var(--content-primary-dark);
+    color: #334156;
     line-height: 1.5;
 }
 #accordion-product-details .product-accordion-content p,
@@ -43,4 +43,102 @@
     color: var(--content-neutral-darkest);
     font-size: var(--body-sm);
     font-weight: var(--fw-regular);
+}
+
+/* Botão Comprar agora: fundo branco, texto e borda azul (igual print 1) */
+.havan-buynow-button .action.secondary.redirect-to-cart {
+    background-color: #fff;
+    color: var(--content-primary-dark);
+    border: 1.5px solid var(--border-primary-dark);
+    width: 100%;
+}
+.havan-buynow-button .action.secondary.redirect-to-cart:hover {
+    background-color: var(--bg-primary-lightest);
+    color: var(--content-primary-medium);
+    border-color: var(--border-primary-medium);
+}
+
+/* Forma de entrega: CEP + Calcular na mesma linha */
+.shipping-quotation-wrapper #shipping-quotation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+.shipping-quotation-wrapper #shipping-quotation .field.postcode-input {
+    flex: 1 1 auto;
+    min-width: 120px;
+    margin: 0;
+}
+.shipping-quotation-wrapper #shipping-quotation .field .control input {
+    border: 1.5px solid var(--border-primary-dark);
+    border-radius: var(--radius-group);
+    font-size: var(--body-lg);
+    font-weight: var(--fw-bold);
+    height: 56px;
+    padding: 0 16px;
+    width: 100%;
+}
+.shipping-quotation-wrapper #shipping-quotation .actions {
+    margin: 0;
+}
+.shipping-quotation-wrapper #shipping-quotation .actions .action.primary {
+    height: 56px;
+    padding: 0 24px;
+}
+.shipping-quotation-wrapper #shipping-quotation .cep-search-product[title="Não sei meu CEP"] {
+    color: var(--content-primary-dark);
+    cursor: pointer;
+    font-size: var(--body-sm);
+    text-decoration: underline;
+}
+
+/* Avaliações: data e link */
+.container-review .content-review .review-card .header-content .title-card .date {
+    color: var(--content-neutral-medium);
+    font-size: var(--body-sm);
+    font-weight: var(--fw-regular);
+    margin-left: 4px;
+}
+.container-review .content-review .review-card .review-text {
+    color: var(--content-neutral-darkest);
+    font-size: var(--body-md);
+    margin: 8px 0 0;
+}
+.container-review .content-review .link.view-all-reviews {
+    color: var(--content-primary-dark);
+    font-size: var(--body-md);
+    font-weight: var(--fw-semibold);
+    margin-top: 16px;
+    display: inline-block;
+    text-decoration: underline;
+}
+
+/* Estrelas no header de avaliações (4.9 e 5 estrelas) */
+.container-review .header-review .rating-summary .rating-result {
+    width: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.container-review .header-review .rating-summary .rating-result:before {
+    color: var(--border-primary-light);
+    content: '\e625' '\e625' '\e625' '\e625' '\e625';
+    font-family: hvn-icons;
+}
+.container-review .header-review .rating-summary .rating-result span:before {
+    color: var(--content-primary-medium);
+    content: '\e605' '\e605' '\e605' '\e605' '\e605';
+    font-family: hvn-icons;
+    letter-spacing: 2px;
+}
+.container-review .content-review .review-card .header-content .rating-summary .rating-result:before {
+    color: var(--border-primary-light);
+    content: '\e625' '\e625' '\e625' '\e625' '\e625';
+    font-family: hvn-icons;
+}
+.container-review .content-review .review-card .header-content .rating-summary .rating-result span:before {
+    color: var(--content-primary-medium);
+    font-family: hvn-icons;
 }
