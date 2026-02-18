@@ -144,12 +144,6 @@ if (compreJuntoStart >= 0 && compreJuntoScript > compreJuntoStart) {
   }
 }
 
-// 11b. Banner Volta às Aulas: clicar não faz nada (URL absoluta ou relativa)
-html = html.replace(
-  /href="(https:\/\/www\.kalunga\.com\.br\/hotsite\/volta-as-aulas|\/hotsite\/volta-as-aulas)"/,
-  'href="javascript:void(0)" onclick="event.preventDefault();return false"'
-);
-
 // 12. Bloqueio de cliques em header/footer
 const clickBlocker = `<script>(function(){function blockNav(e){var t=e.target;if(t.closest("[data-checkout]"))return;if(t.closest("header")||t.closest("footer")||t.closest("nav")||t.closest(".componentheader")||t.closest(".page-header")||t.closest("[class*='megamenu']")||t.closest("[class*='footer']")){e.preventDefault();e.stopPropagation();}}document.addEventListener("click",blockNav,true);})();</script>`;
 if (!html.includes("blockNav")) {
