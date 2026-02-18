@@ -104,6 +104,18 @@ export async function GET(
   };
   const images = (product.images ?? []).map((img) => toAbsoluteUrl(img.url));
   const mainImage = images[0] ?? "";
+  // Galeria Havan: HTML dos swiper-slides a partir das imagens do produto
+  const productTitleEscaped = escapeHtml(product.name);
+  const havanGallerySlides =
+    product.template === "havan"
+      ? (images.length ? images : [mainImage || ""])
+          .filter(Boolean)
+          .map(
+            (src) =>
+              `<div class="swiper-slide" data-type="image"><div class="swiper-zoom-container"><img loading="lazy" src="${src.replace(/"/g, "&quot;")}" alt="${productTitleEscaped}" /></div></div>`
+          )
+          .join("\n")
+      : "";
   // À vista (cash) = sempre valor promocional ou preço
   const priceAvista = product.promotionalPrice ?? product.price;
   // Preço riscado = preço original quando há promoção
@@ -361,6 +373,7 @@ export async function GET(
     ["{{PRODUCT_IMAGE_8}}", images[7] ?? mainImage],
     ["{{PRODUCT_IMAGE_9}}", images[8] ?? mainImage],
     ["{{PRODUCT_IMAGE_10}}", images[9] ?? mainImage],
+    ["{{PRODUCT_GALLERY_SLIDES_HAVAN}}", product.template === "havan" ? havanGallerySlides : ""],
     ["{{PRODUCT_TITLE}}", (product.template === "kalonga" ? product.name.replace(/, Luxcel - PT 1 UN/g, "").replace(/ - Escolar/g, "").trim() : product.name)],
     ["{{PRODUCT_BRAND}}", brandName],
     ["{{AMAZON_BRAND_BYLINE}}", product.template === "amazon" && brandName ? `<div class="amz-byline"><a href="javascript:void(0)">Marca: ${escapeHtml(brandName)}</a></div>` : ""],

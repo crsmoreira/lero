@@ -7,40 +7,84 @@
 <meta name="description" content="{{META_DESCRIPTION}}"/>
 <link rel="canonical" href="{{PRODUCT_URL}}"/>
 <link rel="icon" href="https://www.havan.com.br/media/favicon/stores/1/favicon_havan.png" type="image/x-icon"/>
-<link rel="stylesheet" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/css/styles-m.min.css"/>
-<link rel="stylesheet" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/mage/gallery/gallery.min.css"/>
-<link rel="stylesheet" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/Havan_Gallery/css/swiper-bundle.min.css"/>
-<link rel="stylesheet" media="screen and (min-width: 768px)" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/css/styles-l.min.css"/>
+<link rel="preload" href="/fonts/HvnIconFont/HvnIconFont.woff2" as="font" type="font/woff2" crossorigin="">
+<link rel="stylesheet" type="text/css" media="all" href="/css/havan_base_styles.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/css/havan-icons-local.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 <style>
-.product-havan-wrapper{max-width:1200px;margin:0 auto;padding:16px}.product-havan-main{display:grid;grid-template-columns:1fr 1fr;gap:24px}@media(max-width:768px){.product-havan-main{grid-template-columns:1fr}}.product-havan-gallery{position:relative;background:#f5f5f5;border-radius:8px;aspect-ratio:1}.product-havan-gallery img{width:100%;height:100%;object-fit:contain}.product-havan-info h1{font-size:1.5rem;margin:0 0 12px;color:#222}.product-havan-price .price{font-size:1.75rem;font-weight:700;color:#0c3bdd}.product-havan-price .old-price{text-decoration:line-through;color:#888;font-size:1rem}.product-havan-btn{display:inline-block;background:#0c3bdd;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:16px;border:none;cursor:pointer;font-size:1rem}.product-havan-btn:hover{background:#0a2fb8;color:#fff}.havan-header{background:#0c3bdd;padding:12px 16px;color:#fff}.havan-header a{color:#fff;text-decoration:none}.havan-logo{font-weight:700;font-size:1.25rem}
+.product-havan-wrapper { max-width: 1200px; margin: 0 auto; padding: 16px; }
+.product-havan-main { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+@media (max-width: 768px) { .product-havan-main { grid-template-columns: 1fr; } }
+.product-havan-gallery { position: relative; background: #f5f5f5; border-radius: 8px; overflow: hidden; }
+.product-havan-gallery .swiper { aspect-ratio: 1; }
+.product-havan-gallery .swiper-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.product-info-main .page-title { font-size: 2rem; margin: 0 0 12px; color: #222; }
+.product-add-form { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.product-add-form .havan-btn-cart, .product-add-form .havan-btn-buy { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 14px 17px; font-size: 1.8rem; font-weight: 600; border-radius: 8px; text-decoration: none; cursor: pointer; border: 1px solid; width: 100%; }
+.product-add-form .havan-btn-cart { background: var(--bg-primary-dark,#0c3bdd); color: #fff; border-color: var(--border-primary-dark,#0c3bdd); }
+.product-add-form .havan-btn-buy { background: #fff; color: var(--content-primary-dark,#0c3bdd); border-color: var(--border-primary-dark,#0c3bdd); }
+.product-add-form .havan-btn-buy:hover { background: #f5f5f5; }
 </style>
 </head>
-<body>
+<body class="catalog-product-view">
 <header class="havan-header">
-<div class="product-havan-wrapper" style="padding:0">
-<a href="{{PRODUCT_BREADCRUMB_BACK_URL}}" class="havan-logo">← {{PRODUCT_BREADCRUMB_BACK_LABEL}}</a>
-</div>
+  <div class="product-havan-wrapper" style="padding:0">
+    <a href="{{PRODUCT_BREADCRUMB_BACK_URL}}" class="havan-logo">← {{PRODUCT_BREADCRUMB_BACK_LABEL}}</a>
+  </div>
 </header>
 <main class="product-havan-wrapper">
-<div class="product-havan-main">
-<div class="product-havan-gallery">
-<img src="{{PRODUCT_IMAGE_1}}" alt="{{PRODUCT_TITLE}}" loading="eager"/>
-</div>
-<div class="product-havan-info">
-<h1 class="page-title">{{PRODUCT_TITLE}}</h1>
-<div class="product attribute sku"><strong>Código:</strong> {{PRODUCT_SKU}}</div>
-<div class="product-havan-price">
-<div class="price-box">
-<span class="price">{{PRODUCT_PRICE}}</span>
-<span class="old-price">{{PRODUCT_OLD_PRICE}}</span>
-</div>
-<p class="installment">{{PRODUCT_INSTALLMENT_INFO}}</p>
-</div>
-<p class="product-description">{{PRODUCT_SHORT_DESCRIPTION}}</p>
-<a href="{{CHECKOUT_URL}}" class="product-havan-btn">Comprar</a>
-</div>
-</div>
-<div class="product-specs" style="margin-top:24px;padding-top:24px;border-top:1px solid #eee"><h3>Especificações</h3>{{PRODUCT_SPECIFICATIONS}}</div>
+  <div class="product-havan-main">
+    <div class="product-havan-gallery">
+      <div class="swiper havan-swiper-gallery">
+        <div class="swiper-wrapper">
+{{PRODUCT_GALLERY_SLIDES_HAVAN}}
+        </div>
+        <button type="button" class="swiper-button-prev action primary"></button>
+        <button type="button" class="swiper-button-next action primary"></button>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+    <div class="product-info-main">
+      <h1 class="page-title"><span class="base">{{PRODUCT_TITLE}}</span></h1>
+      <div class="product attribute sku"><strong class="type">Código:</strong> <span class="value">{{PRODUCT_SKU}}</span></div>
+      <div class="product-info-price">
+        {{PRICE_DISCOUNT_HAVAN}}
+        <div class="price-box price-final_price" data-role="priceBox">
+          <span class="normal-price">
+            <span class="price-wrapper"><span class="price">{{PRODUCT_PRICE}}</span></span>
+          </span>
+          {{PRODUCT_OLD_PRICE_HAVAN}}
+        </div>
+        <div class="container-installments">
+          <div class="installment-price product-list-price">
+            <span>{{PRODUCT_INSTALLMENT_INFO}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="product-add-form">
+        <form id="product_addtocart_form" action="{{CHECKOUT_URL}}" method="get" target="_blank" rel="noopener">
+          <button type="submit" class="action primary tocart havan-btn-cart">Adicionar ao carrinho</button>
+        </form>
+        <a href="{{CHECKOUT_URL}}" class="action primary havan-btn-buy" target="_blank" rel="noopener">Comprar agora</a>
+      </div>
+      <div class="product-description-block">
+        <p class="product-description">{{PRODUCT_SHORT_DESCRIPTION}}</p>
+      </div>
+      <div class="product-specs product-specs-havan" style="margin-top:24px;padding-top:24px;border-top:1px solid #eee">
+        <h3>Ficha técnica</h3>
+        {{PRODUCT_SPECIFICATIONS}}
+      </div>
+    </div>
+  </div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+(function(){
+  var swiperEl = document.querySelector('.havan-swiper-gallery');
+  if (swiperEl && typeof Swiper !== 'undefined') {
+    new Swiper(swiperEl, { loop: true, pagination: { el: '.swiper-pagination' }, navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' } });
+  }
+})();
+</script>
 </body>
 </html>

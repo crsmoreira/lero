@@ -249,6 +249,21 @@ export function ProductForm({ product, uploadEnabled = false }: ProductFormProps
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      {watch("template") === "havan" && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-800 p-6 space-y-2">
+          <h3 className="font-semibold text-lg">Template Havan</h3>
+          <p className="text-sm text-muted-foreground">
+            Os campos abaixo preenchem a página do produto no estilo Havan: <strong>Nome</strong> (título), <strong>Preço</strong> e <strong>Preço promocional</strong>, <strong>Fotos</strong>, <strong>Link de Checkout</strong>, <strong>Descrição</strong> e <strong>Especificações</strong>. Preencha e salve para ver na página pública.
+          </p>
+          {product?.slug && (
+            <p className="text-sm">
+              <a href={`/produto/${product.slug}`} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
+                Ver página do produto →
+              </a>
+            </p>
+          )}
+        </div>
+      )}
       {watch("template") === "vakinha" && (
         <div className="rounded-lg border bg-muted/30 p-6 space-y-4">
           <h3 className="font-semibold text-lg">Vaquinha</h3>
