@@ -63,9 +63,7 @@
     justify-content: center;
     gap: 8px;
 }
-.catalog-product-view .product-info-main .product-add-form .actions .action.primary.tocart .h-icon,
 .catalog-product-view .product-info-main .product-add-form .actions .action.primary.tocart .text,
-#product-addtocart-button .h-icon,
 #product-addtocart-button .text {
     color: #fff;
 }
@@ -123,43 +121,61 @@
     color: var(--content-neutral-dark);
 }
 
-/* Forma de entrega: CEP + Calcular na mesma linha (input e botão unidos como print 2) */
+/* Forma de entrega: CEP + Calcular alinhados (mesma altura, input com sublinhado azul) */
 .shipping-quotation-wrapper #shipping-quotation {
     display: flex;
     flex-wrap: wrap;
-    align-items: stretch;
+    align-items: center;
     gap: 0;
     margin-bottom: 12px;
+    min-height: 56px;
 }
 .shipping-quotation-wrapper #shipping-quotation .field.postcode-input {
     flex: 1 1 auto;
     min-width: 100px;
     margin: 0;
+    align-self: stretch;
+    display: flex;
+    align-items: stretch;
+}
+.shipping-quotation-wrapper #shipping-quotation .field .control {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
 }
 .shipping-quotation-wrapper #shipping-quotation .field .control input {
-    border: 1.5px solid var(--border-primary-dark);
-    border-right: none;
-    border-radius: var(--radius-group) 0 0 var(--radius-group);
+    border: none;
+    border-bottom: 2px solid var(--border-primary-dark);
+    border-radius: 0;
     font-size: var(--body-lg);
     font-weight: var(--fw-bold);
     height: 56px;
-    padding: 0 16px;
+    padding: 0 16px 0 0;
     width: 100%;
     box-sizing: border-box;
+    background: transparent;
+}
+.shipping-quotation-wrapper #shipping-quotation .field .control input::placeholder {
+    color: var(--content-neutral-medium);
 }
 .shipping-quotation-wrapper #shipping-quotation .actions {
     margin: 0;
     flex: 0 0 auto;
+    align-self: stretch;
+    display: flex;
 }
 .shipping-quotation-wrapper #shipping-quotation .actions .action.primary {
     height: 56px;
+    min-height: 56px;
     padding: 0 24px;
-    border-radius: 0 var(--radius-group) var(--radius-group) 0;
-    border: 1.5px solid var(--border-primary-dark);
-    border-left: none;
-    background: transparent;
-    color: var(--content-primary-dark);
+    border-radius: var(--radius-group);
+    border: none;
+    background: var(--bg-primary-dark);
+    color: #fff;
     font-weight: var(--fw-bold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .shipping-quotation-wrapper #shipping-quotation .cep-search-product[title="Não sei meu CEP"] {
     color: var(--content-primary-dark);
@@ -167,7 +183,7 @@
     font-size: var(--body-sm);
     text-decoration: underline;
     display: inline-block;
-    margin-top: 4px;
+    margin-top: 8px;
 }
 
 /* Avaliações: data e link */
