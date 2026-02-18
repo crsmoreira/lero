@@ -1437,13 +1437,15 @@ require([
         <h2 class="delivery-title">Forma de entrega</h2>
         <span class="delivery-description">Calcule frete, prazo de entrega e retirada</span>
         <form id="shipping-quotation" class="form form-shipping-quotation">
-            <div class="field postcode-input">
-                <div class="control">
-                    <input type="text" id="estimate-postcode" name="estimate_postcode" placeholder="CEP" value="" class="input-text" maxlength="9" />
+            <div class="shipping-quotation-input">
+                <div class="field postcode-input">
+                    <div class="control">
+                        <input type="text" id="estimate-postcode" name="estimate_postcode" placeholder="CEP" value="" class="input-text" maxlength="9" />
+                    </div>
                 </div>
-            </div>
-            <div class="actions">
-                <button type="button" class="action primary cep-search-product" title="Calcular">Calcular</button>
+                <div class="actions">
+                    <button type="button" class="action primary cep-search-product" title="Calcular"><span>Calcular</span></button>
+                </div>
             </div>
             <a href="#" class="cep-search-product" title="Não sei meu CEP">Não sei meu CEP</a>
         </form>
