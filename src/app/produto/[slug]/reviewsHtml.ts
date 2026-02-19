@@ -370,12 +370,24 @@ export function buildReviewsHtmlHavan(
             const starWidth = Math.round((r.rating / 5) * 100);
             const dateStr = formatDateHavan(new Date(r.createdAt));
             const text = (r.comment ?? r.title ?? "").trim() || "—";
+            const imgs = r.images ?? [];
+            const imagesBlock =
+              imgs.length > 0
+                ? `<div class="images"><div>${imgs
+                    .slice(0, 5)
+                    .map(
+                      (url) =>
+                        `<img src="${escapeHtml(url)}" alt="Foto da avaliação" loading="lazy" />`
+                    )
+                    .join("")}</div></div>`
+                : "";
             return `<div class="review-card">
                 <div class="header-content">
                     <div class="title-card"><span class="name">${escapeHtml(r.userName)}</span> <span class="date">${dateStr}</span></div>
                     <div class="rating-summary review-card-stars"><div class="rating-result"><span style="width:${starWidth}%"></span></div></div>
                 </div>
                 <p class="review-text">${escapeHtml(text)}</p>
+                ${imagesBlock}
             </div>`;
           })
           .join("\n            ")
@@ -401,7 +413,6 @@ export function buildReviewsHtmlHavan(
                     <p class="qtd-reviews">(${total}) avaliações</p>
                 </div>
             </div>
-            <i class="h-icon h-arrow-right"></i>
         </div>
         <div class="content-review">
             ${cardsHtml}

@@ -141,6 +141,22 @@
     text-decoration: underline;
 }
 
+/* Preview de imagens nas avaliações (Havan) */
+.container-review .content-review .review-card .images {
+    margin: 12px 0 0;
+}
+.container-review .content-review .review-card .images div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.container-review .content-review .review-card .images div img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
 /* Layout avaliações estilo print: nota + estrelas em linha, contador abaixo discreto */
 .review-section.havan-reviews-design .header-review .rating-summary {
     display: flex;
