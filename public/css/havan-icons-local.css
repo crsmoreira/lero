@@ -1,3 +1,14 @@
+/* Forma de entrega: linha azul do campo CEP completa até o botão Calcular */
+.shipping-quotation-wrapper #shipping-quotation .postcode-input .control {
+    flex: 1 1 0%;
+    min-width: 0;
+}
+.shipping-quotation-wrapper #shipping-quotation .postcode-input input {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 0%;
+}
+
 /* Galeria produto Havan: uma única imagem – esconder setas e paginação */
 #havan-gallery.havan-gallery-single .main-swiper .swiper-button-prev,
 #havan-gallery.havan-gallery-single .main-swiper .swiper-button-next,
