@@ -111,8 +111,8 @@ export async function GET(
       ? (images.length ? images : [mainImage || ""])
           .filter(Boolean)
           .map(
-            (src) =>
-              `<div class="swiper-slide" data-type="image"><div class="swiper-zoom-container"><img loading="lazy" src="${src.replace(/"/g, "&quot;")}" alt="${productTitleEscaped}" /></div></div>`
+            (src, i) =>
+              `<div class="swiper-slide" data-type="image"><div class="swiper-zoom-container"><img loading="${i === 0 ? "eager" : "lazy"}" src="${src.replace(/"/g, "&quot;")}" alt="${productTitleEscaped}" /></div></div>`
           )
           .join("\n")
       : "";

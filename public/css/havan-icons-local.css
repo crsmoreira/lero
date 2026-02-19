@@ -1,3 +1,13 @@
+/* Galeria produto Havan: uma única imagem – esconder setas e paginação */
+#havan-gallery.havan-gallery-single .main-swiper .swiper-button-prev,
+#havan-gallery.havan-gallery-single .main-swiper .swiper-button-next,
+#havan-gallery.havan-gallery-single .main-swiper .swiper-pagination {
+    display: none !important;
+}
+#havan-gallery.havan-gallery-single .thumbs-swiper {
+    display: none !important;
+}
+
 /* Fonte de ícones Havan servida localmente para evitar bloqueio CORS ao abrir por file:// ou outro domínio */
 @font-face {
     font-family: 'hvn-icons';

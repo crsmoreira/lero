@@ -88,7 +88,7 @@
 <link rel="preload" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/mage/requirejs/static.min.js" as="script" />
 <link rel="preload" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/mage/requirejs/mixins.min.js" as="script" />
 <link rel="preload" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/requirejs-config.min.js" as="script" />
-<link rel="preload" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/Havan_Gallery/js/lib/swiper-bundle.min.js" as="script" />
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" as="script" />
 <link rel="preload" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/Smile_Map/js/polyfill/ie11/promise.min.js" as="script" />
 <link rel="preload" href="https://prime.altubots.com/tag/havan/be5dcdeafde942aa8ba1bc2b/tag.js" as="script" />
 <link rel="preload" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/mage/calendar.min.css" as="style" />
@@ -110,7 +110,7 @@
 <link  rel="stylesheet" type="text/css"  media="all" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/Smile_Map/leaflet/plugins/markercluster/MarkerCluster.Default.min.css" />
 <link  rel="stylesheet" type="text/css"  media="all" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/WeltPixel_OwlCarouselSlider/css/owl.carousel.min.css" />
 <link  rel="stylesheet" type="text/css"  media="all" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/mage/gallery/gallery.min.css" />
-<link  rel="stylesheet" type="text/css"  media="all" href="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/Havan_Gallery/css/swiper-bundle.min.css" />
+<link rel="stylesheet" type="text/css" media="all" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <link  rel="stylesheet" type="text/css"  media="screen and (min-width: 768px)" href="/css/styles-l.min.css" />
 <link rel="stylesheet" type="text/css" media="print" href="/css/print.min.css" />
 
@@ -167,7 +167,7 @@
 <script type="text/javascript" src="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/mage/requirejs/static.min.js"></script>
 <script type="text/javascript" src="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/mage/requirejs/mixins.min.js"></script>
 <script type="text/javascript" src="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/requirejs-config.min.js"></script>
-<script type="text/javascript" src="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/Havan_Gallery/js/lib/swiper-bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <!--[if IE 11]>
 <script  type="text/javascript"  src="https://www.havan.com.br/static/version1770314828/frontend/Havan/themeDefault/pt_BR/Smile_Map/js/polyfill/ie11/promise.min.js"></script>
 <![endif]-->
@@ -1031,6 +1031,59 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <div class="swiper-pagination"></div>
     </div>
 </div>
+<script>
+(function() {
+  var container = document.getElementById('havan-gallery');
+  if (!container || typeof Swiper === 'undefined') return;
+  var mainEl = container.querySelector('.main-swiper');
+  var thumbsEl = container.querySelector('.thumbs-swiper');
+  var slides = mainEl.querySelectorAll('.swiper-slide');
+  if (!mainEl || !thumbsEl || !slides.length) return;
+  if (slides.length === 1) container.classList.add('havan-gallery-single');
+  var thumbsSwiper = new Swiper(thumbsEl, {
+    spaceBetween: 12,
+    slidesPerView: 'auto',
+    watchSlidesProgress: true,
+    direction: 'vertical',
+    freeMode: false,
+    breakpoints: { 320: { direction: 'vertical' }, 768: { direction: 'vertical' } }
+  });
+  var mainSwiper = new Swiper(mainEl, {
+    spaceBetween: 0,
+    grabCursor: true,
+    touchRatio: 1,
+    keyboard: { enabled: true },
+    thumbs: { swiper: thumbsSwiper },
+    pagination: { el: mainEl.querySelector('.swiper-pagination'), clickable: true },
+    navigation: {
+      nextEl: mainEl.querySelector('.swiper-button-next'),
+      prevEl: mainEl.querySelector('.swiper-button-prev')
+    }
+  });
+  thumbsSwiper.on('click', function(sw) {
+    if (typeof sw.clickedIndex !== 'undefined') mainSwiper.slideTo(sw.clickedIndex);
+  });
+  var modal = document.getElementById('havan-gallery-modal');
+  var modalSwiperEl = modal && modal.querySelector('.modal-swiper');
+  if (modal && modalSwiperEl && modal.querySelector('.swiper-slide')) {
+    var modalSwiper = new Swiper(modalSwiperEl, {
+      spaceBetween: 0,
+      initialSlide: 0,
+      pagination: { el: modalSwiperEl.querySelector('.swiper-pagination'), type: 'fraction' },
+      navigation: {
+        nextEl: modalSwiperEl.querySelector('.swiper-button-next'),
+        prevEl: modalSwiperEl.querySelector('.swiper-button-prev')
+      }
+    });
+    var closeBtn = modal.querySelector('.hav-swiper-close');
+    function openModal(idx) { modal.style.display = 'flex'; modalSwiper.slideTo(idx || 0); }
+    function closeModal() { modal.style.display = 'none'; }
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
+    mainEl.addEventListener('click', function() { openModal(mainSwiper.activeIndex); });
+  }
+})();
+</script>
 </div><div class="product-info-main"><div class="product-info-price">
 {{PRICE_DISCOUNT_HAVAN}}
 
